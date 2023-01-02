@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from flask import Flask,render_template,request,jsonify
 from flask_cors import CORS
 from threading import Thread
@@ -378,6 +379,7 @@ def index():
     global __mp3_i_max__
     global __mp3Pc_i__
     global __mp3Pi_i__
+    global __radioPlayingPiNo__ 
     if request.method == 'GET':
         __mp3Pc_i__ = (__mp3Pc_i__+  1 ) % __mp3_i_max__
         print(__mp3Pc_i__)
@@ -389,7 +391,8 @@ def index():
         return jsonify({
         "mp3_list" : __mp3_list__,
         "mp3Pi_i" : __mp3Pi_i__,
-        "playingPi" : __playingPi__
+        "playingPi" : __playingPi__,
+        "radioPlayingPiNo" : __radioPlayingPiNo__
          })
     
 @app.route('/playPrePi', methods=['POST'])
@@ -472,14 +475,54 @@ def playRadioPi():
             __radioPlayingPiNo__ = radioNo
         else:
             __q__.terminate()   
-            url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+            match radioNo:
+                case 1:
+                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+                case 2:
+                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+                case 3:
+                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+                case 4:
+                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+                case 5:
+                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+                case 6:
+                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+                case 7:
+                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+                case 8:
+                   url ="https://eclassicalradiow-hichannel.cdn.hinet.net/live/RA000018/media_641018.ts"
+                case 9:
+                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+                case _:
+                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
             __q__ = play_file(url, __qpty_master__)
             time.sleep(0.1)
             qmonitor_thread = Thread(target=qprocess_monitor,args=(__q__,)) 
             qmonitor_thread.start()
             __radioPlayingPiNo__ = radioNo
     else:
-        url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+        match radioNo:
+            case 1:
+               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+            case 2:
+               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+            case 3:
+               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+            case 4:
+               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+            case 5:
+               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+            case 6:
+               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+            case 7:
+               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+            case 8:
+               url ="https://icrt.leanstream.co/ICRTFM-MP3?args=web"
+            case 9:
+               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+            case _:
+               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
         __q__ = play_file(url, __qpty_master__)
         time.sleep(0.1)
         qmonitor_thread = Thread(target=qprocess_monitor,args=(__q__,)) 

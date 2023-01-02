@@ -30,8 +30,8 @@ const vm = createApp({
                MSCurl:"https://npr-ice.streamguys1.com/live.mp3",
                BLBurl:"https://npr-ice.streamguys1.com/live.mp3",
                TPEurl:"https://npr-ice.streamguys1.com/live.mp3",
-               ICRurl:"https://npr-ice.streamguys1.com/live.mp3",
-               WWXurl:"https://npr-ice.streamguys1.com/live.mp3"
+               ICRurl:"https://icrt.leanstream.co/ICRTFM-MP3?args=web",
+               WWXurl:"https://eclassicalradiow-hichannel.cdn.hinet.net/live/RA000018/media_641018.ts"
                 }
           },
   methods:{
@@ -43,6 +43,7 @@ const vm = createApp({
                 this.mp3Pi_i=res.data.mp3Pi_i;
                 this.playingPi=res.data.playingPi;
                 this.mp3_list = res.data.mp3_list;
+                this.radioPlayingPiNo = res.data.radioPlayingPiNo;   
                 this.mp3_i_max = this.mp3_list.length;
                 rn = this.getRandom(this.mp3_i_max-1, 0);
                 //rn = rn % this.mp3_i_max;
