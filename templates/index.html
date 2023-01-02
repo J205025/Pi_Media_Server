@@ -51,12 +51,15 @@
         <div class="sec-2"> <p>--Play [Online]  Audio files --</p></div>
    
     <div class="button-container">
-        <button type="button" class="key-button" v-on:click="playRadioPc(1)">BBC <i class="fa fa-bullseye" v-if="radioPlayingPiNo==1"></i></button>
+    <button type="button" class="key-button" v-on:click="playRadioPc(1)">BBC <i class="fa fa-bullseye" v-if="radioPlayingPcNo==1"></i></button>
 	<button type="button" class="key-button" v-on:click="playRadioPc(2)">CNN <i class="fa fa-bullseye" v-if="radioPlayingPcNo==2"></i></button>
-        <button type="button" class="key-button" v-on:click="playRadioPc(3)">NPR <i class="fa fa-bullseye" v-if="radioPlayingPcNo==3"></i></button>
-        <button type="button" class="key-button" v-on:click="playRadioPc(4)">FOX <i class="fa fa-bullseye" v-if="radioPlayingPcNo==4"></i></button>
+    <button type="button" class="key-button" v-on:click="playRadioPc(3)">NPR <i class="fa fa-bullseye" v-if="radioPlayingPcNo==3"></i></button>
+    <button type="button" class="key-button" v-on:click="playRadioPc(4)">FOX <i class="fa fa-bullseye" v-if="radioPlayingPcNo==4"></i></button>
 	<button type="button" class="key-button" v-on:click="playRadioPc(5)">ABC <i class="fa fa-bullseye" v-if="radioPlayingPcNo==5"></i></button>
-        <button type="button" class="key-button" v-on:click="playRadioPc(6)">NBA <i class="fa fa-bullseye" v-if="radioPlayingPcNo==6"></i></button>
+    <button type="button" class="key-button" v-on:click="playRadioPc(6)">NBA <i class="fa fa-bullseye" v-if="radioPlayingPcNo==6"></i></button>
+    <button type="button" class="key-button" v-on:click="playRadioPc(7)">FOX <i class="fa fa-bullseye" v-if="radioPlayingPcNo==7"></i></button>
+	<button type="button" class="key-button" v-on:click="playRadioPc(8)">ABC <i class="fa fa-bullseye" v-if="radioPlayingPcNo==8"></i></button>
+    <button type="button" class="key-button" v-on:click="playRadioPc(9)">NBA <i class="fa fa-bullseye" v-if="radioPlayingPcNo==9"></i></button>
     </div>
     <div style="display:none" ><audio id="my-radio" controls> <source src="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service" type="audio/mpeg">    你的瀏覽器不支援 audio tag！ </audio></div>
     </br>
@@ -93,12 +96,15 @@
         <div class="sec-2"> <p>--Play [Online]  Audio files --</p></div>
 
     <div class="button-container">
-        <button type="button" class="key-button" v-on:click="playRadioPi(1)">BBC <i class="fa fa-bullseye" v-if="radioPlayingPiNo==1"></i></button>
+    <button type="button" class="key-button" v-on:click="playRadioPi(1)">BBC <i class="fa fa-bullseye" v-if="radioPlayingPiNo==1"></i></button>
 	<button type="button" class="key-button" v-on:click="playRadioPi(2)">CNN <i class="fa fa-bullseye" v-if="radioPlayingPiNo==2"></i></button>
-        <button type="button" class="key-button" v-on:click="playRadioPi(3)">NPR <i class="fa fa-bullseye" v-if="radioPlayingPiNo==3"></i></button>
-        <button type="button" class="key-button" v-on:click="playRadioPi(4)">FOX <i class="fa fa-bullseye" v-if="radioPlayingPiNo==4"></i></button>
+    <button type="button" class="key-button" v-on:click="playRadioPi(3)">NPR <i class="fa fa-bullseye" v-if="radioPlayingPiNo==3"></i></button>
+    <button type="button" class="key-button" v-on:click="playRadioPi(4)">FOX <i class="fa fa-bullseye" v-if="radioPlayingPiNo==4"></i></button>
 	<button type="button" class="key-button" v-on:click="playRadioPi(5)">ABC <i class="fa fa-bullseye" v-if="radioPlayingPiNo==5"></i></button>
-        <button type="button" class="key-button" v-on:click="playRadioPi(6)">NBA <i class="fa fa-bullseye" v-if="radioPlayingPiNo==6"></i></button>
+    <button type="button" class="key-button" v-on:click="playRadioPi(6)">NBA <i class="fa fa-bullseye" v-if="radioPlayingPiNo==6"></i></button>
+    <button type="button" class="key-button" v-on:click="playRadioPi(7)">FOX <i class="fa fa-bullseye" v-if="radioPlayingPiNo==7"></i></button>
+	<button type="button" class="key-button" v-on:click="playRadioPi(8)">ABC <i class="fa fa-bullseye" v-if="radioPlayingPiNo==8"></i></button>
+    <button type="button" class="key-button" v-on:click="playRadioPi(9)">NBA <i class="fa fa-bullseye" v-if="radioPlayingPiNo==9"></i></button>
     </div>
  
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>

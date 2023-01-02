@@ -22,12 +22,16 @@ const vm = createApp({
                keytimerPiRunning: false,
                radioPlayingPcNo: 0,
                radioPlayingPiNo: 0,
+               //broswer audio play src
                BBCurl:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
                CNNurl:"https://npr-ice.streamguys1.com/live.mp3",
                NPRurl:"https://npr-ice.streamguys1.com/live.mp3",
                FOXurl:"https://prod-18-232-88-129.wostreaming.net/foxnewsradio-foxnewsradioaac-imc?session-id=0f99acd44126cef33b40ce217c9ea1ad",
                MSCurl:"https://npr-ice.streamguys1.com/live.mp3",
                BLBurl:"https://npr-ice.streamguys1.com/live.mp3",
+               TPEurl:"https://npr-ice.streamguys1.com/live.mp3",
+               ICRurl:"https://npr-ice.streamguys1.com/live.mp3",
+               WWXurl:"https://npr-ice.streamguys1.com/live.mp3"
                 }
           },
   methods:{
@@ -132,9 +136,10 @@ const vm = createApp({
               },
             playRadioPc(radioNo){
                 let url = "";
-                if(this.radioPlayingNo == radioNo){
+                if(this.radioPlayingPcNo == radioNo){
                 document.getElementById("my-radio").pause();
                 this.radioPlayingPcNo = 0;
+                console.log("Raido No: "+this.radioPlayingPcNo);
                       }
                 else{
                 document.getElementById("my-radio").pause();
@@ -145,12 +150,16 @@ const vm = createApp({
                       case 4 :{ url = this.FOXurl;  break;}
                       case 5 :{ url = this.NPRurl;  break;}
                       case 6 :{ url = this.NPRurl;  break;}
+                      case 7 :{ url = this.TPEurl;  break;}
+                      case 8 :{ url = this.ICRurl;  break;}
+                      case 9 :{ url = this.WWXurl;  break;}
                       default :{break;}
                       }
                 document.getElementById("my-radio").setAttribute('src',url);
                 document.getElementById("my-radio").load();
                 document.getElementById("my-radio").play();
                 this.radioPlayingPcNo = radioNo;
+                console.log("Radio No: "+this.radioPlayingPcNo);
                 }
               },
             playSelectedPi(){
@@ -217,10 +226,14 @@ const vm = createApp({
                 })
               },
             playRadioPi(radioNo){
-                axios.post('/playRadioPi',{"radioNo":radioNo}).then(res => {
+                if(this.radioPlayingPiNo == radioNo){
+                   this.radioPlayingPiNo = 0 ;
+
+                }else{this.radioPlayingPiNo =radioNo;} 
+                console.log("BerfoeNo:"+ this.radioPlayingPiNo);
+                axios.post('/playRadioPi',{"radioNo":this.radioPlayingPiNo}).then(res => {
                 this.radioPlayingPiNo = res.data.radioPlayingPiNo;
-                this.playingPi = res.data.playingPi; 
-                console.log("No:"+ this.radioPlayingPiNo);
+                console.log("AfterNo:"+ this.radioPlayingPiNo);
                 console.log("playRadioPi works");
                 })
                 .catch(error => {

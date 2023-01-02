@@ -23,12 +23,18 @@ __num4dPi__ = [ 0, 0, 0, 0 ]
 __p__ = None
 __pty_master__ = None
 __pty_slave__ = None
+__q__ = None
+__qpty_master__ = None
+__qpty_slave__ = None
 __mpg123Running__ = False  
 __return_code__ = None
+__radiompg123Running__ = False  
+__qreturn_code__ = None
 __playingPi__ = False
 __timer_running__ = False
 __t__ = None
 __radioPlayingPiNo__ =  0
+__radioPaused__ = None
 #------------------------------------------------------------------
 def play_file(mp3_file, pty):
     try:
@@ -82,6 +88,30 @@ def process_monitor(p):
         __return_code__ = p.wait()
     # When we get here, the process has exited and set a return code
     __mpg123Running__ = False
+ 
+def qprocess_monitor(q):
+    global __radiompg123Running__
+    global __qreturn_code__
+    # Indicate that the process is running at the start, it
+    # should be
+    __radiompg123Running__ = True
+    # When a process exits, p.poll() returns the code it set upon
+    # completion
+    __qreturn_code__ = q.poll()
+    # See whether the process has already exited. This will cause a
+    # value (i.e. not None) to return from p.poll()
+    if __qreturn_code__ == None:
+        # Wait for the process to complete, get its return code directly
+        # from the wait() call (i.e. do not use p.poll())
+        __qreturn_code__ = q.wait()
+    # When we get here, the process has exited and set a return code
+    __radiompg123Running__ = False
+ 
+ 
+ 
+ 
+ 
+ 
     
 def pressedNumber(channel):
     if(channel ==12):
@@ -312,10 +342,10 @@ if(True):
         print ("No mp3 files found!")
     print ('--- Available mp3 files ---')
     print(__mp3_list__)
-   # __mp3Pc_i__ = random.randrange(__mp3_i_max__)
     __mp3Pi_i__ = random.randrange(__mp3_i_max__)
    # add openpty
     __pty_master__, __pty_slave__ = os.openpty()
+    __qpty_master__, __qpty_slave__ = os.openpty()
     __playingPi__ = False
    # We need a way to tell if a song is already playing. Start a 
    # thread that tells if the process is running and that sets
@@ -425,32 +455,38 @@ def playPausePi():
 
 @app.route('/playRadioPi', methods=['POST'])
 def playRadioPi():
-    global __playingPi__
-    global __mpg123Running__
-    global __p__
-    global __pty_master__
+    global __q__
+    global __qpty_master__
+    global __qpty_slave__
     global __radioPlayingPiNo__
+    global __radiompg123Running__
+    global __radioPaused__
     data=request.get_json()
     radioNo=int(data["radioNo"])
-    if(__radioPlayingPiNo__ == radioNo ):
-        os.write(__pty_slave__, b's')
-        __radioPlayingPiNo__ = 0
-        __playingPi__ = False
+    if(__radiompg123Running__  == True):
+        if(radioNo == 0):
+            os.write(__qpty_slave__, b's')
+            __radioPlayingPiNo__ = 0
+        elif(radioNo == __radioPlayingPiNo__):
+            os.write(__qpty_slave__, b's')
+            __radioPlayingPiNo__ = radioNo
+        else:
+            __q__.terminate()   
+            url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+            __q__ = play_file(url, __qpty_master__)
+            time.sleep(0.1)
+            qmonitor_thread = Thread(target=qprocess_monitor,args=(__q__,)) 
+            qmonitor_thread.start()
+            __radioPlayingPiNo__ = radioNo
     else:
         url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-        if (__mpg123Running__ == True):
-            __p__.terminate()   
-            __playingPi__ = False
-            __radioPlayingPiNo__ = 0
-        __p__ = play_file(url, __pty_master__)
+        __q__ = play_file(url, __qpty_master__)
         time.sleep(0.1)
-        monitor_thread = Thread(target=process_monitor,args=(__p__,)) 
-        monitor_thread.start()
+        qmonitor_thread = Thread(target=qprocess_monitor,args=(__q__,)) 
+        qmonitor_thread.start()
         __radioPlayingPiNo__ = radioNo
-        __playingPi__ = True
     return jsonify({
         "radioPlayingPiNo" : __radioPlayingPiNo__,
-        "playingPi" : __playingPi__,
          })
 
 
