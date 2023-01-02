@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" >
     <title>Welcome to Raspberry Pi Music Server</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" type="text/css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
     <!--
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="./static/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="./static/css/font-awesome.min.css">
     -->
@@ -48,7 +49,6 @@
             <button type="button" class="key-button" v-on:click="playNextPc"><i class="fa fa-fast-forward"></i></button>
     </div>
 
-        <div class="sec-2"> <p>--Play [Online]  Audio files --</p></div>
    
     <div class="button-container">
     <button type="button" class="key-button" v-on:click="playRadioPc(1)">BBC <i class="fa fa-bullseye" v-if="radioPlayingPcNo==1"></i></button>
@@ -61,6 +61,15 @@
 	<button type="button" class="key-button" v-on:click="playRadioPc(8)">ICRT <i class="fa fa-bullseye" v-if="radioPlayingPcNo==8"></i></button>
     <button type="button" class="key-button" v-on:click="playRadioPc(9)">NBA <i class="fa fa-bullseye" v-if="radioPlayingPcNo==9"></i></button>
     </div>
+
+    <div class="button-container">
+            <button type="button" class="key-button" v-on:click="volumeDownPc"><i class="fa fa-volume-low"></i></button>
+            <button type="button" class="key-button" v-on:click="volumeUpPc"><i class="fa fa-volume-high"></i></button>
+            <button type="button" class="key-button" v-on:click="volumeMutePc"><i class="fa-solid fa-volume-xmark"></i></button>
+    </div>
+
+
+
     <div style="display:none" ><audio id="my-radio" controls> <source src="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service" type="audio/mpeg">    你的瀏覽器不支援 audio tag！ </audio></div>
     </br>
     </br>
@@ -93,8 +102,6 @@
         <button type="button" class="key-button" v-on:click="playNextPi"><i class="fa fa-fast-forward"></i></button>
     </div>
  
-        <div class="sec-2"> <p>--Play [Online]  Audio files --</p></div>
-
     <div class="button-container">
     <button type="button" class="key-button" v-on:click="playRadioPi(1)">BBC <i class="fa fa-bullseye" v-if="radioPlayingPiNo==1"></i></button>
 	<button type="button" class="key-button" v-on:click="playRadioPi(2)">CNN <i class="fa fa-bullseye" v-if="radioPlayingPiNo==2"></i></button>
@@ -105,6 +112,12 @@
     <button type="button" class="key-button" v-on:click="playRadioPi(7)">FOX <i class="fa fa-bullseye" v-if="radioPlayingPiNo==7"></i></button>
 	<button type="button" class="key-button" v-on:click="playRadioPi(8)">ICRT <i class="fa fa-bullseye" v-if="radioPlayingPiNo==8"></i></button>
     <button type="button" class="key-button" v-on:click="playRadioPi(9)">NBA <i class="fa fa-bullseye" v-if="radioPlayingPiNo==9"></i></button>
+    </div>
+ 
+    <div class="button-container">
+        <button type="button" class="key-button" v-on:click="volumeDownPi"><i class="fa fa-volume-low"></i></button>
+        <button type="button" class="key-button" v-on:click="volumeUpPi"><i class="fa fa-volume-high"></i></button>
+        <button type="button" class="key-button" v-on:click="volumeMutePi"><i class="fa-solid fa-volume-xmark"></i></button>
     </div>
  
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>

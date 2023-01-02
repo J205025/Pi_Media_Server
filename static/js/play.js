@@ -22,6 +22,7 @@ const vm = createApp({
                keytimerPiRunning: false,
                radioPlayingPcNo: 0,
                radioPlayingPiNo: 0,
+               volume : 0.65,
                //broswer audio play src
                BBCurl:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
                CNNurl:"https://npr-ice.streamguys1.com/live.mp3",
@@ -53,6 +54,10 @@ const vm = createApp({
                 console.log("mp3Pc: "+this.mp3Pc);
                 console.log("mp3Pi: "+this.mp3Pi);
                 console.log("payingPi: "+this.playingPi);
+                var vid1 = document.getElementById("my-audio");
+                vid1.volume = this.volume; 
+                var vid2 = document.getElementById("my-radio");
+                vid2.volume = this.volume; 
                   });
              },
              playSelectSongPc(){
@@ -135,6 +140,29 @@ const vm = createApp({
                 console.log(this.mp3Pc);
                 console.log("playNextPc works");
               },
+            volumeDownPc(event){
+                var vid1 = document.getElementById("my-audio");
+                var vid2 = document.getElementById("my-radio");
+                this.volume = this.volume - 0.2;
+                if(this.volume < 0 ){this.volume =0;}
+                vid1.volume = this.volume; 
+                vid2.volume = this.volume; 
+              },
+            volumeUpPc(event){
+                var vid1 = document.getElementById("my-audio");
+                var vid2 = document.getElementById("my-radio");
+                this.volume = this.volume + 0.2;
+                if(this.volume > 1){this.volume =1;}
+                vid1.volume = this.volume; 
+                vid2.volume = this.volume; 
+              },
+            volumeMutePc(event){
+                var vid1 = document.getElementById("my-audio");
+                var vid2 = document.getElementById("my-radio");
+                if(this.volume != 0 ){this.volume =0;}
+                vid1.volume = 0; 
+                vid2.volume = 0; 
+              },
             playRadioPc(radioNo){
                 let url = "";
                 if(this.radioPlayingPcNo == radioNo){
@@ -209,6 +237,7 @@ const vm = createApp({
                 axios.post('/playPrePi').then(res => {
                 this.mp3Pi_i = res.data.mp3Pi_i;
                 this.mp3Pi = this.mp3_list[res.data.mp3Pi_i];
+                this.playingPi = res.data.playingPi; 
                 console.log("playPrePi works");
                 })
                 .catch(error => {
@@ -220,6 +249,7 @@ const vm = createApp({
                 this.mp3Pi_i = res.data.mp3Pi_i;
                 this.mp3Pi = this.mp3_list[res.data.mp3Pi_i];
                 dir_mp3Pi = this.dir+this.mp3_list[this.mp3Pi_i];
+                this.playingPi = res.data.playingPi; 
                 console.log("playNextPi works");
                 })
                 .catch(error => {
