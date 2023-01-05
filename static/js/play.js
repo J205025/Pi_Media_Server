@@ -32,7 +32,8 @@ const vm = createApp({
                BLBurl:"https://npr-ice.streamguys1.com/live.mp3",
                TPEurl:"https://npr-ice.streamguys1.com/live.mp3",
                ICRurl:"https://icrt.leanstream.co/ICRTFM-MP3?args=web",
-               WWXurl:"https://eclassicalradiow-hichannel.cdn.hinet.net/live/RA000018/media_641018.ts"
+               WWXurl:"https://icrt.leanstream.co/ICRTFM-MP3?args=web",
+               JRYurl:"http://192.168.1.192:8000/stream.ogg"
                 }
           },
   methods:{
@@ -181,7 +182,7 @@ const vm = createApp({
                       case 6 :{ url = this.NPRurl;  break;}
                       case 7 :{ url = this.TPEurl;  break;}
                       case 8 :{ url = this.ICRurl;  break;}
-                      case 9 :{ url = this.WWXurl;  break;}
+                      case 9 :{ url = this.JRYurl;  break;}
                       default :{break;}
                       }
                 document.getElementById("my-radio").setAttribute('src',url);
