@@ -50,16 +50,30 @@
     </div>
 
    
+    <div style="display:none" ><audio id="my-radio"> <source src="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service" type="audio/mpeg">    你的瀏覽器不支援 audio tag！ </audio></div>
+
     <div class="button-container">
-    <button type="button" class="key-button" v-on:click="playRadioPc(1)">BBC <i class="fa fa-bullseye" v-if="radioPlayingPcNo==1"></i></button>
-	<button type="button" class="key-button" v-on:click="playRadioPc(2)">CNN <i class="fa fa-bullseye" v-if="radioPlayingPcNo==2"></i></button>
-    <button type="button" class="key-button" v-on:click="playRadioPc(3)">NPR <i class="fa fa-bullseye" v-if="radioPlayingPcNo==3"></i></button>
-    <button type="button" class="key-button" v-on:click="playRadioPc(4)">FOX <i class="fa fa-bullseye" v-if="radioPlayingPcNo==4"></i></button>
-	<button type="button" class="key-button" v-on:click="playRadioPc(5)">ABC <i class="fa fa-bullseye" v-if="radioPlayingPcNo==5"></i></button>
-    <button type="button" class="key-button" v-on:click="playRadioPc(6)">NBA <i class="fa fa-bullseye" v-if="radioPlayingPcNo==6"></i></button>
-    <button type="button" class="key-button" v-on:click="playRadioPc(7)">FOX <i class="fa fa-bullseye" v-if="radioPlayingPcNo==7"></i></button>
-	<button type="button" class="key-button" v-on:click="playRadioPc(8)">ICRT <i class="fa fa-bullseye" v-if="radioPlayingPcNo==8"></i></button>
-    <button type="button" class="key-button" v-on:click="playRadioPc(9)">Jerry <i class="fa fa-bullseye" v-if="radioPlayingPcNo==9"></i></button>
+    <button type="button" class="key-button" value="1" v-on:click="playRadioPc($event)">BBC1 <i class="fa fa-bullseye" v-if="radioPlayingPcNo==1"></i></button>
+    <button type="button" class="key-button" value="2" v-on:click="playRadioPc($event)">BBC2 <i class="fa fa-bullseye" v-if="radioPlayingPcNo==2"></i></button>
+    <button type="button" class="key-button" value="3" v-on:click="playRadioPc($event)">BBC3 <i class="fa fa-bullseye" v-if="radioPlayingPcNo==3"></i></button>
+    </div>
+
+    <div class="select-container">
+    <div class="custom-select" style="width:80vw;" >
+        <select  id="select" v-on:Change="playRadioPc($event)">
+           <option default value="0">Choose BBC Radio</option>
+           <option value="1">BBC 1</option>
+           <option value="2">BBC 2</option>
+           <option value="3">BBC 3</option>
+           <option value="4">BBC 4</option>
+           <option value="5">BBC 5</option>
+           <option value="6">BBC 6</option>
+           <option value="7">BBC 7</option>
+           <option value="8">BBC 8</option>
+           <option value="9">BBC 9</option>
+           <option value="10">BBC 10</option>
+        </select>
+    </div>
     </div>
 
     <div class="button-container">
@@ -67,10 +81,6 @@
             <button type="button" class="key-button" v-on:click="volumeUpPc"><i class="fa fa-volume-high"></i></button>
             <button type="button" class="key-button" v-on:click="volumeMutePc"><i class="fa-solid fa-volume-xmark"></i></button>
     </div>
-
-
-
-    <div style="display:none" ><audio id="my-radio" controls> <source src="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service" type="audio/mpeg">    你的瀏覽器不支援 audio tag！ </audio></div>
     </br>
     </br>
     <div class="section-container">
@@ -101,19 +111,53 @@
         <button type="button" class="key-button" v-on:click="playPausePi" v-else><i class="fa fa-play"></i></button>
         <button type="button" class="key-button" v-on:click="playNextPi"><i class="fa fa-fast-forward"></i></button>
     </div>
- 
+
+
     <div class="button-container">
-    <button type="button" class="key-button" v-on:click="playRadioPi(1)">BBC <i class="fa fa-bullseye" v-if="radioPlayingPiNo==1"></i></button>
-	<button type="button" class="key-button" v-on:click="playRadioPi(2)">CNN <i class="fa fa-bullseye" v-if="radioPlayingPiNo==2"></i></button>
-    <button type="button" class="key-button" v-on:click="playRadioPi(3)">NPR <i class="fa fa-bullseye" v-if="radioPlayingPiNo==3"></i></button>
-    <button type="button" class="key-button" v-on:click="playRadioPi(4)">FOX <i class="fa fa-bullseye" v-if="radioPlayingPiNo==4"></i></button>
-	<button type="button" class="key-button" v-on:click="playRadioPi(5)">ABC <i class="fa fa-bullseye" v-if="radioPlayingPiNo==5"></i></button>
-    <button type="button" class="key-button" v-on:click="playRadioPi(6)">NBA <i class="fa fa-bullseye" v-if="radioPlayingPiNo==6"></i></button>
-    <button type="button" class="key-button" v-on:click="playRadioPi(7)">FOX <i class="fa fa-bullseye" v-if="radioPlayingPiNo==7"></i></button>
-	<button type="button" class="key-button" v-on:click="playRadioPi(8)">ICRT <i class="fa fa-bullseye" v-if="radioPlayingPiNo==8"></i></button>
-    <button type="button" class="key-button" v-on:click="playRadioPi(9)">NBA <i class="fa fa-bullseye" v-if="radioPlayingPiNo==9"></i></button>
+    <button type="button" class="key-button" value="1" v-on:click="playRadioPc($event)">BBC1 <i class="fa fa-bullseye" v-if="radioPlayingPiNo==1"></i></button>
+    <button type="button" class="key-button" value="2" v-on:click="playRadioPc($event)">BBC2 <i class="fa fa-bullseye" v-if="radioPlayingPiNo==2"></i></button>
+    <button type="button" class="key-button" value="3" v-on:click="playRadioPc($event)">BBC3 <i class="fa fa-bullseye" v-if="radioPlayingPiNo==3"></i></button>
     </div>
- 
+
+    <div class="select-container">
+    <div class="custom-select" style="width:80vw;" >
+        <select  id="select" v-on:Change="playRadioPi($event)">
+           <option default value="0">Choose BBC Radio</option>
+           <option value="1">BBC World Service</option>
+           <option value="2">BBC 2</option>
+           <option value="3">BBC 3</option>
+           <option value="4">BBC 4</option>
+           <option value="5">BBC 5</option>
+           <option value="6">BBC 6</option>
+           <option value="7">BBC 7</option>
+           <option value="8">BBC 8</option>
+           <option value="9">BBC 9</option>
+           <option value="10">BBC 10</option>
+        </select>
+    </div>
+
+    <div class="custom-select" style="width:80vw;" >
+        <select  class="select" v-on:Change="playRadioPi($event)">
+           <option default value="0" >Choose BBC Radio</option>
+           <option value="11">BBC 31</option>
+           <option value="12">BBC 32</option>
+           <option value="13">BBC 33</option>
+           <option value="14">BBC 34</option>
+           <option value="15">BBC 35</option>
+        </select>
+    </div>
+    <div class="custom-select" style="width:80vw;" >
+        <select class="select" v-on:Change="playRadioPi($event)">
+           <option default value="0">Choose BBC Radio</option>
+           <option value="31">BBC 31</option>
+           <option value="32">BBC 32</option>
+           <option value="33">BBC 33</option>
+           <option value="34">BBC 34</option>
+           <option value="35">BBC 35</option>
+        </select>
+    </div>
+    </div>
+
     <div class="button-container">
         <button type="button" class="key-button" v-on:click="volumeDownPi"><i class="fa fa-volume-low"></i></button>
         <button type="button" class="key-button" v-on:click="volumeUpPi"><i class="fa fa-volume-high"></i></button>

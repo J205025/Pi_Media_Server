@@ -48,7 +48,7 @@ audio-container{
   flex-direction:row;
   justify-content: center;    
  }
-.button-container{
+.button-container .section-container{
   display:flex;
   width: 80vw;
   justify-content: center;    
@@ -117,14 +117,4 @@ audio-container{
     transform: translateY(4px);
   }
 
-
-
-.onliner-container{
-  display:flex;
-  width: 80vw;
-  justify-content: center;    
-  display: block;
-  margin: 1vh auto;
-  align-items: center;
-  text-align:center;
-  }
+ 

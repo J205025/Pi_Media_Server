@@ -11,6 +11,7 @@ import RPi.GPIO as GPIO
 import subprocess
 import time
 import threading
+import vlc 
 #
 #------------------------------------------------------------------
 __dir__ = "./static/assets/"
@@ -35,7 +36,10 @@ __playingPi__ = False
 __timer_running__ = False
 __t__ = None
 __radioPlayingPiNo__ =  0
-__radioPaused__ = None
+__vlc__ = vlc.Instance()
+__vlcplayer__ = None
+__vlcVolume__ = 75
+__vlcVolumeMute__ = False
 #------------------------------------------------------------------
 def play_file(mp3_file, pty):
     try:
@@ -69,6 +73,7 @@ def play_list(mp3_list, pty):
         return p
     except FileNotFoundError as e:
         raise AudioEngineUnavailable(f'AudioEngineUnavailable: {e}')
+    
 
 # Monitor a subprocess, record its state in global variables
 # This function is intended to run in its own thread
@@ -109,6 +114,23 @@ def qprocess_monitor(q):
     __radiompg123Running__ = False
  
  
+def vlcprocess_monitor(q):
+    global __radiovlcRunning__
+    global _vlc_turn_code__
+    # Indicate that the process is running at the start, it
+    # should be
+    __radiovlcRunning__ = True
+    # When a process exits, p.poll() returns the code it set upon
+    # completion
+    __vlcreturn_code__ = q.poll()
+    # See whether the process has already exited. This will cause a
+    # value (i.e. not None) to return from p.poll()
+    if __vlcreturn_code__ == None:
+        # Wait for the process to complete, get its return code directly
+        # from the wait() call (i.e. do not use p.poll())
+        __vlcreturn_code__ = q.wait()
+    # When we get here, the process has exited and set a return code
+    __radiovlcRunning__ = False
  
  
  
@@ -294,6 +316,30 @@ def continuePlaying():
         threading.Timer( 5 , continuePlaying ).start()
     else:
         threading.Timer( 5 , continuePlaying ).start()
+
+class VLC:
+    def __init__(self):
+        self.Player = Instance('--loop')
+
+    def addPlaylist(self):
+        self.mediaList = self.Player.media_list_new()
+        path = r"/home/j205025/radio/store/"
+        songs = os.listdir(path)
+        for s in songs:
+            self.mediaList.add_media(self.Player.media_new(os.path.join(path,s)))
+        self.listPlayer = self.Player.media_list_player_new()
+        self.listPlayer.set_media_list(self.mediaList)
+    def play(self):
+        self.listPlayer.play()
+    def next(self):
+        self.listPlayer.next()
+    def pause(self):
+        self.listPlayer.pause()
+    def previous(self):
+        self.listPlayer.previous()
+    def stop(self):
+        self.listPlayer.stop()
+
 #---------------------------------------------------------------------------------
 if(True):
     GPIO.setmode(GPIO.BOARD)
@@ -420,12 +466,10 @@ def playSelectedPi():
     global __mp3Pi_i__
     global __playingPi__
     global __mp3_i_max__
-    ########################################
     data=request.get_json()
     num=int(data["num"])
     __mp3Pi_i__= num % __mp3_i_max__
     playSelected();
-   #######################################
     return jsonify({ 
            "mp3Pi_i":__mp3Pi_i__,
            "playingPi" :__playingPi__
@@ -455,17 +499,37 @@ def playPausePi():
         "playingPi" : __playingPi__,
         "mp3Pi_i" : __mp3Pi_i__
          })
-
-@app.route('/playRadioPi', methods=['POST'])
-def playRadioPi():
+#this api use mpg123 to play  stream audio , but mpg123 doesn't fully support all streaming format 
+@app.route('/playRadioPi_old', methods=['POST'])
+def playRadioPi_old():
     global __q__
     global __qpty_master__
     global __qpty_slave__
     global __radioPlayingPiNo__
     global __radiompg123Running__
-    global __radioPaused__
     data=request.get_json()
     radioNo=int(data["radioNo"])
+    match radioNo:
+        case 1:
+           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+        case 2:
+           url ="http://192.168.0.105:8000/stream.ogg"
+        case 3:
+           url ="http://192.168.0.103:8000/stream.ogg"
+        case 4:
+           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+        case 5:
+           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+        case 6:
+           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+        case 7:
+           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+        case 8:
+           url ="https://eclassicalradiow-hichannel.cdn.hinet.net/live/RA000018/media_641018.ts"
+        case 9:
+           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+        case _:
+           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
     if(__radiompg123Running__  == True):
         if(radioNo == 0):
             os.write(__qpty_slave__, b's')
@@ -475,54 +539,12 @@ def playRadioPi():
             __radioPlayingPiNo__ = radioNo
         else:
             __q__.terminate()   
-            match radioNo:
-                case 1:
-                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-                case 2:
-                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-                case 3:
-                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-                case 4:
-                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-                case 5:
-                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-                case 6:
-                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-                case 7:
-                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-                case 8:
-                   url ="https://eclassicalradiow-hichannel.cdn.hinet.net/live/RA000018/media_641018.ts"
-                case 9:
-                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-                case _:
-                   url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
             __q__ = play_file(url, __qpty_master__)
             time.sleep(0.1)
             qmonitor_thread = Thread(target=qprocess_monitor,args=(__q__,)) 
             qmonitor_thread.start()
             __radioPlayingPiNo__ = radioNo
     else:
-        match radioNo:
-            case 1:
-               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-            case 2:
-               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-            case 3:
-               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-            case 4:
-               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-            case 5:
-               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-            case 6:
-               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-            case 7:
-               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-            case 8:
-               url ="https://icrt.leanstream.co/ICRTFM-MP3?args=web"
-            case 9:
-               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-            case _:
-               url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
         __q__ = play_file(url, __qpty_master__)
         time.sleep(0.1)
         qmonitor_thread = Thread(target=qprocess_monitor,args=(__q__,)) 
@@ -533,5 +555,92 @@ def playRadioPi():
          })
 
 
+@app.route('/playRadioPi', methods=['POST'])
+def playRadioPi():
+    global __vlc__
+    global __radioPlayingPiNo__
+    global __vlcplayer__
+    data=request.get_json()
+    radioNo=int(data["radioNo"])
+    match radioNo:
+        case 1:
+           url ="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service"
+        case 2:
+           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_two"
+        case 3:
+           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_three"
+        case 4:
+           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_fourth"
+        case 5:
+           url ="http://localhost:8000/stream.ogg"
+        case 6:
+           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+        case 7:
+           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+        case 8:
+           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+        case 9:
+           url ="http://192.168.0.105:8000/stream.ogg"
+        case 10:
+           url ="http://192.168.0.105:8000/stream.ogg"
+        case _:
+           url ="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service"
+    if(radioNo == 0):
+        __vlcplayer__.stop()
+        __radioPlayingPiNo__ = 0
+    else:
+        if(__radioPlayingPiNo__ != 0):
+           __vlcplayer__.stop()
+        __vlcplayer__ = __vlc__.media_player_new()
+        print(url)        
+        vlcmedia  = __vlc__.media_new(url)
+        __vlcplayer__.set_media(vlcmedia)
+        __vlcplayer__.play()
+        __radioPlayingPiNo__ = radioNo
+    return jsonify({
+        "radioPlayingPiNo" : __radioPlayingPiNo__,
+         })
+
+@app.route('/volumeDownPi', methods=['POST'])
+def volumeDownPi():
+    global __vlc__
+    global __radioPlayingPiNo__
+    global __vlcplayer__
+    global __vlcVolume__
+    __vlcVolume__ = __vlcVolume__ -  5
+    if __vlcVolume__ < 0:
+        __vlcVolume__ = 0 
+    __vlcplayer__.audio_set_volume(__vlcVolume__)
+    return jsonify({
+         })
+    
+@app.route('/volumeUpPi', methods=['POST'])
+def volumeUpPi():
+    global __vlc__
+    global __radioPlayingPiNo__
+    global __vlcplayer__
+    global __vlcVolume__
+    __vlcVolume__= __vlcVolume__ + 5
+    if __vlcVolume__ > 100:
+        __vlcVolume__ = 100 
+    __vlcplayer__.audio_set_volume(__vlcVolume__)
+    return jsonify({
+         })
+    
+@app.route('/volumeMutePi', methods=['POST'])
+def volumeMutePi():
+    global __vlc__
+    global __radioPlayingPiNo__
+    global __vlcplayer__
+    global __vlcVolume__
+    global __vlcVolumeMute__
+    if __vlcVolumeMute__ == False :  
+        __vlcplayer__.audio_set_volume(0)
+        __vlcVolumeMute__ = not __vlcVolumeMute__
+    else:
+        __vlcplayer__.audio_set_volume(__vlcVolume__)
+        __vlcVolumeMute__ = not __vlcVolumeMute__
+    return jsonify({
+         })
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=2000,debug=True)

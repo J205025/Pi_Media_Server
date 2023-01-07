@@ -2,6 +2,9 @@
 $ sudo apt install nginx
 $ sudo apt install python3
 $ sudo apt install python3-pip
+$ sudo apt install mpg123
+$ sudo apt install vlc
+
 $ pip3 install virtualenv
 #Chceck Version
 $ virtualenv --version
