@@ -40,6 +40,31 @@ __vlc__ = vlc.Instance()
 __vlcplayer__ = None
 __vlcVolume__ = 75
 __vlcVolumeMute__ = False
+radioUrl={
+          "url01":"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
+          "url02":"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
+          "url03":"https://npr-ice.streamguys1.com/live.mp3",
+          "url04":"https://prod-18-232-88-129.wostreaming.net/foxnewsradio-foxnewsradioaac-imc?session-id=0f99acd44126cef33b40ce217c9ea1ad",
+          "url05":"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_five_live",
+          "url06":"http://stream.live.vc.bbcmedia.co.uk/bbc_asian_network",
+          "url07":"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
+          "url08":"https://icrt.leanstream.co/ICRTFM-MP3?args=web",
+          "url09":"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_two",
+          "url10":"http://192.168.1.192:8000/stream.ogg",
+          "url11":"http://onair.family977.com.tw:8000/live.mp3",
+          "url12":"https://n09.rcs.revma.com/aw9uqyxy2tzuv?rj-ttl=5&rj-tok=AAABhZollCEACdvxzVVN61ARVg",
+          "url13":"https://n10.rcs.revma.com/ndk05tyy2tzuv?rj-ttl=5&rj-tok=AAABhZouFPAAQudE3-49-1PFHQ",
+          "url14":"https://n09.rcs.revma.com/7mnq8rt7k5zuv?rj-ttl=5&rj-tok=AAABhZovh0cASZAucd0xcmxkvQ",
+          "url15":"https://n11a-eu.rcs.revma.com/em90w4aeewzuv?rj-tok=AAABhZoyef8AtFfbdaYYtKJnaw&rj-ttl=5",
+          "url16":"https://n07.rcs.revma.com/78fm9wyy2tzuv?rj-ttl=5&rj-tok=AAABhZozdbQAkV-tPDO6A5aHag",
+          "url17":"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_three",
+          "url18":"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_fourfm",
+          "url19":"http://stream.live.vc.bbcmedia.co.uk/bbc_6music",
+          "url20":"http://media-ice.musicradio.com:80/ClassicFMMP3"
+          }
+url_json=json.dumps(radioUrl)
+__url__=json.loads(url_json)
+
 #------------------------------------------------------------------
 def play_file(mp3_file, pty):
     try:
@@ -271,7 +296,7 @@ def handlePlayPause(channel):
     else:
         mp3Pi = __dir__ + __mp3_list__[__mp3Pi_i__]
         __p__ = play_file(mp3Pi, __pty_master__)
-        print("play:"+mp3Pi)
+        print("handlePlayPause- play:"+mp3Pi)
         time.sleep(0.1)
         monitor_thread = Thread(target=process_monitor,args=(__p__,)) 
         monitor_thread.start()
@@ -317,28 +342,6 @@ def continuePlaying():
     else:
         threading.Timer( 5 , continuePlaying ).start()
 
-class VLC:
-    def __init__(self):
-        self.Player = Instance('--loop')
-
-    def addPlaylist(self):
-        self.mediaList = self.Player.media_list_new()
-        path = r"/home/j205025/radio/store/"
-        songs = os.listdir(path)
-        for s in songs:
-            self.mediaList.add_media(self.Player.media_new(os.path.join(path,s)))
-        self.listPlayer = self.Player.media_list_player_new()
-        self.listPlayer.set_media_list(self.mediaList)
-    def play(self):
-        self.listPlayer.play()
-    def next(self):
-        self.listPlayer.next()
-    def pause(self):
-        self.listPlayer.pause()
-    def previous(self):
-        self.listPlayer.previous()
-    def stop(self):
-        self.listPlayer.stop()
 
 #---------------------------------------------------------------------------------
 if(True):
@@ -350,7 +353,7 @@ if(True):
     GPIO.setup(11, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-   # PLAY NEXT PRE BACK 
+   # PLAY NEXT PRE BACK MUTE 
     GPIO.setup(29, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(31, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(33, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -511,23 +514,25 @@ def playRadioPi_old():
     radioNo=int(data["radioNo"])
     match radioNo:
         case 1:
-           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+           url =__url__["url01"]
         case 2:
-           url ="http://192.168.0.105:8000/stream.ogg"
+           url =__url__["url02"]
         case 3:
-           url ="http://192.168.0.103:8000/stream.ogg"
+           url =__url__["url03"]
         case 4:
-           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+           url =__url__["url04"]
         case 5:
-           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+           url =__url__["url05"]
         case 6:
-           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+           url =__url__["url06"]
         case 7:
-           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+           url =__url__["url07"]
         case 8:
-           url ="https://eclassicalradiow-hichannel.cdn.hinet.net/live/RA000018/media_641018.ts"
+           url =__url__["url08"]
         case 9:
-           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+           url =__url__["url09"]
+        case 10:
+           url =__url__["url10"]
         case _:
            url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
     if(__radiompg123Running__  == True):
@@ -560,29 +565,50 @@ def playRadioPi():
     global __vlc__
     global __radioPlayingPiNo__
     global __vlcplayer__
+    global __url__
     data=request.get_json()
     radioNo=int(data["radioNo"])
     match radioNo:
         case 1:
-           url ="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service"
+           url =__url__["url01"]
         case 2:
-           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_two"
+           url =__url__["url02"]
         case 3:
-           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_three"
+           url =__url__["url03"]
         case 4:
-           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_fourth"
+           url =__url__["url04"]
         case 5:
-           url ="http://localhost:8000/stream.ogg"
+           url =__url__["url05"]
         case 6:
-           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+           url =__url__["url06"]
         case 7:
-           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+           url =__url__["url07"]
         case 8:
-           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+           url =__url__["url08"]
         case 9:
-           url ="http://192.168.0.105:8000/stream.ogg"
+           url =__url__["url09"]
         case 10:
-           url ="http://192.168.0.105:8000/stream.ogg"
+           url =__url__["url10"]
+        case 11:
+           url =__url__["url11"]
+        case 12:
+           url =__url__["url12"]
+        case 13:
+           url =__url__["url13"]
+        case 14:
+           url =__url__["url14"]
+        case 15:
+           url =__url__["url15"]
+        case 16:
+           url =__url__["url16"]
+        case 17:
+           url =__url__["url17"]
+        case 18:
+           url =__url__["url18"]
+        case 19:
+           url =__url__["url19"]
+        case 20:
+           url =__url__["url20"]
         case _:
            url ="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service"
     if(radioNo == 0):
@@ -592,7 +618,7 @@ def playRadioPi():
         if(__radioPlayingPiNo__ != 0):
            __vlcplayer__.stop()
         __vlcplayer__ = __vlc__.media_player_new()
-        print(url)        
+        print("url"+url)        
         vlcmedia  = __vlc__.media_new(url)
         __vlcplayer__.set_media(vlcmedia)
         __vlcplayer__.play()
@@ -607,7 +633,7 @@ def volumeDownPi():
     global __radioPlayingPiNo__
     global __vlcplayer__
     global __vlcVolume__
-    __vlcVolume__ = __vlcVolume__ -  5
+    __vlcVolume__ = __vlcVolume__ -  10
     if __vlcVolume__ < 0:
         __vlcVolume__ = 0 
     __vlcplayer__.audio_set_volume(__vlcVolume__)
@@ -620,9 +646,9 @@ def volumeUpPi():
     global __radioPlayingPiNo__
     global __vlcplayer__
     global __vlcVolume__
-    __vlcVolume__= __vlcVolume__ + 5
+    __vlcVolume__= __vlcVolume__ + 10
     if __vlcVolume__ > 100:
-        __vlcVolume__ = 100 
+        __vlcVolume__ = 99 
     __vlcplayer__.audio_set_volume(__vlcVolume__)
     return jsonify({
          })
@@ -643,4 +669,4 @@ def volumeMutePi():
     return jsonify({
          })
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=2000,debug=True)
+    app.run(host='0.0.0.0',port=2000,debug=True)

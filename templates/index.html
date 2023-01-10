@@ -52,31 +52,48 @@
    
     <div style="display:none" ><audio id="my-radio"> <source src="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service" type="audio/mpeg">    你的瀏覽器不支援 audio tag！ </audio></div>
 
-    <div class="button-container">
-    <button type="button" class="key-button" value="1" v-on:click="playRadioPc($event)">BBC1 <i class="fa fa-bullseye" v-if="radioPlayingPcNo==1"></i></button>
-    <button type="button" class="key-button" value="2" v-on:click="playRadioPc($event)">BBC2 <i class="fa fa-bullseye" v-if="radioPlayingPcNo==2"></i></button>
-    <button type="button" class="key-button" value="3" v-on:click="playRadioPc($event)">BBC3 <i class="fa fa-bullseye" v-if="radioPlayingPcNo==3"></i></button>
+    <div class="button-container" >
+     <select id="sel10Pc"  class="select-button"  v-on:Change="playRadioPc($event)">
+           <option default value="0">網路廣播-1</option>
+           <option value="1">BBC World Service <i class="fa fa-bullseye" v-if="radioPlayingPcNo==1"></i></option>
+           <option value="2">BBC London</option>
+           <option value="3">NPR News</option>
+           <option value="4">FOX News</option>
+           <option value="5">BBC Radio 5 Live </option>
+           <option value="6">BBC Asia Network</option>
+           <option value="7">BBC Radio 1</option>
+           <option value="8">ICRT</option>
+           <option value="9">BBC Radio 2</option>
+           <option value="10">Jerry Radio</option>
+      </select>
+     <select id="sel20Pc" class="select-button"  v-on:Change="playRadioPc($event)">
+           <option default value="0">網路廣播-2</option>
+           <option value="11">台中古典音樂台</option>
+           <option value="12">中廣流行網</option>
+           <option value="13">中廣音樂網</option>
+           <option value="14">IC之音竹科廣播</option>
+           <option value="15">飛碟電台</option>
+           <option value="16">中廣新聞網</option>
+           <option value="17"> BBC Radio 3 </option>
+           <option value="18"> BBC Radio 4 </option>
+           <option value="19"> BBC Radio 6 Music </option>
+           <option value="20"> Classic FM </option>
+      </select>
+     <select id="sel30Pc" class="select-button"  v-on:Change="playRadioPc($event)">
+           <option default value="0">網路廣播-3</option>
+           <option value="21">21</option>
+           <option value="22">22</option>
+           <option value="23">23</option>
+           <option value="24">24</option>
+           <option value="25">25</option>
+           <option value="26">26</option>
+           <option value="27">27</option>
+           <option value="28">28</option>
+           <option value="29">29</option>
+           <option value="30">30</option>
+      </select>
     </div>
-
-    <div class="select-container">
-    <div class="custom-select" style="width:80vw;" >
-        <select  id="select" v-on:Change="playRadioPc($event)">
-           <option default value="0">Choose BBC Radio</option>
-           <option value="1">BBC 1</option>
-           <option value="2">BBC 2</option>
-           <option value="3">BBC 3</option>
-           <option value="4">BBC 4</option>
-           <option value="5">BBC 5</option>
-           <option value="6">BBC 6</option>
-           <option value="7">BBC 7</option>
-           <option value="8">BBC 8</option>
-           <option value="9">BBC 9</option>
-           <option value="10">BBC 10</option>
-        </select>
-    </div>
-    </div>
-
-    <div class="button-container">
+    <div class="button-container" >
             <button type="button" class="key-button" v-on:click="volumeDownPc"><i class="fa fa-volume-low"></i></button>
             <button type="button" class="key-button" v-on:click="volumeUpPc"><i class="fa fa-volume-high"></i></button>
             <button type="button" class="key-button" v-on:click="volumeMutePc"><i class="fa-solid fa-volume-xmark"></i></button>
@@ -112,51 +129,49 @@
         <button type="button" class="key-button" v-on:click="playNextPi"><i class="fa fa-fast-forward"></i></button>
     </div>
 
+    <div class="button-container" >
+     <select id="sel10Pi" class="select-button"  v-on:Change="playRadioPi($event)">
+           <option default value="0">網路廣播-1</option>
+           <option value="1">BBC World Service <i class="fa fa-bullseye" v-show=true></i></option>
+           <option value="7">BBC Radio 1</option>
+           <option value="2">BBC London</option>
+           <option value="3">NPR News</option>
+           <option value="4">FOX News</option>
+           <option value="5">BBC Radio 5 Live </option>
+           <option value="6">BBC Asia Network</option>
+           <option value="8">ICRT</option>
+           <option value="10">Jerry Radio</option>
+           <option value="9">BBC Radio 2</option>
+      </select>
+     <select id="sel20Pi" class="select-button" v-on:Change="playRadioPi($event)">
+           <option default value="0">網路廣播-2</option>
+           <option value="11">台中古典音樂台</option>
+           <option value="12">中廣流行網</option>
+           <option value="13">中廣音樂網</option>
+           <option value="14">IC之音竹科廣播</option>
+           <option value="15">飛碟電台</option>
+           <option value="16">中廣新聞網</option>
+           <option value="17"> BBC Radio 3 </option>
+           <option value="18"> BBC Radio 4 </option>
+           <option value="19"> BBC Radio 6 Music </option>
+           <option value="20"> Classic FM </option>
+      </select>
+     <select id="sel30Pi" class="select-button"  v-on:Change="playRadioPi($event)">
+           <option default value="0">網路廣播-3</option>
+           <option value="21">BBC 1</option>
+           <option value="22">BBC 2</option>
+           <option value="23">BBC 3</option>
+           <option value="24">BBC 4</option>
+           <option value="25">BBC 5</option>
+           <option value="26">BBC 6</option>
+           <option value="27">BBC 7</option>
+           <option value="28">BBC 8</option>
+           <option value="29">BBC 9</option>
+           <option value="30">BBC 10</option>
+      </select>
+     </div>
 
-    <div class="button-container">
-    <button type="button" class="key-button" value="1" v-on:click="playRadioPc($event)">BBC1 <i class="fa fa-bullseye" v-if="radioPlayingPiNo==1"></i></button>
-    <button type="button" class="key-button" value="2" v-on:click="playRadioPc($event)">BBC2 <i class="fa fa-bullseye" v-if="radioPlayingPiNo==2"></i></button>
-    <button type="button" class="key-button" value="3" v-on:click="playRadioPc($event)">BBC3 <i class="fa fa-bullseye" v-if="radioPlayingPiNo==3"></i></button>
-    </div>
 
-    <div class="select-container">
-    <div class="custom-select" style="width:80vw;" >
-        <select  id="select" v-on:Change="playRadioPi($event)">
-           <option default value="0">Choose BBC Radio</option>
-           <option value="1">BBC World Service</option>
-           <option value="2">BBC 2</option>
-           <option value="3">BBC 3</option>
-           <option value="4">BBC 4</option>
-           <option value="5">BBC 5</option>
-           <option value="6">BBC 6</option>
-           <option value="7">BBC 7</option>
-           <option value="8">BBC 8</option>
-           <option value="9">BBC 9</option>
-           <option value="10">BBC 10</option>
-        </select>
-    </div>
-
-    <div class="custom-select" style="width:80vw;" >
-        <select  class="select" v-on:Change="playRadioPi($event)">
-           <option default value="0" >Choose BBC Radio</option>
-           <option value="11">BBC 31</option>
-           <option value="12">BBC 32</option>
-           <option value="13">BBC 33</option>
-           <option value="14">BBC 34</option>
-           <option value="15">BBC 35</option>
-        </select>
-    </div>
-    <div class="custom-select" style="width:80vw;" >
-        <select class="select" v-on:Change="playRadioPi($event)">
-           <option default value="0">Choose BBC Radio</option>
-           <option value="31">BBC 31</option>
-           <option value="32">BBC 32</option>
-           <option value="33">BBC 33</option>
-           <option value="34">BBC 34</option>
-           <option value="35">BBC 35</option>
-        </select>
-    </div>
-    </div>
 
     <div class="button-container">
         <button type="button" class="key-button" v-on:click="volumeDownPi"><i class="fa fa-volume-low"></i></button>
