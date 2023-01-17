@@ -156,10 +156,6 @@ def vlcprocess_monitor(q):
         __vlcreturn_code__ = q.wait()
     # When we get here, the process has exited and set a return code
     __radiovlcRunning__ = False
- 
- 
- 
- 
     
 def pressedNumber(channel):
     if(channel ==12):
@@ -360,7 +356,20 @@ if(True):
     GPIO.setup(35, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(37, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    threading.Timer( 5 , continuePlaying ).start()
+   #callback function 
+    GPIO.add_event_detect(12, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
+    GPIO.add_event_detect(16, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
+    GPIO.add_event_detect(18, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
+    GPIO.add_event_detect(11, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
+    GPIO.add_event_detect(13, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
+    GPIO.add_event_detect(15, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
+    GPIO.add_event_detect(29, GPIO.FALLING, callback=handlePlayPause, bouncetime=500)
+    GPIO.add_event_detect(31, GPIO.FALLING, callback=handleNext, bouncetime=500)
+    GPIO.add_event_detect(33, GPIO.FALLING, callback=handlePre, bouncetime=500)
+    GPIO.add_event_detect(35, GPIO.FALLING, callback=handleBack, bouncetime=500)
+    GPIO.add_event_detect(37, GPIO.FALLING, callback=handleMute, bouncetime=500)
+    
+if(True):
 #---------------------------------------------------------------------
 #file list Method 1
 #    __mp3_list__ = [ f for f in os.listdir(r'./static/assets/.') if f[-4:] == '.mp3' ]
@@ -387,6 +396,7 @@ if(True):
 #    __mp3_list__ = get_files(__dir__)
 #    __mp3_list__.sort(key=lambda x:int(x[:-4]))
 #---------------------------------------------------------------------
+
     __mp3_i_max__ = len(__mp3_list__) 
     if not (len(__mp3_list__) > 0):
         print ("No mp3 files found!")
@@ -405,17 +415,7 @@ if(True):
    #    time.sleep(0.1)
    #    os.write(__pty_slave__, b's')    
     print ('--- Press button #play to start playing mp3 ---')
-    GPIO.add_event_detect(12, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
-    GPIO.add_event_detect(16, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
-    GPIO.add_event_detect(18, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
-    GPIO.add_event_detect(11, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
-    GPIO.add_event_detect(13, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
-    GPIO.add_event_detect(15, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
-    GPIO.add_event_detect(29, GPIO.FALLING, callback=handlePlayPause, bouncetime=500)
-    GPIO.add_event_detect(31, GPIO.FALLING, callback=handleNext, bouncetime=500)
-    GPIO.add_event_detect(33, GPIO.FALLING, callback=handlePre, bouncetime=500)
-    GPIO.add_event_detect(35, GPIO.FALLING, callback=handleBack, bouncetime=500)
-    GPIO.add_event_detect(37, GPIO.FALLING, callback=handleMute, bouncetime=500)
+    threading.Timer( 5 , continuePlaying ).start()
 
 #==============================================================================================
 app = Flask(__name__)
