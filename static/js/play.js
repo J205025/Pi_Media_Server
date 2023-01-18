@@ -3,8 +3,10 @@ const vm = createApp({
   delimiters:['%{', '}%'],
   data(){
                return {
-               playingPc : false,
-               playingPi : false,
+               musicPlayingPc : false,
+               musicplayingPi : false,
+               musicPlayModePc : 2,
+               musicPlayModePi : 2,
                mp3Pc : '',
                mp3Pi : '',
                mp3Pc_i : 0,
@@ -63,7 +65,7 @@ const vm = createApp({
             loading(){
                 axios.post('/').then(res => {
                 this.mp3Pi_i=res.data.mp3Pi_i;
-                this.playingPi=res.data.playingPi;
+                this.musicPlayingPi=res.data.musicPlayingPi;
                 this.mp3_list = res.data.mp3_list;
                 this.radioPlayingPiNo = res.data.radioPlayingPiNo;   
                 this.mp3_i_max = this.mp3_list.length;
@@ -74,7 +76,7 @@ const vm = createApp({
                 this.mp3Pi=this.mp3_list[this.mp3Pi_i];
                 console.log("mp3Pc: "+this.mp3Pc);
                 console.log("mp3Pi: "+this.mp3Pi);
-                console.log("payingPi: "+this.playingPi);
+                console.log("musicPayingPi: "+this.musicPlayingPi);
                 console.log("radioPlayingPiNo: "+this.radioPlayingPiNo);
                 var vid1 = document.getElementById("my-audio");
                 vid1.volume = this.volume; 
@@ -128,7 +130,7 @@ const vm = createApp({
                 document.getElementById("my-audio").setAttribute('src',dirmp3Pc);
                 document.getElementById("my-audio").load();
                 document.getElementById("my-audio").play();
-                this.playingPc = true;
+                this.musicPlayingPc = true;
                 this.num4dPc[0]=0;
                 this.num4dPc[1]=0;
                 this.num4dPc[2]=0;
@@ -154,14 +156,14 @@ const vm = createApp({
             playPausePc(event){
                 dirmp3Pc=this.dir+this.mp3_list[this.mp3Pc_i];
                 document.getElementById("my-audio").setAttribute('src',dirmp3Pc);
-                if(this.playingPc == false){
+                if(this.musicPlayingPc == false){
                 document.getElementById("my-audio").play();
-                this.playingPc = true;
+                this.musicPlayingPc = true;
                 console.log("playPausePc to Play"); 
                 }
                 else{
                 document.getElementById("my-audio").pause();
-                this.playingPc = false;
+                this.musicPlayingPc = false;
                 console.log("playPausePc to Pause"); 
                 }
            	  },
@@ -175,7 +177,7 @@ const vm = createApp({
                 document.getElementById("my-audio").setAttribute('src',dirmp3Pc);
                 document.getElementById("my-audio").load();
                 document.getElementById("my-audio").play();
-                this.playingPc = true; 
+                this.musicPlayingPc = true; 
                 console.log(this.mp3Pc_i);
                 console.log(this.mp3Pc);
                 console.log("playPrePc works");
@@ -191,7 +193,7 @@ const vm = createApp({
                 document.getElementById("my-audio").setAttribute('src',dirmp3Pc);
                 document.getElementById("my-audio").load();
                 document.getElementById("my-audio").play();
-                this.playingPc = true;
+                this.musicPlayingPc = true;
                 console.log(this.mp3Pc_i);
                 console.log(this.mp3Pc);
                 console.log("playNextPc works");
@@ -304,7 +306,7 @@ const vm = createApp({
             playSelectedPi(){
                 num=this.num4dPi.join("");
                 axios.post('/playSelectedPi',{"num":num}).then(res => {
-                this.playingPi = res.data.playingPi;
+                this.musicPlayingPi = res.data.musicPlayingPi;
                 this.mp3Pi_i = res.data.mp3Pi_i;
                 this.mp3Pi=this.mp3_list[this.mp3Pi_i];
                 console.log("works playSelectedPi");
@@ -334,7 +336,7 @@ const vm = createApp({
               },
              playPausePi(event){
                 axios.post('/playPausePi').then(res => {
-                this.playingPi = res.data.playingPi; 
+                this.musicPlayingPi = res.data.musicPlayingPi; 
                 this.mp3Pi_i = res.data.mp3Pi_i;
                 this.mp3Pi = this.mp3_list[res.data.mp3Pi_i];
                 console.log("works playPausePi");
@@ -347,7 +349,7 @@ const vm = createApp({
                 axios.post('/playPrePi').then(res => {
                 this.mp3Pi_i = res.data.mp3Pi_i;
                 this.mp3Pi = this.mp3_list[res.data.mp3Pi_i];
-                this.playingPi = res.data.playingPi; 
+                this.musicPlayingPi = res.data.musicPlayingPi; 
                 console.log("playPrePi works");
                 })
                 .catch(error => {
@@ -359,7 +361,7 @@ const vm = createApp({
                 this.mp3Pi_i = res.data.mp3Pi_i;
                 this.mp3Pi = this.mp3_list[res.data.mp3Pi_i];
                 dir_mp3Pi = this.dir+this.mp3_list[this.mp3Pi_i];
-                this.playingPi = res.data.playingPi; 
+                this.musicPlayingPi = res.data.musicPlayingPi; 
                 console.log("playNextPi works");
                 })
                 .catch(error => {
