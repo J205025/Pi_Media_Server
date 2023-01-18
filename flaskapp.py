@@ -130,23 +130,6 @@ def process_monitor(p):
     # When we get here, the process has exited and set a return code
     __mpg123Running__ = False
  
-def qprocess_monitor(q):
-    global __radiompg123Running__
-    global __qreturn_code__
-    # Indicate that the process is running at the start, it
-    # should be
-    __radiompg123Running__ = True
-    # When a process exits, p.poll() returns the code it set upon
-    # completion
-    __qreturn_code__ = q.poll()
-    # See whether the process has already exited. This will cause a
-    # value (i.e. not None) to return from p.poll()
-    if __qreturn_code__ == None:
-        # Wait for the process to complete, get its return code directly
-        # from the wait() call (i.e. do not use p.poll())
-        __qreturn_code__ = q.wait()
-    # When we get here, the process has exited and set a return code
-    __radiompg123Running__ = False
  
     
 def pressedNumber(channel):
