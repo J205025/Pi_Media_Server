@@ -5,41 +5,38 @@ from threading import Thread
 import os
 import json
 import glob
-import random
+import random 
 import jinja2
 import RPi.GPIO as GPIO
 import subprocess
 import time
 import threading
-import vlc 
+import vlc
 #
 #------------------------------------------------------------------
 __dir__ = "./static/assets/"
-__mp3_list__ = None
-__mp3_list__z__ = None
-__mp3_i_max__ = 0
-__mp3Pi_i__ = 0
-__mp3Pc_i__ = 0 
+__fileList__ = [] 
+__fileList_Rn__ = []
+__indexMax__ = 0
+__indexPi__ = 0
+__indexPc__ = 0 
 __num4dPi_i__ = 4
 __num4dPi__ = [ 0, 0, 0, 0 ]
-__p__ = None
-__pty_master__ = None
-__pty_slave__ = None
-__q__ = None
-__qpty_master__ = None
-__qpty_slave__ = None
-__mpg123Running__ = False  
-__return_code__ = None
-__radiompg123Running__ = False  
-__qreturn_code__ = None
-__musicPlayingPi__ = False
-__timer_running__ = False
-__t__ = None
-__radioPlayingPiNo__ =  0
-__vlc__ = vlc.Instance()
-__radioVlcPlayer__ = None
-__vlcVolume__ = 75
-__vlcVolumeMute__ = False
+__keyTimerPi__= False
+__timer_Key__ = None
+opt = "--aout=alsa --alsa-audio-device=hw --verbose=-1"
+__musicVlcInstance__ = vlc.Instance(opt)
+__radioVlcInstance__ = vlc.Instance(opt)
+__vlcEnded__ = vlc.State.Ended
+__vlcPaused__ = vlc.State.Paused
+__vlcPlaying__ = vlc.State.Playing
+__musicVlcPi__ = __musicVlcInstance__.media_player_new()
+__radioVlcPi__ = __radioVlcInstance__.media_player_new()
+__musicPiPlaying__ = False
+__radioPiPlayingNo__ =  0
+__volumePi__ = 75
+__volumePiMute__ = False
+
 radioUrl={
           "url01":"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
           "url02":"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -50,7 +47,7 @@ radioUrl={
           "url07":"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
           "url08":"https://icrt.leanstream.co/ICRTFM-MP3?args=web",
           "url09":"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_two",
-          "url10":"http://192.168.1.192:8000/stream.ogg",
+          "url10":"http://192.168.1.146:8000/stream.ogg",
           "url11":"http://onair.family977.com.tw:8000/live.mp3",
           "url12":"https://n09.rcs.revma.com/aw9uqyxy2tzuv?rj-ttl=5&rj-tok=AAABhZollCEACdvxzVVN61ARVg",
           "url13":"https://n10.rcs.revma.com/ndk05tyy2tzuv?rj-ttl=5&rj-tok=AAABhZouFPAAQudE3-49-1PFHQ",
@@ -76,61 +73,6 @@ url_json=json.dumps(radioUrl)
 __url__=json.loads(url_json)
 
 #------------------------------------------------------------------
-def play_file(mp3_file, pty):
-    try:
-        command = ['mpg123', '-C', '-q', mp3_file]
-        p = subprocess.Popen( command, 
-#                             ['mpg123', # The program to launch in the subprocess
-#                             '-C',     # Enable commands to be read from stdin
-#                             '-q',     # Be quiet
-#                              mp3_file],
-                              stdin=pty, # Pipe input via bytes
-                              stdout=None,   
-                              stderr=None
-                              )
-        return p
-    except FileNotFoundError as e:
-        raise AudioEngineUnavailable(f'AudioEngineUnavailable: {e}')
-
-def play_list(mp3_list, pty):
-    try:
-        command = ['mpg123', '-C', '-q','-z'] + mp3_list
-        p = subprocess.Popen( command,
-#                              ['mpg123', # The program to launch in the subprocess
-#                              '-C',     # Enable commands to be read from stdin
-#                              '-q',     # Be quiet
-#                              '-z']     # 
-#                              +mp3_list,
-                              stdin=pty,  # Pipe input via bytes
-                              stdout=None,   
-                              stderr=None
-                              )
-        return p
-    except FileNotFoundError as e:
-        raise AudioEngineUnavailable(f'AudioEngineUnavailable: {e}')
-    
-
-# Monitor a subprocess, record its state in global variables
-# This function is intended to run in its own thread
-def process_monitor(p):
-    global __mpg123Running__
-    global __return_code__
-    # Indicate that the process is running at the start, it
-    # should be
-    __mpg123Running__ = True
-    # When a process exits, p.poll() returns the code it set upon
-    # completion
-    __return_code__ = p.poll()
-    # See whether the process has already exited. This will cause a
-    # value (i.e. not None) to return from p.poll()
-    if __return_code__ == None:
-        # Wait for the process to complete, get its return code directly
-        # from the wait() call (i.e. do not use p.poll())
-        __return_code__ = p.wait()
-    # When we get here, the process has exited and set a return code
-    __mpg123Running__ = False
- 
- 
     
 def pressedNumber(channel):
     if(channel ==12):
@@ -153,26 +95,23 @@ def pressedNumber(channel):
         print("6 Pressed")
     return Number
 
-def playSelected():
-    global __p__
-    global __musicPlayingPi__
+def handleSelectedPi():
+    global __musicVlcInstance__
+    global __musicVlcPi__
+    global __musicPiPlaying__
     global __dir__
-    global __mp3_list__
-    global __mpg123Running__
-    global __pty_master__
+    global __fileList__
     global __num4dPi__
-    global __mp3Pi_i__
+    global __indexPi__
     global __num4dPi_i__
-    if (__mpg123Running__ == True):
-        __p__.terminate() 
-        time.sleep(0.1)
-    mp3_file = __dir__ + __mp3_list__[__mp3Pi_i__]
-    print("play:"+mp3_file)
-    __p__ = play_file(mp3_file, __pty_master__)
-    monitor_thread = Thread(target=process_monitor,args=(__p__,)) 
-    monitor_thread.start()
-    __musicPlayingPi__ = True
-    __timer_running__ = False
+    file = __dir__ + __fileList__[__indexPi__]
+    __musicVlcPi__.stop()
+    vlcmedia  = __musicVlcInstance__.media_new(file)
+    __musicVlcPi__.set_media(vlcmedia)
+    __musicVlcPi__.play()
+    __musicPiPlaying__ = True
+    print("play:"+file)
+    __keyTimerPi__= False
     __num4dPi__ = [0, 0, 0, 0]
     __num4dPi_i__ = 4
 #Convert int array to decimal interger
@@ -181,17 +120,15 @@ def convert(list):
     return(no)
 
 def handleKeyInputPi(channel):
-    global __mp3Pi_i__
-    global __p__
-    global __mp3_i_max__
+    global __indexPi__
+    global __indexMax__
     global __dir__
-    global __musicPlayingPi__
+    global __musicPiPlaying__
     global __num4dPi_i__
     global __num4dPi__
-    global __timer_running__
-    global __t__
-    if (__timer_running__ == True):
-        __t__.cancel()
+    global __timer_Key__
+    if (__keyTimerPi__== True):
+        __timer_Key__.cancel()
     Number = pressedNumber(channel)
     __num4dPi_i__ = __num4dPi_i__ - 1
     if(__num4dPi_i__ < 0):
@@ -201,117 +138,133 @@ def handleKeyInputPi(channel):
     __num4dPi__[2] = __num4dPi__[3] 
     __num4dPi__[3] = Number 
     num = convert(__num4dPi__)
-    __mp3Pi_i__ = ( num % __mp3_i_max__) - 1
-    if (__mp3Pi_i__ == -1 ):
-       __mp3Pi_i__ = __mp3Pi_i__ + __mp3_i_max__
-    print("the NO."+str(__mp3Pi_i__ + 1)+" mp3 will be played")
-    __t__ = threading.Timer(3, playSelected)
-    __t__.start()
-    __timer_running__ = True
+    __indexPi__ = ( num % __indexMax__) - 1
+    if (__indexPi__ == -1 ):
+       __indexPi__ = __indexPi__ + __indexMax__
+    print("the NO."+str(__indexPi__ + 1)+" mp3 will be played")
+    __timer_Key__ = threading.Timer(3, handleSelectedPi)
+    __timer_Key__.start()
+    __keyTimerPi__= True
 
-def handleNext(channel):
-    global __mp3Pi_i__
-    global __p__
-    global __mp3_i_max__
-    global __mp3_list__
+def handleNextPi():
+    global __indexPi__
+    global __indexMax__
+    global __fileList__
     global __dir__
-    global __mpg123Running__
-    global __musicPlayingPi__
-    __mp3Pi_i__ = __mp3Pi_i__ + 1
-    if (__mp3Pi_i__  > (__mp3_i_max__ -1 )):
-        __mp3Pi_i__= 0 
-    dir_mp3Pi = __dir__ + __mp3_list__[__mp3Pi_i__]
-    print("play:"+dir_mp3Pi)
-    if (__mpg123Running__ == True):
-        __p__.terminate()   
-    __p__ = play_file(dir_mp3Pi, __pty_master__)
-    time.sleep(0.1)
-    monitor_thread = Thread(target=process_monitor,args=(__p__,)) 
-    monitor_thread.start()
-    __musicPlayingPi__ = True
+    global __musicVlcInstance__
+    global __musicVlcPi__
+    global __musicPiPlaying__
+    __indexPi__ = __indexPi__ + 1
+    if (__indexPi__  > (__indexMax__ -1 )):
+        __indexPi__= 0 
+    file = __dir__ + __fileList__[__indexPi__]
+    __musicVlcPi__.stop()
+    vlcmedia  = __musicVlcInstance__.media_new(file)
+    __musicVlcPi__.set_media(vlcmedia)
+    __musicVlcPi__.play()
+    __musicPiPlaying__ = True
+    print("Next play:"+file)
 
-def handlePre(channel):
-    global __mp3Pi_i__
-    global __p__
-    global __mp3_i_max__
-    global __mp3_list__
+def handlePrePi():
+    global __indexPi__
+    global __indexMax__
+    global __fileList__
     global __dir__
-    global __mpg123Running__
-    global __musicPlayingPi__
-    __mp3Pi_i__ = __mp3Pi_i__ - 1
-    if (__mp3Pi_i__ < 0):
-       __mp3Pi_i__= __mp3_i_max__ - 1
-    dir_mp3Pi = __dir__ + __mp3_list__[__mp3Pi_i__]
-    print("play:"+dir_mp3Pi)
-    if (__mpg123Running__ == True):
-        __p__.terminate()
-    __p__ = play_file(dir_mp3Pi, __pty_master__)
-    time.sleep(0.1)
-    monitor_thread = Thread(target=process_monitor,args=(__p__,)) 
-    monitor_thread.start()
-    __musicPlayingPi__ = True
+    global __musicVlcInstance__
+    global __musicVlcPi__
+    global __musicPiPlaying__
+    __indexPi__ = __indexPi__ - 1
+    if (__indexPi__ < 0):
+       __indexPi__= __indexMax__ - 1
+    file = __dir__ + __fileList__[__indexPi__]
+    vlcmedia  = __musicVlcInstance__.media_new(file)
+    __musicVlcPi__.stop()
+    __musicVlcPi__.set_media(vlcmedia)
+    __musicVlcPi__.play()
+    __musicPiPlaying__ = True
+    print("Pre play:"+file)
 
-def handlePlayPause(channel):
-    global __mp3Pi_i__
-    global __musicPlayingPi__
-    global __mpg123Running__
-    global __p__
-    global __mp3_list__
-    time.sleep(0.1)
-    if (__mpg123Running__ == True):
+def handlePlayPausePi():
+    global __indexPi__
+    global __musicVlcInstance__
+    global __musicVlcPi__
+    global __musicPiPlaying__
+    global __fileList__
+    if (__musicPiPlaying__ == True):
         time.sleep(0.1)
-        os.write(__pty_slave__, b's')
-        __musicPlayingPi__ = not __musicPlayingPi__
-        #__p__.stdin.write(b's')
-        #__p__.stdin.flush()
+        __musicVlcPi__.pause()
+        __musicPiPlaying__ = False
     else:
-        mp3Pi = __dir__ + __mp3_list__[__mp3Pi_i__]
-        __p__ = play_file(mp3Pi, __pty_master__)
-        print("handlePlayPause- play:"+mp3Pi)
-        time.sleep(0.1)
-        monitor_thread = Thread(target=process_monitor,args=(__p__,)) 
-        monitor_thread.start()
-        __musicPlayingPi__ = True
-def handleMute(channel):
-    global __musicPlayingPi__
-    if (__musicPlayingPi__ == True):
-        os.write(__pty_slave__, b'u')
+        file = __dir__ + __fileList__[__indexPi__]
+        vlcmedia  = __musicVlcInstance__.media_new(file)
+        __musicVlcPi__.set_media(vlcmedia)
+        __musicVlcPi__.play()
+        __musicPiPlaying__ = True
+        print("PlayPause- Play:"+file)
+        
+def handleMutePi():
+    global __musicVlcPi__
+    global __radioVlcPi__
+    global __volumePi__
+    global __volumePiMute__
+    if __volumePiMute__ == False :  
+        __musicVlcPi__.audio_set_volume(0)
+        __radioVlcPi__.audio_set_volume(0)
+        __volumePiMute__ = True
+    else:
+        vlcvolume = __volumePi__
+        __musicVlcPi__.audio_set_volume(vlcvolume)
+        __radioVlcPi__.audio_set_volume(vlcvolume)
+        __volumePiMute__ = False
 
-def handleBack(channel):
-    global __musicPlayingPi__
-    if (__musicPlayingPi__ == True):
-        os.write(__pty_slave__, b'b')
+def handleVolumeDownPi():
+    global __musicVlcPi__
+    global __radioVlcPi__
+    global __volumePi__
+    __volumePi__ = __volumePi__ -25
+    if __volumePi__ < 0:
+        __volumePi__ = 0 
+        
+    vlcvolume = __volumePi__
+    __radioVlcPi__.audio_set_volume(vlcvolume)
+    __musicVlcPi__.audio_set_volume(vlcvolume)
 
-def get_files(root):
-    files = []
-    def scan_dir(dir):
-        for f in os.listdir(dir):
-            #f = os.path.join(dir, f)
-            if os.path.isdir(f):
-                scan_dir(f)
-            elif os.path.splitext(f)[1] == ".mp3":
-                files.append(f)
-    scan_dir(root)
-    return files
+def handleVolumeUpPi():
+    global __musicVlcPi__
+    global __radioVlcPi__
+    global __volumePi__
+    __volumePi__= __volumePi__ + 25
+    if __volumePi__ > 100:
+        __volumePi__ = 99 
+    vlcvolume = __volumePi__
+    __radioVlcPi__.audio_set_volume(vlcvolume)
+    __musicVlcPi__.audio_set_volume(vlcvolume)
+
+#def get_files(root):
+#    files = []
+#    def scan_dir(dir):
+#        for f in os.listdir(dir):
+#            #f = os.path.join(dir, f)
+#            if os.path.isdir(f):
+#                scan_dir(f)
+#            elif os.path.splitext(f)[1] == ".mp3":
+#                files.append(f)
+#   scan_dir(root)
+#   return files
 
 def continuePlaying():
-    global __musicPlayingPi__
-    global __mpg123Running__
-    global __pty_master__
-    global __mp3_list_z__ 
-    global __p__
-    if (( __mpg123Running__ == False ) and (__musicPlayingPi__ == True )):
-        handleNext(8888);
-        ######if want to play random###but can't trace playing's mp3#####
-        #__p__ = play_list(__mp3_list_z__, __pty_master__)
-        #time.sleep(0.1)
-        #monitor_thread = Thread(target=process_monitor,args=(__p__,)) 
-        #monitor_thread.start()
-        #__musicPlayingPi__ = True
-        ######if want to play random###but can't trace playing's mp3#####
-        threading.Timer( 5 , continuePlaying ).start()
+    global __musicVlcPi__
+    global __musicPiPlaying__
+    global __vlcEnded__
+    global __vlcPlaying__
+    state = __musicVlcPi__.get_state()
+    print(state)
+    if (__musicPiPlaying__ == True ):
+        if (state == __vlcEnded__):
+            handleNextPi();
+        threading.Timer( 10 , continuePlaying ).start()
     else:
-        threading.Timer( 5 , continuePlaying ).start()
+        threading.Timer( 10 , continuePlaying ).start()
 
 
 #---------------------------------------------------------------------------------
@@ -328,7 +281,6 @@ if(True):
     GPIO.setup(29, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(31, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(33, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(35, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(37, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
    #callback function 
@@ -338,16 +290,15 @@ if(True):
     GPIO.add_event_detect(11, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
     GPIO.add_event_detect(13, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
     GPIO.add_event_detect(15, GPIO.FALLING, callback=handleKeyInputPi, bouncetime=500)
-    GPIO.add_event_detect(29, GPIO.FALLING, callback=handlePlayPause, bouncetime=500)
-    GPIO.add_event_detect(31, GPIO.FALLING, callback=handleNext, bouncetime=500)
-    GPIO.add_event_detect(33, GPIO.FALLING, callback=handlePre, bouncetime=500)
-    GPIO.add_event_detect(35, GPIO.FALLING, callback=handleBack, bouncetime=500)
-    GPIO.add_event_detect(37, GPIO.FALLING, callback=handleMute, bouncetime=500)
+    GPIO.add_event_detect(29, GPIO.FALLING, callback=handlePlayPausePi, bouncetime=500)
+    GPIO.add_event_detect(31, GPIO.FALLING, callback=handleNextPi, bouncetime=500)
+    GPIO.add_event_detect(33, GPIO.FALLING, callback=handlePrePi, bouncetime=500)
+    GPIO.add_event_detect(37, GPIO.FALLING, callback=handleMutePi, bouncetime=500)
     
 if(True):
 #---------------------------------------------------------------------
 #file list Method 1
-#    __mp3_list__ = [ f for f in os.listdir(r'./static/assets/.') if f[-4:] == '.mp3' ]
+#    __fileList__ = [ f for f in os.listdir(r'./static/assets/.') if f[-4:] == '.mp3' ]
 #    mp3_list.sort(key=lambda x:int(x[:-4]))
 #--------------------------------------------------------------------
 #file list Method 2
@@ -360,37 +311,26 @@ if(True):
         files = [path + file for file in files];
         mp3s= mp3s + files; 
     mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
-    __mp3_list__ = mp3s;
+    __fileList__ = mp3s;
 
 #---------------------------------------------------------------------
 #file list Methos 3
-    __mp3_list_z__ = glob.glob(r'./static/assets/*.mp3')
-#    __mp3_list_z__.sort(key=lambda x:int(x[25:-4]))
+    __fileListRn__ = glob.glob(r'./static/assets/*.mp3')
+#    __fileListRn__.sort(key=lambda x:int(x[25:-4]))
 #---------------------------------------------------------------------
 #file list Method 4
-#    __mp3_list__ = get_files(__dir__)
-#    __mp3_list__.sort(key=lambda x:int(x[:-4]))
+#    __fileList__ = get_files(__dir__)
+#    __fileList__.sort(key=lambda x:int(x[:-4]))
 #---------------------------------------------------------------------
-
-    __mp3_i_max__ = len(__mp3_list__) 
-    if not (len(__mp3_list__) > 0):
+    __indexMax__ = len(__fileList__) 
+    if not (len(__fileList__) > 0):
         print ("No mp3 files found!")
     print ('--- Available mp3 files ---')
-    print(__mp3_list__)
-    __mp3Pi_i__ = random.randrange(__mp3_i_max__)
-   # add openpty
-    __pty_master__, __pty_slave__ = os.openpty()
-    __qpty_master__, __qpty_slave__ = os.openpty()
-    __musicPlayingPi__ = False
-   # We need a way to tell if a song is already playing. Start a 
-   # thread that tells if the process is running and that sets
-   # a global flag with the process running status.
-   #    monitor_thread = Thread(target=process_monitor,args=(__p__,)) 
-   #    monitor_thread.start()
-   #    time.sleep(0.1)
-   #    os.write(__pty_slave__, b's')    
+    print(__fileList__)
+    __indexPi__ = random.randrange(__indexMax__)
     print ('--- Press button #play to start playing mp3 ---')
-    threading.Timer( 5 , continuePlaying ).start()
+
+    threading.Timer( 10 , continuePlaying ).start()
 
 #==============================================================================================
 app = Flask(__name__)
@@ -399,147 +339,75 @@ CORS(app)
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global __dir__
-    global __mp3_list__
-    global __mp3_i_max__
-    global __mp3Pc_i__
-    global __mp3Pi_i__
-    global __radioPlayingPiNo__ 
+    global __fileList__
+    global __indexPi__
+    global __musicPiPlaying__ 
+    global __radioPiPlayingNo__ 
+    global __volumePi__
+    global __volumePiMute__
     if request.method == 'GET':
-        __mp3Pc_i__ = (__mp3Pc_i__+  1 ) % __mp3_i_max__
-        print(__mp3Pc_i__)
-        mp3Pc = __dir__+ __mp3_list__[__mp3Pc_i__]
-        mp3Pi = __dir__+ __mp3_list__[__mp3Pi_i__]
-        print(mp3Pc)
         return render_template('index.html')
     if request.method =='POST':
         return jsonify({
-        "mp3_list" : __mp3_list__,
-        "mp3Pi_i" : __mp3Pi_i__,
-        "musicPlayingPi" : __musicPlayingPi__,
-        "radioPlayingPiNo" : __radioPlayingPiNo__
+        "fileList" : __fileList__,
+        "indexPi" : __indexPi__,
+        "musicPiPlaying" : __musicPiPlaying__,
+        "radioPiPlayingNo" : __radioPiPlayingNo__,
+        "volumePi" : __volumePi__,
+        "volumePiMute" : __volumePiMute__
          })
     
 @app.route('/playPrePi', methods=['POST'])
 def playPrePi():
-    global __mp3Pi_i__
-    global __mp3_i_max__
-    handlePre(8888);
+    global __indexPi__
+    global __indexMax__
+    global __musicPiPlaying__
+    handlePrePi();
     return jsonify({ 
-           "mp3Pi_i":__mp3Pi_i__,
-           "musicPlayingPi" :__musicPlayingPi__
+           "indexPi":__indexPi__,
+           "musicPiPlaying" :__musicPiPlaying__
           })
         
 @app.route('/playNextPi', methods=['POST'])
 def playNextPi():
-    global __mp3Pi_i__
-    global __mp3_i_max__
-    handleNext(8888);
+    global __indexPi__
+    global __indexMax__
+    global __musicPiPlaying__
+    handleNextPi();
     return jsonify({ 
-           "mp3Pi_i":__mp3Pi_i__,
-           "musicPlayingPi" :__musicPlayingPi__
+           "indexPi":__indexPi__,
+           "musicPiPlaying" :__musicPiPlaying__
           })
     
 @app.route('/playSelectedPi', methods=['POST'])
 def playSelectedPi():
-    global __mp3Pi_i__
-    global __musicPlayingPi__
-    global __mp3_i_max__
+    global __indexPi__
+    global __musicPiPlaying__
+    global __indexMax__
     data=request.get_json()
     num=int(data["num"])
-    __mp3Pi_i__= num % __mp3_i_max__
-    playSelected();
+    __indexPi__= num % __indexMax__
+    handleSelectedPi();
     return jsonify({ 
-           "mp3Pi_i":__mp3Pi_i__,
-           "musicPlayingPi" :__musicPlayingPi__
+           "indexPi":__indexPi__,
+           "musicPiPlaying" :__musicPiPlaying__
           })
 
 @app.route('/playPausePi', methods=['POST'])
 def playPausePi():
-    global __mp3Pi_i__
-    global __musicPlayingPi__
-    global __mpg123Running__
-    global __p__
-    global __mp3_list__
-    time.sleep(0.1)
-    if (__mpg123Running__ == True):
-        time.sleep(0.1)
-        os.write(__pty_slave__, b's')
-        __musicPlayingPi__ = not __musicPlayingPi__
-    else:
-        file = __dir__ + __mp3_list__[__mp3Pi_i__]
-        __p__ = play_file(file, __pty_master__)
-        print("play:"+file)
-        time.sleep(0.1)
-        monitor_thread = Thread(target=process_monitor,args=(__p__,)) 
-        monitor_thread.start()
-        __musicPlayingPi__ = True   
+    global __musicPiPlaying__
+    global __indexPi__
+    handlePlayPausePi()
     return jsonify({
-        "musicPlayingPi" : __musicPlayingPi__,
-        "mp3Pi_i" : __mp3Pi_i__
+        "musicPiPlaying" : __musicPiPlaying__,
+        "indexPi" : __indexPi__
          })
-#this api use mpg123 to play  stream audio , but mpg123 doesn't fully support all streaming format 
-@app.route('/playRadioPi_old', methods=['POST'])
-def playRadioPi_old():
-    global __q__
-    global __qpty_master__
-    global __qpty_slave__
-    global __radioPlayingPiNo__
-    global __radiompg123Running__
-    data=request.get_json()
-    radioNo=int(data["radioNo"])
-    match radioNo:
-        case 1:
-           url =__url__["url01"]
-        case 2:
-           url =__url__["url02"]
-        case 3:
-           url =__url__["url03"]
-        case 4:
-           url =__url__["url04"]
-        case 5:
-           url =__url__["url05"]
-        case 6:
-           url =__url__["url06"]
-        case 7:
-           url =__url__["url07"]
-        case 8:
-           url =__url__["url08"]
-        case 9:
-           url =__url__["url09"]
-        case 10:
-           url =__url__["url10"]
-        case _:
-           url ="http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-    if(__radiompg123Running__  == True):
-        if(radioNo == 0):
-            os.write(__qpty_slave__, b's')
-            __radioPlayingPiNo__ = 0
-        elif(radioNo == __radioPlayingPiNo__):
-            os.write(__qpty_slave__, b's')
-            __radioPlayingPiNo__ = radioNo
-        else:
-            __q__.terminate()   
-            __q__ = play_file(url, __qpty_master__)
-            time.sleep(0.1)
-            qmonitor_thread = Thread(target=qprocess_monitor,args=(__q__,)) 
-            qmonitor_thread.start()
-            __radioPlayingPiNo__ = radioNo
-    else:
-        __q__ = play_file(url, __qpty_master__)
-        time.sleep(0.1)
-        qmonitor_thread = Thread(target=qprocess_monitor,args=(__q__,)) 
-        qmonitor_thread.start()
-        __radioPlayingPiNo__ = radioNo
-    return jsonify({
-        "radioPlayingPiNo" : __radioPlayingPiNo__,
-         })
-
 
 @app.route('/playRadioPi', methods=['POST'])
 def playRadioPi():
-    global __vlc__
-    global __radioPlayingPiNo__
-    global __radioVlcPlayer__
+    global __radioVlcInstance__
+    global __radioPiPlayingNo__
+    global __radioVlcPi__
     global __url__
     data=request.get_json()
     radioNo=int(data["radioNo"])
@@ -607,61 +475,48 @@ def playRadioPi():
         case _:
            url ="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service"
     if(radioNo == 0):
-        __radioVlcPlayer__.stop()
-        __radioPlayingPiNo__ = 0
+        __radioVlcPi__.stop()
+        __radioPiPlayingNo__ = 0
     else:
-        if(__radioPlayingPiNo__ != 0):
-           __radioVlcPlayer__.stop()
-        __radioVlcPlayer__ = __vlc__.media_player_new()
-        print("url"+url)        
-        vlcmedia  = __vlc__.media_new(url)
-        __radioVlcPlayer__.set_media(vlcmedia)
-        __radioVlcPlayer__.play()
-        __radioPlayingPiNo__ = radioNo
+        if(__radioPiPlayingNo__ != 0):
+           __radioVlcPi__.stop()
+        vlcmedia  = __radioVlcInstance__.media_new(url)
+        __radioVlcPi__.set_media(vlcmedia)
+        __radioVlcPi__.play()
+        __radioPiPlayingNo__ = radioNo
+        print("Rasio Stream URL :"+url)        
     return jsonify({
-        "radioPlayingPiNo" : __radioPlayingPiNo__,
+        "radioPiPlayingNo" : __radioPiPlayingNo__
          })
 
 @app.route('/volumeDownPi', methods=['POST'])
 def volumeDownPi():
-    global __vlc__
-    global __radioPlayingPiNo__
-    global __radioVlcPlayer__
-    global __vlcVolume__
-    __vlcVolume__ = __vlcVolume__ -  10
-    if __vlcVolume__ < 0:
-        __vlcVolume__ = 0 
-    __radioVlcPlayer__.audio_set_volume(__vlcVolume__)
+    global __volumePi__
+    global __volumePiMute__
+    handleVolumeDownPi()
     return jsonify({
+        "volumePi" : __volumePi__,
+        "volumePiMute" : __volumePiMute__
          })
     
 @app.route('/volumeUpPi', methods=['POST'])
 def volumeUpPi():
-    global __vlc__
-    global __radioPlayingPiNo__
-    global __radioVlcPlayer__
-    global __vlcVolume__
-    __vlcVolume__= __vlcVolume__ + 10
-    if __vlcVolume__ > 100:
-        __vlcVolume__ = 99 
-    __radioVlcPlayer__.audio_set_volume(__vlcVolume__)
+    global __volumePi__
+    global __volumePiMute__
+    handleVolumeUpPi()
     return jsonify({
+        "volumePi" : __volumePi__,
+        "volumePiMute" : __volumePiMute__
          })
     
 @app.route('/volumeMutePi', methods=['POST'])
 def volumeMutePi():
-    global __vlc__
-    global __radioPlayingPiNo__
-    global __radioVlcPlayer__
-    global __vlcVolume__
-    global __vlcVolumeMute__
-    if __vlcVolumeMute__ == False :  
-        __radioVlcPlayer__.audio_set_volume(0)
-        __vlcVolumeMute__ = not __vlcVolumeMute__
-    else:
-        __radioVlcPlayer__.audio_set_volume(__vlcVolume__)
-        __vlcVolumeMute__ = not __vlcVolumeMute__
+    global __volumePi__
+    global __volumePiMute__
+    handleMutePi()
     return jsonify({
+        "volumePi" : __volumePi__,
+        "volumePiMute" : __volumePiMute__
          })
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=2000,debug=True)

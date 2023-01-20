@@ -24,9 +24,9 @@
     </div>
     
     <div class="banner-container">
-    <div class="audiobox"><p v-model="mp3Pc">%{mp3Pc}%</p></div>
+    <div class="audiobox"><p v-model="filePc">%{filePc}%</p></div>
     </div>
-    <div style="display:none" ><audio id="my-audio" controls> <source src="{{mp3Pc}}" type="audio/mpeg">    你的瀏覽器不支援 audio tag！ </audio></div>
+    <div style="display:none" ><audio id="my-audio" controls> <source src="{{filePc}}" type="audio/mpeg">    你的瀏覽器不支援 audio tag！ </audio></div>
     <div class="button-container">
             <button type="text" class="key-button" v-model="num4dPc[0]">%{num4dPc[0]}% %{num4dPc[1]}% %{num4dPc[2]}% %{num4dPc[3]}%</button>
             <button type="button" class="key-button" v-on:click="keyInputPc(0)">0</button>
@@ -39,14 +39,14 @@
             <button type="button" class="key-button" v-on:click="keyInputPc(7)">7</button>
             <button type="button" class="key-button" v-on:click="keyInputPc(8)">8</button>
             <button type="button" class="key-button" v-on:click="keyInputPc(9)">9</button>
-            <button type="button" class="key-button" v-on:click="setPlayModePc" v-if="musicPlayModePc==1"><i class="fa fa-shuffle"></i></button>
-            <button type="button" class="key-button" v-on:click="setPlayModePc" v-if="musicPlayModePc==2"><i class="fa fa-repeat"></i></button>
-            <button type="button" class="key-button" v-on:click="setPlayModePc" v-if="musicPlayModePc==3"><i class="fa fa-repeat"></i></button>
+            <button type="button" class="key-button" v-on:click="setPlayModePc" v-if="musicPcPlayMode==0"><i class="fa fa-shuffle"></i></button>
+            <button type="button" class="key-button" v-on:click="setPlayModePc" v-if="musicPcPlayMode==1"><i class="fa fa-repeat"></i></button>
+            <button type="button" class="key-button" v-on:click="setPlayModePc" v-if="musicPcPlayMode==2"><i class="fa fa-repeat"></i></button>
     </div>
 
     <div class="button-container">
             <button type="button" class="key-button" v-on:click="playPrePc"><i class="fa fa-fast-backward"></i></button>
-            <button type="button" class="key-button" v-on:click="playPausePc" v-if="musicPlayingPc"><i class="fa fa-pause"></i></button>
+            <button type="button" class="key-button" v-on:click="playPausePc" v-if="musicPcPlaying"><i class="fa fa-pause"></i></button>
             <button type="button" class="key-button" v-on:click="playPausePc" v-else><i class="fa fa-play"></i></button>
             <button type="button" class="key-button" v-on:click="playNextPc"><i class="fa fa-fast-forward"></i></button>
     </div>
@@ -107,7 +107,7 @@
     </div>
 
     <div class="banner-container">
-    <div class="banner"><p v-model="mp3Pi">%{mp3Pi}%</p></div>
+    <div class="banner"><p v-model="filePi">%{filePi}%</p></div>
     </div>
 
     <div class="button-container">
@@ -122,13 +122,13 @@
         <button type="button" class="key-button" v-on:click="keyInputPi(7)">7</button>
         <button type="button" class="key-button" v-on:click="keyInputPi(8)">8</button>
         <button type="button" class="key-button" v-on:click="keyInputPi(9)">9</button>
-        <button type="button" class="key-button" v-on:click="setPlayModePi" v-if="musicPlayModePi==1"><i class="fa fa-shuffle"></i></button>
-        <button type="button" class="key-button" v-on:click="setPlayModePi" v-if="musicPlayModePi==2"><i class="fa fa-repeat"></i></button>
-        <button type="button" class="key-button" v-on:click="setPlayModePi" v-if="musicPlayModePi==3"><i class="fa fa-repeat"></i></button>
+        <button type="button" class="key-button" v-on:click="setPlayModePi" v-if="musicPiPlayMode==1"><i class="fa fa-shuffle"></i></button>
+        <button type="button" class="key-button" v-on:click="setPlayModePi" v-if="musicPiPlayMode==2"><i class="fa fa-repeat"></i></button>
+        <button type="button" class="key-button" v-on:click="setPlayModePi" v-if="musicPiPlayMode==3"><i class="fa fa-repeat"></i></button>
     </div>
     <div class="button-container">
         <button type="button" class="key-button" v-on:click="playPrePi"><i class="fa fa-fast-backward"></i></button>
-        <button type="button" class="key-button" v-on:click="playPausePi" v-if="musicPlayingPi"><i class="fa fa-pause"></i></button>
+        <button type="button" class="key-button" v-on:click="playPausePi" v-if="musicPiPlaying"><i class="fa fa-pause"></i></button>
         <button type="button" class="key-button" v-on:click="playPausePi" v-else><i class="fa fa-play"></i></button>
         <button type="button" class="key-button" v-on:click="playNextPi"><i class="fa fa-fast-forward"></i></button>
     </div>

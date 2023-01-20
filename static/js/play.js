@@ -3,40 +3,43 @@ const vm = createApp({
   delimiters:['%{', '}%'],
   data(){
                return {
-               musicPlayingPc : false,
-               musicplayingPi : false,
-               musicPlayModePc : 2,
-               musicPlayModePi : 2,
-               mp3Pc : '',
-               mp3Pi : '',
-               mp3Pc_i : 0,
-               mp3Pi_i : 0,
+               musicPcPlaying : false,
+               musicPiPlaying : false,
+               musicPcPlayMode : 2,
+               musicPiPlayMode : 2,
+               fileList : [],
+               dir :"/static/assets/",
+               filePc: '',
+               filePi : '',
+               indexPc : 0,
+               indexPi : 0,
+               indexMax : 0 ,
                num4dPc : [0,0,0,0],
                num4dPi : [0,0,0,0],
                num4dPc_i : 4,
                num4dPi_i : 4,
-               dir :"/static/assets/",
-               mp3_list : [],
-               mp3_i_max : 0 ,
                keytimerPc : null,
                keytimerPi : null,
                keytimerPcRunning: false,
                keytimerPiRunning: false,
-               radioPlayingPcNo: 0,
-               radioPlayingPiNo: 0,
-               volume : 0.65,
+               radioPiPlayingNo: 0,
+               radioPcPlayingNo: 0,
+               volumePc : 0.65,
+               volumePi : 0.65,
+               volumePcMute : false,
+               volumePiMute : false,
                //broswer audio play src
                url01:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
                url02:"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
-               url03:"https://npr-ice.streamguys1.com/live.mp3",
+               url03:"https://npr-ice.streamguys1.com/live.file",
                url04:"https://prod-18-232-88-129.wostreaming.net/foxnewsradio-foxnewsradioaac-imc?session-id=0f99acd44126cef33b40ce217c9ea1ad",
                url05:"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_five_live",
                url06:"http://stream.live.vc.bbcmedia.co.uk/bbc_asian_network",
                url07:"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
                url08:"https://icrt.leanstream.co/ICRTFM-MP3?args=web",
                url09:"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_two",
-               url10:"http://192.168.1.192:8000/stream.ogg",
-               url11:"http://onair.family977.com.tw:8000/live.mp3",
+               url10:"http://192.168.1.146:8000/stream.ogg",
+               url11:"http://onair.family977.com.tw:8000/live.file",
                url12:"https://n09.rcs.revma.com/aw9uqyxy2tzuv?rj-ttl=5&rj-tok=AAABhZollCEACdvxzVVN61ARVg",
                url13:"https://n10.rcs.revma.com/ndk05tyy2tzuv?rj-ttl=5&rj-tok=AAABhZouFPAAQudE3-49-1PFHQ",
                url14:"https://n09.rcs.revma.com/7mnq8rt7k5zuv?rj-ttl=5&rj-tok=AAABhZovh0cASZAucd0xcmxkvQ",
@@ -64,26 +67,30 @@ const vm = createApp({
             },
             loading(){
                 axios.post('/').then(res => {
-                this.mp3Pi_i=res.data.mp3Pi_i;
-                this.musicPlayingPi=res.data.musicPlayingPi;
-                this.mp3_list = res.data.mp3_list;
-                this.radioPlayingPiNo = res.data.radioPlayingPiNo;   
-                this.mp3_i_max = this.mp3_list.length;
-                rn = this.getRandom(this.mp3_i_max-1, 0);
-                //rn = rn % this.mp3_i_max;
-                this.mp3Pc_i=rn;
-                this.mp3Pc=this.mp3_list[rn];
-                this.mp3Pi=this.mp3_list[this.mp3Pi_i];
-                console.log("mp3Pc: "+this.mp3Pc);
-                console.log("mp3Pi: "+this.mp3Pi);
-                console.log("musicPayingPi: "+this.musicPlayingPi);
-                console.log("radioPlayingPiNo: "+this.radioPlayingPiNo);
+                this.indexPi=res.data.indexPi;
+                this.musicPiPlaying=res.data.musicPiPlaying;
+                this.fileList = res.data.fileList;
+                this.radioPiPlayingNo = res.data.radioPiPlayingNo;   
+                this.indexMax = this.fileList.length;
+                this.volumePi= res.data.volumePi;
+                this.volumePiMute= res.data.volumePiMute;
+                rn = this.getRandom(this.indexMax-1, 0);
+                //rn = rn % this.indexMax;
+                this.indexPc=rn;
+                this.filePc=this.fileList[rn];
+                this.filePi=this.fileList[this.indexPi];
+                console.log("filePc: "+this.filePc);
+                console.log("filePi: "+this.filePi);
+                console.log("musicPiPaying: "+this.musicPiPlaying);
+                console.log("radioPiPlayingNo: "+this.radioPiPlayingNo);
+                console.log("volumePi: "+this.volumePi);
+                console.log("volumePiMute: "+this.volumePiMute);
                 var vid1 = document.getElementById("my-audio");
-                vid1.volume = this.volume; 
+                vid1.volumePc = this.volumePc; 
                 var vid2 = document.getElementById("my-radio");
-                vid2.volume = this.volume;
+                vid2.volumePc = this.volumePc;
 
-                if(this.radioPlayingPiNo==0){
+                if(this.radioPiPlayingNo==0){
                   element = document.getElementById("sel10Pi");
                   element.value = "0"
                   element = document.getElementById("sel20Pi");
@@ -91,21 +98,21 @@ const vm = createApp({
                   element = document.getElementById("sel30Pi");
                   element.value = "0"
                 }
-                else if(this.radioPlayingPiNo>0 && this.radioPlayingPiNo <11){
+                else if(this.radioPiPlayingNo>0 && this.radioPiPlayingNo <11){
                   element = document.getElementById("sel20Pi");
                   element.value = "0"
                   element = document.getElementById("sel30Pi");
                   element.value = "0"
                   element = document.getElementById("sel10Pi");
-                  element.value = this.radioPlayingPiNo 
+                  element.value = this.radioPiPlayingNo 
                 }
-                else if(  this.radioPlayingPiNo>11 &&this.radioPlayingPiNo<21){
+                else if(  this.radioPiPlayingNo>11 &&this.radioPiPlayingNo<21){
                   element = document.getElementById("sel10Pi");
                   element.value = "0"
                   element = document.getElementById("sel30Pi");
                   element.value = "0"
                   element = document.getElementById("sel20Pi");
-                  element.value = this.radioPlayingPiNo 
+                  element.value = this.radioPiPlayingNo 
                 }
                 else{
                   element = document.getElementById("sel10");
@@ -113,30 +120,32 @@ const vm = createApp({
                   element = document.getElementById("sel20");
                   element.value = "0"
                   element = document.getElementById("sel30");
-                  element.value = this.radioPlayingPiNo 
+                  element.value = this.radioPiPlayingNo 
                 }
 
               });
              },
-             playSelectSongPc(){
+             playSelectedPc(){
                 num=this.num4dPc.join("");
                 num = num-1;
                 console.log("current keyno is: "+num);
-                this.mp3Pc_i= num % this.mp3_i_max;
-                this.mp3Pc=this.mp3_list[this.mp3Pc_i];
-                console.log(this.dir+this.mp3_list[this.mp3Pc_i]);
-                dirmp3Pc=this.dir+this.mp3_list[this.mp3Pc_i];
+                this.indexPc= num % this.indexMax;
+                this.filePc=this.fileList[this.indexPc];
+                console.log(this.dir+this.fileList[this.indexPc]);
+                dirfilePc=this.dir+this.fileList[this.indexPc];
                 document.getElementById("my-audio").pause();
-                document.getElementById("my-audio").setAttribute('src',dirmp3Pc);
+                document.getElementById("my-audio").setAttribute('src',dirfilePc);
                 document.getElementById("my-audio").load();
                 document.getElementById("my-audio").play();
-                this.musicPlayingPc = true;
+                this.musicPcPlaying = true;
                 this.num4dPc[0]=0;
                 this.num4dPc[1]=0;
                 this.num4dPc[2]=0;
                 this.num4dPc[3]=0;
                 this.keytimerPcRunning = false;
-                
+             },
+             setPlayModePc(mode){
+                this.musicPcPlayMode = this.musicPcPlayMode % 3;
              },
              keyInputPc(keyno){
                 if(this.keytimerPcRunning == true){
@@ -150,76 +159,76 @@ const vm = createApp({
                 this.num4dPc[1] = this.num4dPc[2];
                 this.num4dPc[2] = this.num4dPc[3];
                 this.num4dPc[3] = keyno ;
-                this.keytimerPc=setTimeout(this.playSelectSongPc,3000);
+                this.keytimerPc=setTimeout(this.playSelectedPc,3000);
                 this.keytimerPcRunning = true;
                 },
             playPausePc(event){
-                dirmp3Pc=this.dir+this.mp3_list[this.mp3Pc_i];
-                document.getElementById("my-audio").setAttribute('src',dirmp3Pc);
-                if(this.musicPlayingPc == false){
+                dirfilePc=this.dir+this.fileList[this.indexPc];
+                document.getElementById("my-audio").setAttribute('src',dirfilePc);
+                if(this.musicPcPlaying == false){
                 document.getElementById("my-audio").play();
-                this.musicPlayingPc = true;
+                this.musicPcPlaying = true;
                 console.log("playPausePc to Play"); 
                 }
                 else{
                 document.getElementById("my-audio").pause();
-                this.musicPlayingPc = false;
+                this.musicPcPlaying = false;
                 console.log("playPausePc to Pause"); 
                 }
            	  },
             playPrePc(event){
-                this.mp3Pc_i = this.mp3Pc_i-1
-                if(this.mp3Pc_i < 0){
-                  this.mp3Pc_i = this.mp3_i_max - 1;
+                this.indexPc = this.indexPc-1
+                if(this.indexPc < 0){
+                  this.indexPc = this.indexMax - 1;
                   }
-                this.mp3Pc=this.mp3_list[this.mp3Pc_i];
-                dirmp3Pc=this.dir+this.mp3_list[this.mp3Pc_i];
-                document.getElementById("my-audio").setAttribute('src',dirmp3Pc);
+                this.filePc=this.fileList[this.indexPc];
+                dirfilePc=this.dir+this.fileList[this.indexPc];
+                document.getElementById("my-audio").setAttribute('src',dirfilePc);
                 document.getElementById("my-audio").load();
                 document.getElementById("my-audio").play();
-                this.musicPlayingPc = true; 
-                console.log(this.mp3Pc_i);
-                console.log(this.mp3Pc);
+                this.musicPcPlaying = true; 
+                console.log(this.indexPc);
+                console.log(this.filePc);
                 console.log("playPrePc works");
               },
             playNextPc(event){
-                this.mp3Pc_i = this.mp3Pc_i+1
-                if(this.mp3Pc_i >= this.mp3_i_max){
-                  this.mp3Pc_i = 0;
+                this.indexPc = this.indexPc+1
+                if(this.indexPc >= this.indexMax){
+                  this.indexPc = 0;
                   }
-                this.mp3Pc=this.mp3_list[this.mp3Pc_i];
-                dirmp3Pc=this.dir+this.mp3_list[this.mp3Pc_i];
+                this.filePc=this.fileList[this.indexPc];
+                dirfilePc=this.dir+this.fileList[this.indexPc];
                 document.getElementById("my-audio").pause();
-                document.getElementById("my-audio").setAttribute('src',dirmp3Pc);
+                document.getElementById("my-audio").setAttribute('src',dirfilePc);
                 document.getElementById("my-audio").load();
                 document.getElementById("my-audio").play();
-                this.musicPlayingPc = true;
-                console.log(this.mp3Pc_i);
-                console.log(this.mp3Pc);
+                this.musicPcPlaying = true;
+                console.log(this.indexPc);
+                console.log(this.filePc);
                 console.log("playNextPc works");
               },
             volumeDownPc(event){
                 var vid1 = document.getElementById("my-audio");
                 var vid2 = document.getElementById("my-radio");
-                this.volume = this.volume - 0.2;
-                if(this.volume < 0 ){this.volume =0;}
-                vid1.volume = this.volume; 
-                vid2.volume = this.volume; 
+                this.volumePc = this.volumePc - 0.2;
+                if(this.volumePc < 0 ){this.volumePc =0;}
+                vid1.volumePc = this.volumePc; 
+                vid2.volumePc = this.volumePc; 
               },
             volumeUpPc(event){
                 var vid1 = document.getElementById("my-audio");
                 var vid2 = document.getElementById("my-radio");
-                this.volume = this.volume + 0.2;
-                if(this.volume > 1){this.volume =1;}
-                vid1.volume = this.volume; 
-                vid2.volume = this.volume; 
+                this.volumePc = this.volumePc + 0.2;
+                if(this.volumePc > 1){this.volumePc =1;}
+                vid1.volumePc = this.volumePc; 
+                vid2.volumePc = this.volumePc; 
               },
             volumeMutePc(event){
                 var vid1 = document.getElementById("my-audio");
                 var vid2 = document.getElementById("my-radio");
-                if(this.volume != 0 ){this.volume =0;}
-                vid1.volume = 0; 
-                vid2.volume = 0; 
+                if(this.volumePc != 0 ){this.volumePc =0;}
+                vid1.volumePc = 0; 
+                vid2.volumePc = 0; 
               },
             playRadioPc(event){
                 this.radioPlayingPcNo = event.target.value;
@@ -299,16 +308,16 @@ const vm = createApp({
                 document.getElementById("my-radio").setAttribute('src',url);
                 document.getElementById("my-radio").load();
                 document.getElementById("my-radio").play();
-                console.log("radioPlayingNo: "+this.radioPlayingPcNo);
+                console.log("radioPcPlayingNo: "+this.radioPcPlayingPcNo);
                 }
               },
 
             playSelectedPi(){
                 num=this.num4dPi.join("");
                 axios.post('/playSelectedPi',{"num":num}).then(res => {
-                this.musicPlayingPi = res.data.musicPlayingPi;
-                this.mp3Pi_i = res.data.mp3Pi_i;
-                this.mp3Pi=this.mp3_list[this.mp3Pi_i];
+                this.musicPiPlaying = res.data.musicPiPlaying;
+                this.indexPi = res.data.indexPi;
+                this.filePi=this.fileList[this.indexPi];
                 console.log("works playSelectedPi");
                   })
                   .catch(error => {
@@ -334,11 +343,14 @@ const vm = createApp({
                 this.keytimerPi=setTimeout(this.playSelectedPi,3000);
                 this.keytimerPiRunning = true;
               },
+             setPlayModePi(mode){
+                this.musicPiPlayMode = this.musicPiPlayMode % 3;
+             },
              playPausePi(event){
                 axios.post('/playPausePi').then(res => {
-                this.musicPlayingPi = res.data.musicPlayingPi; 
-                this.mp3Pi_i = res.data.mp3Pi_i;
-                this.mp3Pi = this.mp3_list[res.data.mp3Pi_i];
+                this.musicPiPlaying = res.data.musicPiPlaying; 
+                this.indexPi = res.data.indexPi;
+                this.filePi = this.fileList[res.data.indexPi];
                 console.log("works playPausePi");
                 })
                 .catch(error => {
@@ -347,9 +359,9 @@ const vm = createApp({
            	  },
              playPrePi(event){
                 axios.post('/playPrePi').then(res => {
-                this.mp3Pi_i = res.data.mp3Pi_i;
-                this.mp3Pi = this.mp3_list[res.data.mp3Pi_i];
-                this.musicPlayingPi = res.data.musicPlayingPi; 
+                this.indexPi = res.data.indexPi;
+                this.filePi = this.fileList[res.data.indexPi];
+                this.musicPiPlaying = res.data.musicPiPlaying; 
                 console.log("playPrePi works");
                 })
                 .catch(error => {
@@ -358,10 +370,10 @@ const vm = createApp({
               },
             playNextPi(event){
                 axios.post('/playNextPi').then(res => {
-                this.mp3Pi_i = res.data.mp3Pi_i;
-                this.mp3Pi = this.mp3_list[res.data.mp3Pi_i];
-                dir_mp3Pi = this.dir+this.mp3_list[this.mp3Pi_i];
-                this.musicPlayingPi = res.data.musicPlayingPi; 
+                this.indexPi = res.data.indexPi;
+                this.filePi = this.fileList[res.data.indexPi];
+                dir_filePi = this.dir+this.fileList[this.indexPi];
+                this.musicPiPlaying = res.data.musicPiPlaying; 
                 console.log("playNextPi works");
                 })
                 .catch(error => {
@@ -370,14 +382,14 @@ const vm = createApp({
               },
             playRadioPi(event){
                 radioNo=event.target.value;
-                if(this.radioPlayingPiNo == radioNo){
-                   this.radioPlayingPiNo = 0 ;
-                }else{this.radioPlayingPiNo =radioNo;} 
-                console.log("Before radioPalyingPiNo:"+ this.radioPlayingPiNo);
-                axios.post('/playRadioPi',{"radioNo":this.radioPlayingPiNo}).then(res => {
-                this.radioPlayingPiNo = res.data.radioPlayingPiNo;
+                if(this.radioPiPlayingNo == radioNo){
+                   this.radioPiPlayingNo = 0 ;
+                }else{this.radioPiPlayingNo =radioNo;} 
+                console.log("Before radioPalyingPiNo:"+ this.radioPiPlayingNo);
+                axios.post('/playRadioPi',{"radioNo":this.radioPiPlayingNo}).then(res => {
+                this.radioPiPlayingNo = res.data.radioPiPlayingNo;
 
-                if(this.radioPlayingPiNo==0){
+                if(this.radioPiPlayingNo==0){
                   element = document.getElementById("sel10Pi");
                   element.value = 0
                   element = document.getElementById("sel20Pi");
@@ -385,21 +397,21 @@ const vm = createApp({
                   element = document.getElementById("sel30Pi");
                   element.value = 0
                 }
-                else if(this.radioPlayingPiNo>0 && this.radioPlayingPiNo <11){
+                else if(this.radioPiPlayingNo>0 && this.radioPiPlayingNo <11){
                   element = document.getElementById("sel20Pi");
                   element.value = 0
                   element = document.getElementById("sel30Pi");
                   element.value = 0
                   element = document.getElementById("sel10Pi");
-                  element.value = this.radioPlayingPiNo 
+                  element.value = this.radioPiPlayingNo 
                 }
-                else if(  this.radioPlayingPiNo>11 &&this.radioPlayingPiNo<21){
+                else if(  this.radioPiPlayingNo>11 &&this.radioPiPlayingNo<21){
                   element = document.getElementById("sel10Pi");
                   element.value = 0
                   element = document.getElementById("sel30Pi");
                   element.value = 0
                   element = document.getElementById("sel20Pi");
-                  element.value = this.radioPlayingPiNo 
+                  element.value = this.radioPiPlayingNo 
                 }
                 else{
                   element = document.getElementById("sel10");
@@ -407,10 +419,10 @@ const vm = createApp({
                   element = document.getElementById("sel20");
                   element.value = 0
                   element = document.getElementById("sel30");
-                  element.value = this.radioPlayingPiNo 
+                  element.value = this.radioPiPlayingNo 
                 }
 
-                console.log("After radioPlayingPiNo:"+ this.radioPlayingPiNo);
+                console.log("After radioPiPlayingNo:"+ this.radioPiPlayingNo);
                 console.log("playRadioPi works");
                 })
                 .catch(error => {
@@ -419,6 +431,10 @@ const vm = createApp({
               },
             volumeDownPi(event){
                 axios.post('/volumeDownPi').then(res => {
+                this.volumePi= res.data.volumePi;
+                this.volumePiMute= res.data.volumePiMute;
+                console.log("Volume: " + this.volumePi); 
+                console.log("Mute: "+ this.volumePiMute); 
                 console.log("VolumeDownPi works");
                 })
                 .catch(error => {
@@ -427,6 +443,10 @@ const vm = createApp({
               },
             volumeUpPi(event){
                 axios.post('/volumeUpPi').then(res => {
+                this.volumePi= res.data.volumePi;
+                this.volumePiMute= res.data.volumePiMute;
+                console.log("Volume: " + this.volumePi); 
+                console.log("Mute: "+ this.volumePiMute); 
                 console.log("VolumeUpPi works");
                 })
                 .catch(error => {
@@ -435,6 +455,10 @@ const vm = createApp({
               },
             volumeMutePi(event){
                 axios.post('/volumeMutePi').then(res => {
+                this.volumePi= res.data.volumePi;
+                this.volumePiMute= res.data.volumePiMute;
+                console.log("Volume: " + this.volumePi); 
+                console.log("Mute: "+ this.volumePiMute); 
                 console.log("VolumeMutePi works");
                 })
                 .catch(error => {
