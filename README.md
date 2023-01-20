@@ -21,6 +21,8 @@ $ pip install -r requirements.txt
 $ sudo nano /etc/nginx/sites-available/pimediaserver.conf
 $ sudo ln -s /etc/nginx/sites-available/pimediaserver.conf /etc/nginx/sites-enabled/
 ref: https://www.edmondchuc.com/blog/deploying-python-flask-with-gunicorn-nginx-and-systemd
+
+
 #gunicorn
 #systemd service
 
