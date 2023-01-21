@@ -8,7 +8,7 @@ const vm = createApp({
                musicPcPlayMode : 2,
                musicPiPlayMode : 2,
                fileList : [],
-               dir :"/home/ubuntu/Music/",
+               dir :"/home/share/Music/",
                filePc: '',
                filePi : '',
                indexPc : 0,

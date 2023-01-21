@@ -14,7 +14,7 @@ import threading
 import vlc
 #
 #------------------------------------------------------------------
-__dir__ = "/home/ubuntu/Music/"
+__dir__ = "../Music/"
 __fileList__ = [] 
 __fileList_Rn__ = []
 __indexMax__ = 0
@@ -303,7 +303,7 @@ if(True):
 #--------------------------------------------------------------------
 #file list Method 2
     mp3s = []; 
-    for path, subdirs, files in os.walk(__dir__):
+    for path, subdirs, files in os.walk(r'../Music'):
        # for name in files:
         path = path[(len(__dir__)-1):];
         path = path+"/";
@@ -315,7 +315,7 @@ if(True):
 
 #---------------------------------------------------------------------
 #file list Methos 3
-    __fileListRn__ = glob.glob(r'./static/assets/*.mp3')
+    __fileListRn__ = glob.glob(r'../Music/*.mp3')
 #    __fileListRn__.sort(key=lambda x:int(x[25:-4]))
 #---------------------------------------------------------------------
 #file list Method 4
