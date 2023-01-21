@@ -5,10 +5,10 @@ const vm = createApp({
                return {
                musicPcPlaying : false,
                musicPiPlaying : false,
-               musicPcPlayMode : 2,
-               musicPiPlayMode : 2,
+               musicPcPlayMode : 0,
+               musicPiPlayMode : 0,
                fileList : [],
-               dir :"/home/share/Music/",
+               dir :"./static/assets/",
                filePc: '',
                filePi : '',
                indexPc : 0,
@@ -69,6 +69,7 @@ const vm = createApp({
                 axios.post('/').then(res => {
                 this.indexPi=res.data.indexPi;
                 this.musicPiPlaying=res.data.musicPiPlaying;
+                this.musicPiPlayMode=res.data.musicPiPlayMode;
                 this.fileList = res.data.fileList;
                 this.radioPiPlayingNo = res.data.radioPiPlayingNo;   
                 this.indexMax = this.fileList.length;
@@ -81,7 +82,8 @@ const vm = createApp({
                 this.filePi=this.fileList[this.indexPi];
                 console.log("filePc: "+this.filePc);
                 console.log("filePi: "+this.filePi);
-                console.log("musicPiPaying: "+this.musicPiPlaying);
+                console.log("musicPiPlaying: "+this.musicPiPlaying);
+                console.log("musicPiPlayMode: "+this.musicPiPlayMode);
                 console.log("radioPiPlayingNo: "+this.radioPiPlayingNo);
                 console.log("volumePi: "+this.volumePi);
                 console.log("volumePiMute: "+this.volumePiMute);
@@ -116,7 +118,7 @@ const vm = createApp({
                 }
                 else{
                   element = document.getElementById("sel10");
-                  element.value ="0"
+                  element.value = "0"
                   element = document.getElementById("sel20");
                   element.value = "0"
                   element = document.getElementById("sel30");
@@ -145,6 +147,7 @@ const vm = createApp({
                 this.keytimerPcRunning = false;
              },
              setPlayModePc(mode){
+                this.musicPcPlayMode = this.musicPcPlayMode +1
                 this.musicPcPlayMode = this.musicPcPlayMode % 3;
              },
              keyInputPc(keyno){
@@ -164,6 +167,7 @@ const vm = createApp({
                 },
             playPausePc(event){
                 dirfilePc=this.dir+this.fileList[this.indexPc];
+                console.log(dirfilePc); 
                 document.getElementById("my-audio").setAttribute('src',dirfilePc);
                 if(this.musicPcPlaying == false){
                 document.getElementById("my-audio").play();
@@ -192,12 +196,19 @@ const vm = createApp({
                 console.log("playPrePc works");
               },
             playNextPc(event){
-                this.indexPc = this.indexPc+1
+                if(this.musicPcPlayMode==2){
+                rn = this.getRandom(this.indexMax-1, 0);
+                this.indexPc = rn
+                  }
+                else{
+                this.indexPc = this.indexPc + 1;
+                  }
                 if(this.indexPc >= this.indexMax){
                   this.indexPc = 0;
                   }
                 this.filePc=this.fileList[this.indexPc];
                 dirfilePc=this.dir+this.fileList[this.indexPc];
+                console.log(dirfilePc);
                 document.getElementById("my-audio").pause();
                 document.getElementById("my-audio").setAttribute('src',dirfilePc);
                 document.getElementById("my-audio").load();
@@ -235,35 +246,35 @@ const vm = createApp({
                 console.log("this.radioPlayingPcNo:"+this.radioPlayingPcNo);
                 if(this.radioPlayingPcNo==0){
                   element = document.getElementById("sel10Pc");
-                  element.value = 0
+                  element.value = 0;
                   element = document.getElementById("sel20Pc");
-                  element.value = 0
+                  element.value = 0;
                   element = document.getElementById("sel30Pc");
-                  element.value = 0
+                  element.value = 0;
                 }
-                else if(this.radioPlayingPcNo>0 && this.radioPlayingPcNo <11){
+                else if(this.radioPlayingPcNo>0 && this.radioPlayingPcNo<11){
                   element = document.getElementById("sel20Pc");
-                  element.value = 0
+                  element.value = 0;
                   element = document.getElementById("sel30Pc");
-                  element.value = 0
+                  element.value = 0;
                   element = document.getElementById("sel10Pc");
-                  element.value = this.radioPlayingPcNo 
+                  element.value = this.radioPlayingPcNo; 
                 }
-                else if( this.radioPlayingPcNo>11 && this.radioPlayingPcNo<21){
+                else if(this.radioPlayingPcNo>11 && this.radioPlayingPcNo<21){
                   element = document.getElementById("sel10Pc");
-                  element.value = 0
+                  element.value = 0;
                   element = document.getElementById("sel30Pc");
-                  element.value = 0
+                  element.value = 0;
                   element = document.getElementById("sel20Pc");
-                  element.value = this.radioPlayingPcNo 
+                  element.value = this.radioPlayingPcNo; 
                 }
                 else{
                   element = document.getElementById("sel10Pc");
-                  element.value = 0
+                  element.value = 0;
                   element = document.getElementById("sel20Pc");
-                  element.value = 0
+                  element.value = 0;
                   element = document.getElementById("sel30Pc");
-                  element.value = this.radioPlayingPcNo 
+                  element.value = this.radioPlayingPcNo;
                 }
                 let url = "";
                 if(this.radioPlayingPcNo == 0){
@@ -344,7 +355,15 @@ const vm = createApp({
                 this.keytimerPiRunning = true;
               },
              setPlayModePi(mode){
+                this.musicPiPlayMode = this.musicPiPlayMode + 1;
                 this.musicPiPlayMode = this.musicPiPlayMode % 3;
+                mode = this.musicPiPlayMode
+                axios.post('/setPlayModePi',{"mode":mode}).then(res => {
+                this.musicPiPlayMode = res.data.musicPiPlayMode;
+                })
+                .catch(error => {
+                console.log("handle error =>", error);
+                })
              },
              playPausePi(event){
                 axios.post('/playPausePi').then(res => {
@@ -388,40 +407,38 @@ const vm = createApp({
                 console.log("Before radioPalyingPiNo:"+ this.radioPiPlayingNo);
                 axios.post('/playRadioPi',{"radioNo":this.radioPiPlayingNo}).then(res => {
                 this.radioPiPlayingNo = res.data.radioPiPlayingNo;
-
                 if(this.radioPiPlayingNo==0){
                   element = document.getElementById("sel10Pi");
-                  element.value = 0
+                  element.value = 0;
                   element = document.getElementById("sel20Pi");
-                  element.value = 0
+                  element.value = 0;
                   element = document.getElementById("sel30Pi");
-                  element.value = 0
+                  element.value = 0;
                 }
                 else if(this.radioPiPlayingNo>0 && this.radioPiPlayingNo <11){
                   element = document.getElementById("sel20Pi");
-                  element.value = 0
+                  element.value = 0;
                   element = document.getElementById("sel30Pi");
-                  element.value = 0
+                  element.value = 0;
                   element = document.getElementById("sel10Pi");
-                  element.value = this.radioPiPlayingNo 
+                  element.value = this.radioPiPlayingNo; 
                 }
-                else if(  this.radioPiPlayingNo>11 &&this.radioPiPlayingNo<21){
+                else if(this.radioPiPlayingNo>11 && this.radioPiPlayingNo<21){
                   element = document.getElementById("sel10Pi");
-                  element.value = 0
+                  element.value = 0;
                   element = document.getElementById("sel30Pi");
-                  element.value = 0
+                  element.value = 0;
                   element = document.getElementById("sel20Pi");
-                  element.value = this.radioPiPlayingNo 
+                  element.value = this.radioPiPlayingNo;
                 }
                 else{
-                  element = document.getElementById("sel10");
-                  element.value = 0
-                  element = document.getElementById("sel20");
-                  element.value = 0
-                  element = document.getElementById("sel30");
-                  element.value = this.radioPiPlayingNo 
+                  element = document.getElementById("sel10Pi");
+                  element.value = 0;
+                  element = document.getElementById("sel20Pi");
+                  element.value = 0;
+                  element = document.getElementById("sel30Pi");
+                  element.value = this.radioPiPlayingNo; 
                 }
-
                 console.log("After radioPiPlayingNo:"+ this.radioPiPlayingNo);
                 console.log("playRadioPi works");
                 })
@@ -465,7 +482,28 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
 
+              },
+            getFileList(event){
+                axios.post('/getFileList').then(res => {
+                this.fileList = res.data.fileList;
+                console.log(this.fileList);
+                console.log("FileList Refresh");
+                })
+                .catch(error => {
+                console.log("handle error =>", error);
+                })
+              },
+            getPodcastList(event){
+                axios.post('/getPodcastList').then(res => {
+                this.podcastList = res.data.podcastList;
+                console.log(this.podcastList);
+                console.log("PodcastList Refresh");
+                })
+                .catch(error => {
+                console.log("handle error =>", error);
+                })
               }
+
 
           },
   created:  function(){

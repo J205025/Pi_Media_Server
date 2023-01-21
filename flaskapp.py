@@ -14,8 +14,9 @@ import threading
 import vlc
 #
 #------------------------------------------------------------------
-__dir__ = "../Music/"
+__dir__ = "./static/assets/"
 __fileList__ = [] 
+__podcastList__ = [] 
 __fileList_Rn__ = []
 __indexMax__ = 0
 __indexPi__ = 0
@@ -34,9 +35,9 @@ __musicVlcPi__ = __musicVlcInstance__.media_player_new()
 __radioVlcPi__ = __radioVlcInstance__.media_player_new()
 __musicPiPlaying__ = False
 __radioPiPlayingNo__ =  0
-__volumePi__ = 75
+__volumePi__ = 70
 __volumePiMute__ = False
-
+__musicPiPlayMode__ = 0
 radioUrl={
           "url01":"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
           "url02":"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -154,7 +155,11 @@ def handleNextPi():
     global __musicVlcInstance__
     global __musicVlcPi__
     global __musicPiPlaying__
-    __indexPi__ = __indexPi__ + 1
+    global __musicPiPlayMode__
+    if (__musicPiPlayMode__ == 2):
+        __indexPi__ = random.randrange(__indexMax__)
+    else:
+        __indexPi__ = __indexPi__ + 1
     if (__indexPi__  > (__indexMax__ -1 )):
         __indexPi__= 0 
     file = __dir__ + __fileList__[__indexPi__]
@@ -163,6 +168,7 @@ def handleNextPi():
     __musicVlcPi__.set_media(vlcmedia)
     __musicVlcPi__.play()
     __musicPiPlaying__ = True
+    print("__indexPi__:"+str(__indexPi__))
     print("Next play:"+file)
 
 def handlePrePi():
@@ -267,6 +273,31 @@ def continuePlaying():
         threading.Timer( 10 , continuePlaying ).start()
 
 
+def genFileList():
+    global __fileList__
+    mp3s = []; 
+    for path, subdirs, files in os.walk(r'./static/assets'):
+       # for name in files:
+        path = path[(len(__dir__)-1):];
+        path = path+"/";
+        path = path[1:];
+        files = [path + file for file in files];
+        mp3s= mp3s + files; 
+    mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
+    __fileList__ = mp3s;
+def genPodcastList():
+    global __podcastList__
+    mp3s = []; 
+    for path, subdirs, files in os.walk(r'./static/assets/podcast'):
+       # for name in files:
+        path = path[(len(__dir__)-1):];
+        path = path+"/";
+        path = path[1:];
+        files = [path + file for file in files];
+        mp3s= mp3s + files; 
+    mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
+    __podcastList__ = mp3s;
+    
 #---------------------------------------------------------------------------------
 if(True):
     GPIO.setmode(GPIO.BOARD)
@@ -295,42 +326,42 @@ if(True):
     GPIO.add_event_detect(33, GPIO.FALLING, callback=handlePrePi, bouncetime=500)
     GPIO.add_event_detect(37, GPIO.FALLING, callback=handleMutePi, bouncetime=500)
     
-if(True):
 #---------------------------------------------------------------------
 #file list Method 1
 #    __fileList__ = [ f for f in os.listdir(r'./static/assets/.') if f[-4:] == '.mp3' ]
 #    mp3_list.sort(key=lambda x:int(x[:-4]))
 #--------------------------------------------------------------------
 #file list Method 2
-    mp3s = []; 
-    for path, subdirs, files in os.walk(r'../Music'):
-       # for name in files:
-        path = path[(len(__dir__)-1):];
-        path = path+"/";
-        path = path[1:];
-        files = [path + file for file in files];
-        mp3s= mp3s + files; 
-    mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
-    __fileList__ = mp3s;
-
+#    mp3s = []; 
+#    for path, subdirs, files in os.walk(r'./static/assets'):
+#       # for name in files:
+#        path = path[(len(__dir__)-1):];
+#        path = path+"/";
+#        path = path[1:];
+#        files = [path + file for file in files];
+#        mp3s= mp3s + files; 
+#    mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
+#    __fileList__ = mp3s;
 #---------------------------------------------------------------------
 #file list Methos 3
-    __fileListRn__ = glob.glob(r'../Music/*.mp3')
+#    __fileListRn__ = glob.glob(r'../Music/*.mp3')
 #    __fileListRn__.sort(key=lambda x:int(x[25:-4]))
 #---------------------------------------------------------------------
 #file list Method 4
 #    __fileList__ = get_files(__dir__)
 #    __fileList__.sort(key=lambda x:int(x[:-4]))
 #---------------------------------------------------------------------
-    __indexMax__ = len(__fileList__) 
-    if not (len(__fileList__) > 0):
-        print ("No mp3 files found!")
-    print ('--- Available mp3 files ---')
-    print(__fileList__)
-    __indexPi__ = random.randrange(__indexMax__)
-    print ('--- Press button #play to start playing mp3 ---')
+genFileList()
+genPodcastList()
+__indexMax__ = len(__fileList__) 
+if not (len(__fileList__) > 0):
+    print ("No mp3 files found!")
+print ('--- Available mp3 files ---')
+#    print(__fileList__)
+__indexPi__ = random.randrange(__indexMax__)
+print ('--- Press button #play to start playing mp3 ---')
 
-    threading.Timer( 10 , continuePlaying ).start()
+threading.Timer( 10 , continuePlaying ).start()
 
 #==============================================================================================
 app = Flask(__name__)
@@ -342,6 +373,7 @@ def index():
     global __fileList__
     global __indexPi__
     global __musicPiPlaying__ 
+    global __musicPiPlayMode__
     global __radioPiPlayingNo__ 
     global __volumePi__
     global __volumePiMute__
@@ -352,6 +384,7 @@ def index():
         "fileList" : __fileList__,
         "indexPi" : __indexPi__,
         "musicPiPlaying" : __musicPiPlaying__,
+        "musicPiPlayMode" : __musicPiPlayMode__,
         "radioPiPlayingNo" : __radioPiPlayingNo__,
         "volumePi" : __volumePi__,
         "volumePiMute" : __volumePiMute__
@@ -403,6 +436,15 @@ def playPausePi():
         "indexPi" : __indexPi__
          })
 
+@app.route('/setPlayModePi', methods=['POST'])
+def setPlayModePi():
+    global __musicPiPlayMode__
+    data=request.get_json()
+    __musicPiPlayMode__=int(data["mode"])
+    return jsonify({
+        "musicPiPlayMode" : __musicPiPlayMode__
+         })
+    
 @app.route('/playRadioPi', methods=['POST'])
 def playRadioPi():
     global __radioVlcInstance__
@@ -518,5 +560,23 @@ def volumeMutePi():
         "volumePi" : __volumePi__,
         "volumePiMute" : __volumePiMute__
          })
+    
+@app.route('/getFileList', methods=['POST'])
+def getFileList():
+    global __fileList__
+    genFileList()
+    return jsonify({
+        "fileList" : __fileList__,
+         })
+
+@app.route('/getPodcastList', methods=['POST'])
+def getPodcastList():
+    global __podcastList__
+    genPodcastList()
+    print(__podcastList__)
+    return jsonify({
+        "podcastList" : __podcastList__,
+         })
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=2000,debug=True)

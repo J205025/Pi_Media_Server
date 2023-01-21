@@ -9,7 +9,7 @@ Ndays_ago.strftime("%Y-%m-%d")
 opt = getpodcast.options(
     date_from = str(Ndays_ago),
     deleteold = True,
-    root_dir = './podcast'
+    root_dir = './Podcast'
             )
 
 podcasts = {

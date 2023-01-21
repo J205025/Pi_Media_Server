@@ -4,4 +4,4 @@
 *.txt
 *.swp
 .venv/
-/static/assets
+

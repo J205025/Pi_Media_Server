@@ -11,9 +11,10 @@ body {
   }
 .title{
   font-size: 1.5em; 
-  color:rgb(58, 63, 177); 
+  color:rgb(9, 20, 230); 
  } 
 .banner-container{
+  color: hsla(219, 61%, 57%, 0.5);
   width: 100vw;
   display: flex;
   flex-direction:column;
@@ -26,23 +27,18 @@ body {
   text-align: center;
  }
 
-.sec-1{
+.section-container{
+  justify-content: center;
+  align-items: center;  
+ }
+ 
+.section{
   font-size: 1.25em;
   color:rgb(83, 81, 204);
   text-align: center;
   background-color: rgb(185, 183, 178);
- }  
-.sec-2{
-  font-size: 1.25em; 
-  text-align: center;
- }  
-audio-container{
-  width: 100vw;
-  display: flex;
-  flex-wrap:wrap;
-  flex-direction:row;
-  justify-content: center;    
  }
+
 .button-container{
   display:flex;
   width: 80vw;
