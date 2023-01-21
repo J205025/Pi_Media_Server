@@ -47,7 +47,7 @@ radioUrl={
           "url07":"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
           "url08":"https://icrt.leanstream.co/ICRTFM-MP3?args=web",
           "url09":"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_two",
-          "url10":"http://192.168.1.146:8000/stream.ogg",
+          "url10":"http://localhost:8000/stream.ogg",
           "url11":"http://onair.family977.com.tw:8000/live.mp3",
           "url12":"https://n09.rcs.revma.com/aw9uqyxy2tzuv?rj-ttl=5&rj-tok=AAABhZollCEACdvxzVVN61ARVg",
           "url13":"https://n10.rcs.revma.com/ndk05tyy2tzuv?rj-ttl=5&rj-tok=AAABhZouFPAAQudE3-49-1PFHQ",
@@ -221,7 +221,7 @@ def handleVolumeDownPi():
     global __musicVlcPi__
     global __radioVlcPi__
     global __volumePi__
-    __volumePi__ = __volumePi__ -25
+    __volumePi__ = __volumePi__ -12
     if __volumePi__ < 0:
         __volumePi__ = 0 
         
@@ -233,7 +233,7 @@ def handleVolumeUpPi():
     global __musicVlcPi__
     global __radioVlcPi__
     global __volumePi__
-    __volumePi__= __volumePi__ + 25
+    __volumePi__= __volumePi__ + 12
     if __volumePi__ > 100:
         __volumePi__ = 99 
     vlcvolume = __volumePi__

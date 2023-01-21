@@ -1,6 +1,8 @@
 [Unit]
 Description= Pi Media Server Service 
 After=network.target  sound.target
+Restart=always
+RestartSec=10 
 [Service]
 User=ubuntu
 Group=www-data
