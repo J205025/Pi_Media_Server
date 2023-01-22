@@ -33,6 +33,14 @@ ref: https://www.edmondchuc.com/blog/deploying-python-flask-with-gunicorn-nginx-
 
 # put music file at /home/ubuntu/Music/
 
-
+------------------------------------------------------
+#mp3 file name space 
+# remove space of filename
+$ sudo apt install rename
+# do the directories first 
+$ find . -name "* *" -type d | rename 's/ /_/g'
+# do the files then 
+$ find . -name "* *" -type f | rename 's/ /_/g'
+-----------------------------------------------------
 # Description 
 Music player with 1. play on client_PC and 2. play on server_Raspberry  of the Server music Files

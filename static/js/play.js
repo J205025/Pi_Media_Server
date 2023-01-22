@@ -8,6 +8,7 @@ const vm = createApp({
                musicPcPlayMode : 0,
                musicPiPlayMode : 0,
                fileList : [],
+               podcastList : [],
                dir :"./static/assets/",
                filePc: '',
                filePi : '',
@@ -28,6 +29,7 @@ const vm = createApp({
                volumePi : 0.65,
                volumePcMute : false,
                volumePiMute : false,
+               downStatus : 0,
                //broswer audio play src
                url01:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
                url02:"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -148,7 +150,7 @@ const vm = createApp({
              },
              setPlayModePc(mode){
                 this.musicPcPlayMode = this.musicPcPlayMode +1
-                this.musicPcPlayMode = this.musicPcPlayMode % 3;
+                this.musicPcPlayMode = this.musicPcPlayMode % 2;
              },
              keyInputPc(keyno){
                 if(this.keytimerPcRunning == true){
@@ -181,7 +183,13 @@ const vm = createApp({
                 }
            	  },
             playPrePc(event){
-                this.indexPc = this.indexPc-1
+                if(this.musicPcPlayMode==1){
+                rn = this.getRandom(this.indexMax-1, 0);
+                this.indexPc = rn
+                  }
+                else{
+                this.indexPc = this.indexPc - 1;
+                  }
                 if(this.indexPc < 0){
                   this.indexPc = this.indexMax - 1;
                   }
@@ -196,7 +204,7 @@ const vm = createApp({
                 console.log("playPrePc works");
               },
             playNextPc(event){
-                if(this.musicPcPlayMode==2){
+                if(this.musicPcPlayMode==1){
                 rn = this.getRandom(this.indexMax-1, 0);
                 this.indexPc = rn
                   }
@@ -242,9 +250,9 @@ const vm = createApp({
                 vid2.volumePc = 0; 
               },
             playRadioPc(event){
-                this.radioPlayingPcNo = event.target.value;
-                console.log("this.radioPlayingPcNo:"+this.radioPlayingPcNo);
-                if(this.radioPlayingPcNo==0){
+                this.radioPcPlayingNo = event.target.value;
+                console.log("this.radioPcPlayingNo:"+this.radioPcPlayingNo);
+                if(this.radioPcPlayingNo==0){
                   element = document.getElementById("sel10Pc");
                   element.value = 0;
                   element = document.getElementById("sel20Pc");
@@ -252,21 +260,21 @@ const vm = createApp({
                   element = document.getElementById("sel30Pc");
                   element.value = 0;
                 }
-                else if(this.radioPlayingPcNo>0 && this.radioPlayingPcNo<11){
+                else if(this.radioPcPlayingNo>0 && this.radioPcPlayingNo<11){
                   element = document.getElementById("sel20Pc");
                   element.value = 0;
                   element = document.getElementById("sel30Pc");
                   element.value = 0;
                   element = document.getElementById("sel10Pc");
-                  element.value = this.radioPlayingPcNo; 
+                  element.value = this.radioPcPlayingNo; 
                 }
-                else if(this.radioPlayingPcNo>11 && this.radioPlayingPcNo<21){
+                else if(this.radioPcPlayingNo>11 && this.radioPcPlayingNo<21){
                   element = document.getElementById("sel10Pc");
                   element.value = 0;
                   element = document.getElementById("sel30Pc");
                   element.value = 0;
                   element = document.getElementById("sel20Pc");
-                  element.value = this.radioPlayingPcNo; 
+                  element.value = this.radioPcPlayingNo; 
                 }
                 else{
                   element = document.getElementById("sel10Pc");
@@ -274,15 +282,15 @@ const vm = createApp({
                   element = document.getElementById("sel20Pc");
                   element.value = 0;
                   element = document.getElementById("sel30Pc");
-                  element.value = this.radioPlayingPcNo;
+                  element.value = this.radioPcPlayingNo;
                 }
                 let url = "";
-                if(this.radioPlayingPcNo == 0){
+                if(this.radioPcPlayingNo == 0){
                 document.getElementById("my-radio").pause();
                       }
                 else{
                 document.getElementById("my-radio").pause();
-                switch (this.radioPlayingPcNo) {
+                switch (this.radioPcPlayingNo) {
                       case "1" : { url = this.url01;  break;}
                       case "2" : { url = this.url02;  break;}
                       case "3" : { url = this.url03;  break;}
@@ -319,7 +327,7 @@ const vm = createApp({
                 document.getElementById("my-radio").setAttribute('src',url);
                 document.getElementById("my-radio").load();
                 document.getElementById("my-radio").play();
-                console.log("radioPcPlayingNo: "+this.radioPcPlayingPcNo);
+                console.log("radioPcPlayingNo: "+this.radioPcPlayingNo);
                 }
               },
 
@@ -356,7 +364,7 @@ const vm = createApp({
               },
              setPlayModePi(mode){
                 this.musicPiPlayMode = this.musicPiPlayMode + 1;
-                this.musicPiPlayMode = this.musicPiPlayMode % 3;
+                this.musicPiPlayMode = this.musicPiPlayMode % 2;
                 mode = this.musicPiPlayMode
                 axios.post('/setPlayModePi',{"mode":mode}).then(res => {
                 this.musicPiPlayMode = res.data.musicPiPlayMode;
@@ -496,15 +504,24 @@ const vm = createApp({
             getPodcastList(event){
                 axios.post('/getPodcastList').then(res => {
                 this.podcastList = res.data.podcastList;
+                console.log(typeof res)
+                console.log(typeof this.podcastList)
                 console.log(this.podcastList);
                 console.log("PodcastList Refresh");
                 })
                 .catch(error => {
                 console.log("handle error =>", error);
                 })
+              },
+            downPodcastFile(event){
+                axios.post('/downPodcastFile').then(res => {
+                this.downStatus = res.data.downStatus;
+                console.log("downStatus:" + this.downStatus);
+                })
+                .catch(error => {
+                console.log("handle error =>", error);
+                })
               }
-
-
           },
   created:  function(){
                 this.loading();

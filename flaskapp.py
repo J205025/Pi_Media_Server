@@ -2,6 +2,8 @@
 from flask import Flask,render_template,request,jsonify
 from flask_cors import CORS
 from threading import Thread
+from datetime import date,timedelta 
+import getpodcast
 import os
 import json
 import glob
@@ -38,6 +40,8 @@ __radioPiPlayingNo__ =  0
 __volumePi__ = 70
 __volumePiMute__ = False
 __musicPiPlayMode__ = 0
+__down_thread__ = None
+__downStatus__ = 0
 radioUrl={
           "url01":"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
           "url02":"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -156,7 +160,7 @@ def handleNextPi():
     global __musicVlcPi__
     global __musicPiPlaying__
     global __musicPiPlayMode__
-    if (__musicPiPlayMode__ == 2):
+    if (__musicPiPlayMode__ == 1):
         __indexPi__ = random.randrange(__indexMax__)
     else:
         __indexPi__ = __indexPi__ + 1
@@ -179,7 +183,10 @@ def handlePrePi():
     global __musicVlcInstance__
     global __musicVlcPi__
     global __musicPiPlaying__
-    __indexPi__ = __indexPi__ - 1
+    if (__musicPiPlayMode__ == 1):
+        __indexPi__ = random.randrange(__indexMax__)
+    else:
+        __indexPi__ = __indexPi__ - 1
     if (__indexPi__ < 0):
        __indexPi__= __indexMax__ - 1
     file = __dir__ + __fileList__[__indexPi__]
@@ -188,6 +195,7 @@ def handlePrePi():
     __musicVlcPi__.set_media(vlcmedia)
     __musicVlcPi__.play()
     __musicPiPlaying__ = True
+    print("__indexPi__:"+str(__indexPi__))
     print("Pre play:"+file)
 
 def handlePlayPausePi():
@@ -298,6 +306,20 @@ def genPodcastList():
     mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
     __podcastList__ = mp3s;
     
+def downPodcastFile_sh():
+    N = 1
+    Ndays_ago = date.today()- timedelta(days=N)
+    Ndays_ago.strftime("%Y-%m-%d")
+    opt = getpodcast.options(
+    root_dir = './static/assets/podcast',
+    date_from = str(Ndays_ago),
+    deleteold = True,
+    run = True)
+    podcasts = {
+       "BBC" : "http://podcasts.files.bbci.co.uk/p02nq0gn.rss"
+    }
+    getpodcast.getpodcast(podcasts, opt)
+
 #---------------------------------------------------------------------------------
 if(True):
     GPIO.setmode(GPIO.BOARD)
@@ -356,8 +378,6 @@ genPodcastList()
 __indexMax__ = len(__fileList__) 
 if not (len(__fileList__) > 0):
     print ("No mp3 files found!")
-print ('--- Available mp3 files ---')
-#    print(__fileList__)
 __indexPi__ = random.randrange(__indexMax__)
 print ('--- Press button #play to start playing mp3 ---')
 
@@ -568,15 +588,32 @@ def getFileList():
     return jsonify({
         "fileList" : __fileList__,
          })
-
 @app.route('/getPodcastList', methods=['POST'])
 def getPodcastList():
     global __podcastList__
     genPodcastList()
-    print(__podcastList__)
     return jsonify({
         "podcastList" : __podcastList__,
          })
+@app.route('/downPodcastFile', methods=['POST'])
+def downPodcastFile():
+    global __down_thread__
+    global __downStatus__ 
+    global __podcastLisit__
+    print("Before Request -->downStatus: "+str(__downStatus__))
+    if __downStatus__ == 0:
+        __down_thread__=Thread(target=downPodcastFile_sh);
+        __down_thread__.start()
+        __downStatus__ = 1
+        print("thread running --> downStatus: "+str(__downStatus__))
+        __down_thread__.join()
+        __downStatus__ = 0 
+        print("thread finished--> downStatus: "+str(__downStatus__))
+    else:
+        print("thread Runniing --> downStatus: "+str(__downStatus__))
+    return jsonify({
+        "downStatus" : __downStatus__
+         })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',port=2000,debug=True)
+    app.run(host='0.0.0.0',port=2000,debug=True,threaded=True)

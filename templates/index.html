@@ -43,8 +43,7 @@
             <button type="button" class="key-button" v-on:click="keyInputPc(8)">8</button>
             <button type="button" class="key-button" v-on:click="keyInputPc(9)">9</button>
             <button type="button" class="key-button" v-on:click="setPlayModePc" v-if="musicPcPlayMode==0"><i class="fas fa-repeat"></i></button>
-            <button type="button" class="key-button" v-on:click="setPlayModePc" v-if="musicPcPlayMode==1"><i class="fa fa-repeat"></i></button>
-            <button type="button" class="key-button" v-on:click="setPlayModePc" v-if="musicPcPlayMode==2"><i class="fa fa-shuffle"></i></button>
+            <button type="button" class="key-button" v-on:click="setPlayModePc" v-if="musicPcPlayMode==1"><i class="fa fa-shuffle"></i></button>
     </div>
 
     <div class="button-container">
@@ -125,9 +124,8 @@
         <button type="button" class="key-button" v-on:click="keyInputPi(7)">7</button>
         <button type="button" class="key-button" v-on:click="keyInputPi(8)">8</button>
         <button type="button" class="key-button" v-on:click="keyInputPi(9)">9</button>
-        <button type="button" class="key-button" v-on:click="setPlayModePi" v-if="musicPiPlayMode==0"><i class="fa-solid fa-repeat-1"></i></button>
-        <button type="button" class="key-button" v-on:click="setPlayModePi" v-if="musicPiPlayMode==1"><i class="fa-solid fa-repeat"></i></button>
-        <button type="button" class="key-button" v-on:click="setPlayModePi" v-if="musicPiPlayMode==2"><i class="fa-solid fa-shuffle"></i></button>
+        <button type="button" class="key-button" v-on:click="setPlayModePi" v-if="musicPiPlayMode==0"><i class="fa-solid fa-repeat"></i></button>
+        <button type="button" class="key-button" v-on:click="setPlayModePi" v-if="musicPiPlayMode==1"><i class="fa-solid fa-shuffle"></i></button>
     </div>
     <div class="button-container">
         <button type="button" class="key-button" v-on:click="playPrePi"><i class="fa fa-fast-backward"></i></button>
@@ -185,16 +183,21 @@
         <button type="button" class="key-button" v-on:click="volumeUpPi"><i class="fa fa-volume-high"></i></button>
         <button type="button" class="key-button" v-on:click="volumeMutePi"><i class="fa-solid fa-volume-xmark"></i></button>
     </div>
- 
+    
+
+    <button type="button" >podcastfile  select play </button>
+
     <button type="button" v-on:click="getFileList($event)">.</button>
     <button type="button" v-on:click="getPodcastList($event)">..</button>
-    
+    <button type="button" v-on:click="downPodcastFile($event)">...</button>
+   
+
+
+</div>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="./static/js/play.js"></script>
 
 
-
-</div>
 </body>
 </html>
