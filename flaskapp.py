@@ -638,7 +638,7 @@ def myjob1():
     global __indexPi__
     global __indexMax__
     __indexPi__ = 7
-    handleSelectedPi()
+    #handleSelectedPi()
     print("myPlayJob executed")
 
 @scheduler.task('cron', id='myjob2', day='*', hour='14', minute='06', second='00')
