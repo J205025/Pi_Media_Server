@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 from flask import Flask,render_template,request,jsonify
+from flask_apscheduler import APScheduler
 from flask_cors import CORS
 from threading import Thread
-from datetime import date,timedelta 
+from datetime import date,timedelta,datetime 
 import getpodcast
 import os
 import json
@@ -320,7 +321,26 @@ def downPodcastFile_sh():
     }
     getpodcast.getpodcast(podcasts, opt)
 
-#---------------------------------------------------------------------------------
+def start_downPodcastFile_sh():
+    global __down_thread__
+    global __downStatus__
+    __downStatus__ = 1 
+    time.sleep(1)
+    __down_thread__=Thread(target=downPodcastFile_sh);
+    __down_thread__.start()
+    print("DownPodcast thread start to run")
+    __down_thread__.join()
+    __downStatus__ = 0 
+    print("DownPodcast thread finished--> downStatus: "+str(__downStatus__))
+
+
+#----------------------------------------------------------------------------
+class Config(object):
+    SCHEDULER_API_ENABLED = True
+    
+scheduler = APScheduler()
+#----------------------------------------------------------------------------
+
 if(True):
     GPIO.setmode(GPIO.BOARD)
    # gpio binary  
@@ -386,7 +406,13 @@ threading.Timer( 10 , continuePlaying ).start()
 #==============================================================================================
 app = Flask(__name__)
 CORS(app)
-
+#APScheduler start
+app.config.from_object(Config())
+# it is also possible to enable the API directly
+# scheduler.api_enabled = True
+scheduler.init_app(app)
+scheduler.start()
+#==============================================================================================
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global __dir__
@@ -546,7 +572,7 @@ def playRadioPi():
         __radioVlcPi__.set_media(vlcmedia)
         __radioVlcPi__.play()
         __radioPiPlayingNo__ = radioNo
-        print("Rasio Stream URL :"+url)        
+        print("Radio Stream URL :"+url)        
     return jsonify({
         "radioPiPlayingNo" : __radioPiPlayingNo__
          })
@@ -598,22 +624,30 @@ def getPodcastList():
 @app.route('/downPodcastFile', methods=['POST'])
 def downPodcastFile():
     global __down_thread__
-    global __downStatus__ 
-    global __podcastLisit__
-    print("Before Request -->downStatus: "+str(__downStatus__))
+    global __downStatus__
     if __downStatus__ == 0:
-        __down_thread__=Thread(target=downPodcastFile_sh);
-        __down_thread__.start()
-        __downStatus__ = 1
-        print("thread running --> downStatus: "+str(__downStatus__))
-        __down_thread__.join()
-        __downStatus__ = 0 
-        print("thread finished--> downStatus: "+str(__downStatus__))
+        start_downPodcastFile_sh()
     else:
-        print("thread Runniing --> downStatus: "+str(__downStatus__))
+        print("DonwPodcast thread is Running, please wait")
     return jsonify({
         "downStatus" : __downStatus__
          })
+
+@scheduler.task('cron', id='myjob1', day='*', hour='14', minute='05', second='00')
+def myjob1():
+    global __indexPi__
+    global __indexMax__
+    __indexPi__ = 7
+    handleSelectedPi()
+    print("myPlayJob executed")
+
+@scheduler.task('cron', id='myjob2', day='*', hour='14', minute='06', second='00')
+def myjob2():
+    global __indexPi__
+    global __indexMax__
+    __indexPi__ = 7
+    start_downPodcastFile_sh()
+    print("myDownPodcastFileJob executed")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=2000,debug=True,threaded=True)

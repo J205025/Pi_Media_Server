@@ -231,23 +231,26 @@ const vm = createApp({
                 var vid2 = document.getElementById("my-radio");
                 this.volumePc = this.volumePc - 0.2;
                 if(this.volumePc < 0 ){this.volumePc =0;}
-                vid1.volumePc = this.volumePc; 
-                vid2.volumePc = this.volumePc; 
+                vid1.volume = this.volumePc; 
+                vid2.volume = this.volumePc; 
+                console.log("volumeDownPc works");
               },
             volumeUpPc(event){
                 var vid1 = document.getElementById("my-audio");
                 var vid2 = document.getElementById("my-radio");
                 this.volumePc = this.volumePc + 0.2;
                 if(this.volumePc > 1){this.volumePc =1;}
-                vid1.volumePc = this.volumePc; 
-                vid2.volumePc = this.volumePc; 
+                vid1.volume = this.volumePc; 
+                vid2.volume = this.volumePc; 
+                console.log("volumeUpPc works");
               },
             volumeMutePc(event){
                 var vid1 = document.getElementById("my-audio");
                 var vid2 = document.getElementById("my-radio");
                 if(this.volumePc != 0 ){this.volumePc =0;}
-                vid1.volumePc = 0; 
-                vid2.volumePc = 0; 
+                vid1.volume = 0; 
+                vid2.volume = 0; 
+                console.log("volumeMutePc works");
               },
             playRadioPc(event){
                 this.radioPcPlayingNo = event.target.value;

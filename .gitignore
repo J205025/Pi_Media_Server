@@ -4,4 +4,6 @@
 *.txt
 *.swp
 .venv/
+./static/assets
+*.pyc
 
