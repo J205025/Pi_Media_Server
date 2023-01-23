@@ -183,13 +183,11 @@
         <button type="button" class="key-button" v-on:click="volumeUpPi"><i class="fa fa-volume-high"></i></button>
         <button type="button" class="key-button" v-on:click="volumeMutePi"><i class="fa-solid fa-volume-xmark"></i></button>
     </div>
-    
 
-    <button type="button" >podcastfile  select play </button>
 
-    <button type="button" v-on:click="getFileList($event)">.</button>
-    <button type="button" v-on:click="getPodcastList($event)">..</button>
-    <button type="button" v-on:click="downPodcastFile($event)">...</button>
+    <button type="button" v-on:click="getFileList($event)">filelist</button>
+    <button type="button" v-on:click="getPodcastList($event)">podcastlist</button>
+    <button type="button" v-on:click="downPodcastFile($event)">download</button>
    
 
 

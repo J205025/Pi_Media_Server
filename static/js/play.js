@@ -131,7 +131,6 @@ const vm = createApp({
              },
              playSelectedPc(){
                 num=this.num4dPc.join("");
-                num = num-1;
                 console.log("current keyno is: "+num);
                 this.indexPc= num % this.indexMax;
                 this.filePc=this.fileList[this.indexPc];
@@ -507,8 +506,6 @@ const vm = createApp({
             getPodcastList(event){
                 axios.post('/getPodcastList').then(res => {
                 this.podcastList = res.data.podcastList;
-                console.log(typeof res)
-                console.log(typeof this.podcastList)
                 console.log(this.podcastList);
                 console.log("PodcastList Refresh");
                 })

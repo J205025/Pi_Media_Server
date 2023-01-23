@@ -165,8 +165,8 @@ def handleNextPi():
         __indexPi__ = random.randrange(__indexMax__)
     else:
         __indexPi__ = __indexPi__ + 1
-    if (__indexPi__  > (__indexMax__ -1 )):
-        __indexPi__= 0 
+        if (__indexPi__ == __indexMax__):
+            __indexPi__ = 0; 
     file = __dir__ + __fileList__[__indexPi__]
     __musicVlcPi__.stop()
     vlcmedia  = __musicVlcInstance__.media_new(file)
