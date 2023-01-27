@@ -19,6 +19,13 @@ $ source ./.ven/bin/activate
 
 #pip3 install packages
 $ pip3 install -r requirements.txt
+[
+flask
+wheel
+gunicorn[gevent]
+flask_apscheduler
+pip install flask[async] 
+]
 ----------------------------------------
 #nginx configure
 $ sudo nano /etc/nginx/sites-available/pimediaserver.conf
@@ -31,7 +38,7 @@ ref: https://www.edmondchuc.com/blog/deploying-python-flask-with-gunicorn-nginx-
 
 #systemd service
 
-# put music file at /home/ubuntu/Music/
+# put music file at ./static/assets/
 
 ------------------------------------------------------
 #mp3 file name space 

@@ -270,7 +270,7 @@ const vm = createApp({
                   element = document.getElementById("sel10Pc");
                   element.value = this.radioPcPlayingNo; 
                 }
-                else if(this.radioPcPlayingNo>11 && this.radioPcPlayingNo<21){
+                else if(this.radioPcPlayingNo>10 && this.radioPcPlayingNo<21){
                   element = document.getElementById("sel10Pc");
                   element.value = 0;
                   element = document.getElementById("sel30Pc");
@@ -414,7 +414,6 @@ const vm = createApp({
                 if(this.radioPiPlayingNo == radioNo){
                    this.radioPiPlayingNo = 0 ;
                 }else{this.radioPiPlayingNo =radioNo;} 
-                console.log("Before radioPalyingPiNo:"+ this.radioPiPlayingNo);
                 axios.post('/playRadioPi',{"radioNo":this.radioPiPlayingNo}).then(res => {
                 this.radioPiPlayingNo = res.data.radioPiPlayingNo;
                 if(this.radioPiPlayingNo==0){
@@ -433,7 +432,7 @@ const vm = createApp({
                   element = document.getElementById("sel10Pi");
                   element.value = this.radioPiPlayingNo; 
                 }
-                else if(this.radioPiPlayingNo>11 && this.radioPiPlayingNo<21){
+                else if(this.radioPiPlayingNo>10 && this.radioPiPlayingNo<21){
                   element = document.getElementById("sel10Pi");
                   element.value = 0;
                   element = document.getElementById("sel30Pi");

@@ -4,6 +4,10 @@ from flask_apscheduler import APScheduler
 from flask_cors import CORS
 from threading import Thread
 from datetime import date,timedelta,datetime 
+#import asyncio
+#import argparse
+
+
 import getpodcast
 import os
 import json
@@ -284,8 +288,9 @@ def continuePlaying():
 
 def genFileList():
     global __fileList__
+    global __dir__
     mp3s = []; 
-    for path, subdirs, files in os.walk(r'./static/assets'):
+    for path, subdirs, files in os.walk(__dir__,followlinks=False):
        # for name in files:
         path = path[(len(__dir__)-1):];
         path = path+"/";
@@ -296,8 +301,9 @@ def genFileList():
     __fileList__ = mp3s;
 def genPodcastList():
     global __podcastList__
+    global __dir__
     mp3s = []; 
-    for path, subdirs, files in os.walk(r'./static/assets/podcast'):
+    for path, subdirs, files in os.walk(__dir__+'podcast'):
        # for name in files:
         path = path[(len(__dir__)-1):];
         path = path+"/";
@@ -306,6 +312,20 @@ def genPodcastList():
         mp3s= mp3s + files; 
     mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
     __podcastList__ = mp3s;
+   
+def genFileList2():
+    global __fileList__
+    global __dir__
+    mp3s = []; 
+    for path, subdirs, files in os.walk(__dir__,followlinks=True):
+       # for name in files:
+        path = path[(len(__dir__)-1):];
+        path = path+"/";
+        path = path[1:];
+        files = [path + file for file in files];
+        mp3s= mp3s + files; 
+    mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
+    __fileList__ = mp3s;
     
 def downPodcastFile_sh():
     N = 1
@@ -332,13 +352,11 @@ def start_downPodcastFile_sh():
     __down_thread__.join()
     __downStatus__ = 0 
     print("DownPodcast thread finished--> downStatus: "+str(__downStatus__))
+    return __downStatus__
 
 
 #----------------------------------------------------------------------------
-class Config(object):
-    SCHEDULER_API_ENABLED = True
-    
-scheduler = APScheduler()
+#
 #----------------------------------------------------------------------------
 
 if(True):
@@ -406,12 +424,19 @@ threading.Timer( 10 , continuePlaying ).start()
 #==============================================================================================
 app = Flask(__name__)
 CORS(app)
+#-----------------------
+class Config(object):
+    SCHEDULER_API_ENABLED = True
+
+scheduler = APScheduler()
+#-----------------------
 #APScheduler start
 app.config.from_object(Config())
 # it is also possible to enable the API directly
 # scheduler.api_enabled = True
 scheduler.init_app(app)
 scheduler.start()
+#-----------------------
 #==============================================================================================
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -648,6 +673,15 @@ def myjob2():
     __indexPi__ = 7
     start_downPodcastFile_sh()
     print("myDownPodcastFileJob executed")
+    
+    
+#parser = argparse.ArgumentParser()
+#parser.add_argument("--workers 1 --threads 4,--worker-class gevent", type=str, default=False)
+#parser.parse_args()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',port=2000,debug=True,threaded=True)
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--workers 1 --threads 4,--worker-class gevent", type=str, default=False)
+    parser.parse_args()
+    app.run(host='0.0.0.0',port=2000,debug=False,threaded=True)

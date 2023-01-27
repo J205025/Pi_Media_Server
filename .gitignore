@@ -6,4 +6,4 @@
 .venv/
 ./static/assets
 *.pyc
-
+__pycache__
