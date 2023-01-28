@@ -8,7 +8,6 @@ const vm = createApp({
                musicPcPlayMode : 0,
                musicPiPlayMode : 0,
                fileList : [],
-               podcastList : [],
                dir :"./static/assets/",
                filePc: '',
                filePi : '',
@@ -490,11 +489,21 @@ const vm = createApp({
                 .catch(error => {
                 console.log("handle error =>", error);
                 })
-
+              },
+            refreshList(event){
+                this.indexMax = this.fileList.length;
+                rn = this.getRandom(this.indexMax-1, 0);
+                this.indexPc=rn;
+                this.filePc=this.fileList[rn];
+                this.filePi=this.fileList[this.indexPi];
               },
             getFileList(event){
+                document.getElementById("my-audio").pause();
+                this.musicPcPlaying = false;
+                this.musicPiPlaying = false;
                 axios.post('/getFileList').then(res => {
                 this.fileList = res.data.fileList;
+                this.refreshList(event);
                 console.log(this.fileList);
                 console.log("FileList Refresh");
                 })
@@ -503,9 +512,13 @@ const vm = createApp({
                 })
               },
             getPodcastList(event){
+                document.getElementById("my-audio").pause();
+                this.musicPcPlaying = false;
+                this.musicPiPlaying = false;
                 axios.post('/getPodcastList').then(res => {
-                this.podcastList = res.data.podcastList;
-                console.log(this.podcastList);
+                this.fileList = res.data.fileList;
+                this.refreshList(event);
+                console.log(this.fileList);
                 console.log("PodcastList Refresh");
                 })
                 .catch(error => {

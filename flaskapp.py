@@ -289,8 +289,14 @@ def continuePlaying():
 def genFileList():
     global __fileList__
     global __dir__
+    global __musicVlcPi__
+    global __musicPiPlaying__
+    global __indexMax__
+    global __indexPi__
+    __musicVlcPi__.stop()
+    __musicPiPlaying__ = False
     mp3s = []; 
-    for path, subdirs, files in os.walk(__dir__,followlinks=False):
+    for path, subdirs, files in os.walk(__dir__+"song",followlinks=True):
        # for name in files:
         path = path[(len(__dir__)-1):];
         path = path+"/";
@@ -299,9 +305,18 @@ def genFileList():
         mp3s= mp3s + files; 
     mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
     __fileList__ = mp3s;
+    __indexMax__ = len(__fileList__) 
+    __indexPi__ = random.randrange(__indexMax__)
+    
 def genPodcastList():
-    global __podcastList__
+    global __fileList__
     global __dir__
+    global __musicVlcPi__
+    global __musicPiPlaying__
+    global __indexMax__
+    global __indexPi__
+    __musicVlcPi__.stop()
+    __musicPiPlaying__ = False
     mp3s = []; 
     for path, subdirs, files in os.walk(__dir__+'podcast'):
        # for name in files:
@@ -311,28 +326,16 @@ def genPodcastList():
         files = [path + file for file in files];
         mp3s= mp3s + files; 
     mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
-    __podcastList__ = mp3s;
-   
-def genFileList2():
-    global __fileList__
-    global __dir__
-    mp3s = []; 
-    for path, subdirs, files in os.walk(__dir__,followlinks=True):
-       # for name in files:
-        path = path[(len(__dir__)-1):];
-        path = path+"/";
-        path = path[1:];
-        files = [path + file for file in files];
-        mp3s= mp3s + files; 
-    mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
     __fileList__ = mp3s;
+    __indexMax__ = len(__fileList__) 
+    __indexPi__ = random.randrange(__indexMax__)
     
 def downPodcastFile_sh():
     N = 1
     Ndays_ago = date.today()- timedelta(days=N)
     Ndays_ago.strftime("%Y-%m-%d")
     opt = getpodcast.options(
-    root_dir = './static/assets/podcast',
+    root_dir = '/home/ubuntu/Music/podcast',
     date_from = str(Ndays_ago),
     deleteold = True,
     run = True)
@@ -412,11 +415,8 @@ if(True):
 #    __fileList__.sort(key=lambda x:int(x[:-4]))
 #---------------------------------------------------------------------
 genFileList()
-genPodcastList()
-__indexMax__ = len(__fileList__) 
 if not (len(__fileList__) > 0):
     print ("No mp3 files found!")
-__indexPi__ = random.randrange(__indexMax__)
 print ('--- Press button #play to start playing mp3 ---')
 
 threading.Timer( 10 , continuePlaying ).start()
@@ -635,16 +635,20 @@ def volumeMutePi():
 @app.route('/getFileList', methods=['POST'])
 def getFileList():
     global __fileList__
+    global __musicPiPlaying__
     genFileList()
     return jsonify({
         "fileList" : __fileList__,
+        "musicPiPlaying" : __musicPiPlaying__
          })
 @app.route('/getPodcastList', methods=['POST'])
 def getPodcastList():
-    global __podcastList__
+    global __fileList__
+    global __musicPiPlaying__
     genPodcastList()
     return jsonify({
-        "podcastList" : __podcastList__,
+        "fileList" : __fileList__,
+        "musicPiPlaying" : __musicPiPlaying__
          })
 @app.route('/downPodcastFile', methods=['POST'])
 def downPodcastFile():
