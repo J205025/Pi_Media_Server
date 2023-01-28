@@ -23,7 +23,7 @@ import vlc
 #------------------------------------------------------------------
 __dir__ = "./static/assets/"
 __fileList__ = [] 
-__podcastList__ = [] 
+__typeList__ = ["all","pop","podcast","classical","sutra","red","jacky"] 
 __fileList_Rn__ = []
 __indexMax__ = 0
 __indexPi__ = 0
@@ -286,17 +286,35 @@ def continuePlaying():
         threading.Timer( 10 , continuePlaying ).start()
 
 
-def genFileList():
+def genFileList(style):
     global __fileList__
     global __dir__
     global __musicVlcPi__
     global __musicPiPlaying__
     global __indexMax__
     global __indexPi__
+    global __typeList__
+    match style:
+        case 0:
+           subdir = __typeList__[0]
+        case 1:
+           subdir = __typeList__[1]
+        case 2:
+           subdir = __typeList__[2]
+        case 3:
+           subdir = __typeList__[3]
+        case 4:
+           subdir = __typeList__[4]
+        case 5:
+           subdir = __typeList__[5]
+        case 6:
+           subdir = __typeList__[6]
+        case _:
+           subdir = __typeList__[0]
     __musicVlcPi__.stop()
     __musicPiPlaying__ = False
     mp3s = []; 
-    for path, subdirs, files in os.walk(__dir__+"song",followlinks=True):
+    for path, subdirs, files in os.walk(__dir__ + subdir, followlinks=True):
        # for name in files:
         path = path[(len(__dir__)-1):];
         path = path+"/";
@@ -414,7 +432,7 @@ if(True):
 #    __fileList__ = get_files(__dir__)
 #    __fileList__.sort(key=lambda x:int(x[:-4]))
 #---------------------------------------------------------------------
-genFileList()
+genFileList(0)
 if not (len(__fileList__) > 0):
     print ("No mp3 files found!")
 print ('--- Press button #play to start playing mp3 ---')
@@ -636,20 +654,17 @@ def volumeMutePi():
 def getFileList():
     global __fileList__
     global __musicPiPlaying__
-    genFileList()
+    global __indexPi__
+    
+    data=request.get_json()
+    style=int(data["style"])
+    genFileList(style)
     return jsonify({
         "fileList" : __fileList__,
-        "musicPiPlaying" : __musicPiPlaying__
+        "musicPiPlaying" : __musicPiPlaying__,
+        "indexPi":__indexPi__
          })
-@app.route('/getPodcastList', methods=['POST'])
-def getPodcastList():
-    global __fileList__
-    global __musicPiPlaying__
-    genPodcastList()
-    return jsonify({
-        "fileList" : __fileList__,
-        "musicPiPlaying" : __musicPiPlaying__
-         })
+    
 @app.route('/downPodcastFile', methods=['POST'])
 def downPodcastFile():
     global __down_thread__

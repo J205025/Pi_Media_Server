@@ -497,29 +497,16 @@ const vm = createApp({
                 this.filePc=this.fileList[rn];
                 this.filePi=this.fileList[this.indexPi];
               },
-            getFileList(event){
+            getFileList(style){
                 document.getElementById("my-audio").pause();
                 this.musicPcPlaying = false;
                 this.musicPiPlaying = false;
-                axios.post('/getFileList').then(res => {
+                axios.post('/getFileList',{"style":style}).then(res => {
                 this.fileList = res.data.fileList;
+                this.indexPi = res.data.indexPi;
                 this.refreshList(event);
                 console.log(this.fileList);
                 console.log("FileList Refresh");
-                })
-                .catch(error => {
-                console.log("handle error =>", error);
-                })
-              },
-            getPodcastList(event){
-                document.getElementById("my-audio").pause();
-                this.musicPcPlaying = false;
-                this.musicPiPlaying = false;
-                axios.post('/getPodcastList').then(res => {
-                this.fileList = res.data.fileList;
-                this.refreshList(event);
-                console.log(this.fileList);
-                console.log("PodcastList Refresh");
                 })
                 .catch(error => {
                 console.log("handle error =>", error);

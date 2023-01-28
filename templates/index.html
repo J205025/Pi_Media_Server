@@ -185,12 +185,13 @@
     </div>
 
 
-    <button type="button" v-on:click="getFileList($event)">全部</button>
-    <button type="button" v-on:click="getFileList($event)">歌曲</button>
-    <button type="button" v-on:click="getFileList($event)">張學友</button>
-    <button type="button" v-on:click="getPodcastList($event)">播客</button>
-    <button type="button" v-on:click="getPodcastList($event)">金剛經</button>
-    <button type="button" v-on:click="getPodcastList($event)">紅樓夢</button>
+    <button type="button" v-on:click="getFileList(0)">全部</button>
+    <button type="button" v-on:click="getFileList(1)">流行</button>
+    <button type="button" v-on:click="getFileList(2)">播客</button>
+    <button type="button" v-on:click="getFileList(3)">古典</button>
+    <button type="button" v-on:click="getFileList(4)">金剛經</button>
+    <button type="button" v-on:click="getFileList(5)">紅樓夢</button>
+    <button type="button" v-on:click="getFileList(6)">張學友</button>
     <button type="button" v-on:click="downPodcastFile($event)">download</button>
 
 </div>
