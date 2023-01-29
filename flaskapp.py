@@ -322,28 +322,7 @@ def genFileList(style):
         files = [path + file for file in files];
         mp3s= mp3s + files; 
     mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
-    __fileList__ = mp3s;
-    __indexMax__ = len(__fileList__) 
-    __indexPi__ = random.randrange(__indexMax__)
-    
-def genPodcastList():
-    global __fileList__
-    global __dir__
-    global __musicVlcPi__
-    global __musicPiPlaying__
-    global __indexMax__
-    global __indexPi__
-    __musicVlcPi__.stop()
-    __musicPiPlaying__ = False
-    mp3s = []; 
-    for path, subdirs, files in os.walk(__dir__+'podcast'):
-       # for name in files:
-        path = path[(len(__dir__)-1):];
-        path = path+"/";
-        path = path[1:];
-        files = [path + file for file in files];
-        mp3s= mp3s + files; 
-    mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
+    mp3s.sort()
     __fileList__ = mp3s;
     __indexMax__ = len(__fileList__) 
     __indexPi__ = random.randrange(__indexMax__)
@@ -655,7 +634,6 @@ def getFileList():
     global __fileList__
     global __musicPiPlaying__
     global __indexPi__
-    
     data=request.get_json()
     style=int(data["style"])
     genFileList(style)
