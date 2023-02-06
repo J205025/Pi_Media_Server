@@ -7,6 +7,12 @@ from datetime import date,timedelta,datetime
 #import asyncio
 #import argparse
 
+#from multiprocessing import Process
+from multiprocessing.pool import ThreadPool
+
+#import logging
+
+
 
 import getpodcast
 import os
@@ -19,6 +25,7 @@ import subprocess
 import time
 import threading
 import vlc
+
 #
 #------------------------------------------------------------------
 __dir__ = "./static/assets/"
@@ -46,7 +53,8 @@ __volumePi__ = 70
 __volumePiMute__ = False
 __musicPiPlayMode__ = 0
 __down_thread__ = None
-__downStatus__ = 0
+__downStatus__ = False
+__return_code__ = None
 radioUrl={
           "url01":"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
           "url02":"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -286,7 +294,7 @@ def continuePlaying():
         threading.Timer( 10 , continuePlaying ).start()
 
 
-def genFileList(style):
+def genFileList_sh(style):
     global __fileList__
     global __dir__
     global __musicVlcPi__
@@ -328,7 +336,7 @@ def genFileList(style):
     __indexPi__ = random.randrange(__indexMax__)
     
 def downPodcastFile_sh():
-    N = 1
+    N = 3
     Ndays_ago = date.today()- timedelta(days=N)
     Ndays_ago.strftime("%Y-%m-%d")
     opt = getpodcast.options(
@@ -341,20 +349,21 @@ def downPodcastFile_sh():
     }
     getpodcast.getpodcast(podcasts, opt)
 
-def start_downPodcastFile_sh():
-    global __down_thread__
+def downPodcastFile_sh2():
+    try:
+      command = ["/home/ubuntu/Pi_Media_Server/.venv/bin/python3", "/home/ubuntu/Pi_Media_Server/getpodcast_sh.py"]
+      p = subprocess.Popen(command)
+      return p
+    except FileNotFoundError as e:
+       raise AudioEngineUnavailable(f'AudioEngineUnavailable: {e}')
+
+def process_monitor(p):
+    global __return_code__
     global __downStatus__
-    __downStatus__ = 1 
-    time.sleep(1)
-    __down_thread__=Thread(target=downPodcastFile_sh);
-    __down_thread__.start()
-    print("DownPodcast thread start to run")
-    __down_thread__.join()
-    __downStatus__ = 0 
-    print("DownPodcast thread finished--> downStatus: "+str(__downStatus__))
-    return __downStatus__
-
-
+    __return_code__ = p.poll()
+    if __return_code__ == None:
+        __return_code__ = p.wait()
+    __downStatus__ = False
 #----------------------------------------------------------------------------
 #
 #----------------------------------------------------------------------------
@@ -411,7 +420,7 @@ if(True):
 #    __fileList__ = get_files(__dir__)
 #    __fileList__.sort(key=lambda x:int(x[:-4]))
 #---------------------------------------------------------------------
-genFileList(0)
+genFileList_sh(0)
 if not (len(__fileList__) > 0):
     print ("No mp3 files found!")
 print ('--- Press button #play to start playing mp3 ---')
@@ -636,7 +645,7 @@ def getFileList():
     global __indexPi__
     data=request.get_json()
     style=int(data["style"])
-    genFileList(style)
+    genFileList_sh(style)
     return jsonify({
         "fileList" : __fileList__,
         "musicPiPlaying" : __musicPiPlaying__,
@@ -648,12 +657,45 @@ def downPodcastFile():
     global __down_thread__
     global __downStatus__
     if __downStatus__ == 0:
-        start_downPodcastFile_sh()
+        __downStatus__ = 1 
+        print("downStatus: "+str(__downStatus__))
+        #time.sleep(10)
+        __down_thread__=Thread(target=downPodcastFile_sh)
+        __down_thread__.start()
+        print("DownPodcast thread start to run")
+        __down_thread__.join()
+        __downStatus__ = 0 
+        print("DownPodcast thread finished--> downStatus: "+str(__downStatus__))
     else:
         print("DonwPodcast thread is Running, please wait")
     return jsonify({
         "downStatus" : __downStatus__
          })
+
+
+@app.route('/downPodcastFile2', methods=['POST'])
+def downPodcastFile2():
+    global __down_thread__
+    global __downStatus__
+    if __downStatus__ == False:
+        __downStatus__ = True 
+        print("downStatus: "+str(__downStatus__))
+        #time.sleep(10)
+        __p__=downPodcastFile_sh2()
+        monitor_thread = Thread(target=process_monitor,args=(__p__,)) 
+        monitor_thread.start()
+        print("DownPodcast thread start to run")
+        print("DownPodcast thread finished--> downStatus: "+str(__downStatus__))
+    else:
+        print("DonwPodcast thread is Running, please wait")
+        
+    return jsonify({
+        "downStatus" : __downStatus__
+         })
+
+
+
+
 
 @scheduler.task('cron', id='myjob1', day='*', hour='14', minute='05', second='00')
 def myjob1():
@@ -668,7 +710,7 @@ def myjob2():
     global __indexPi__
     global __indexMax__
     __indexPi__ = 7
-    start_downPodcastFile_sh()
+    downPodcastFile_sh()
     print("myDownPodcastFileJob executed")
     
     
@@ -677,8 +719,9 @@ def myjob2():
 #parser.parse_args()
 
 if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--workers 1 --threads 4,--worker-class gevent", type=str, default=False)
-    parser.parse_args()
+    #import argparse
+    #parser = argparse.ArgumentParser()
+    #parser.add_argument("--workers 1 --threads 4,--worker-class gevent", type=str, default=False)
+    #parser.parse_args()
+    
     app.run(host='0.0.0.0',port=2000,debug=False,threaded=True)

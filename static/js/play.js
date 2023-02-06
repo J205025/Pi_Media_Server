@@ -28,7 +28,7 @@ const vm = createApp({
                volumePi : 0.65,
                volumePcMute : false,
                volumePiMute : false,
-               downStatus : 0,
+               downStatus : false,
                //broswer audio play src
                url01:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
                url02:"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -338,6 +338,7 @@ const vm = createApp({
                 this.musicPiPlaying = res.data.musicPiPlaying;
                 this.indexPi = res.data.indexPi;
                 this.filePi=this.fileList[this.indexPi];
+                console.log(this.filePi)
                 console.log("works playSelectedPi");
                   })
                   .catch(error => {
@@ -378,6 +379,7 @@ const vm = createApp({
                 axios.post('/playPausePi').then(res => {
                 this.musicPiPlaying = res.data.musicPiPlaying; 
                 this.indexPi = res.data.indexPi;
+                console.log(this.filePi)
                 this.filePi = this.fileList[res.data.indexPi];
                 console.log("works playPausePi");
                 })
@@ -389,6 +391,7 @@ const vm = createApp({
                 axios.post('/playPrePi').then(res => {
                 this.indexPi = res.data.indexPi;
                 this.filePi = this.fileList[res.data.indexPi];
+                console.log(this.filePi)
                 this.musicPiPlaying = res.data.musicPiPlaying; 
                 console.log("playPrePi works");
                 })
@@ -400,6 +403,7 @@ const vm = createApp({
                 axios.post('/playNextPi').then(res => {
                 this.indexPi = res.data.indexPi;
                 this.filePi = this.fileList[res.data.indexPi];
+                console.log(this.filePi)
                 dir_filePi = this.dir+this.fileList[this.indexPi];
                 this.musicPiPlaying = res.data.musicPiPlaying; 
                 console.log("playNextPi works");
@@ -513,7 +517,7 @@ const vm = createApp({
                 })
               },
             downPodcastFile(event){
-                axios.post('/downPodcastFile').then(res => {
+                axios.post('/downPodcastFile2').then(res => {
                 this.downStatus = res.data.downStatus;
                 console.log("downStatus:" + this.downStatus);
                 })
