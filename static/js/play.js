@@ -7,6 +7,8 @@ const vm = createApp({
                musicPiPlaying : false,
                musicPcPlayMode : 0,
                musicPiPlayMode : 0,
+               playRatePc : 1 ,
+               playRatePi : 1 ,
                fileList : [],
                dir :"./static/assets/",
                filePc: '',
@@ -70,6 +72,7 @@ const vm = createApp({
                 axios.post('/').then(res => {
                 this.indexPi=res.data.indexPi;
                 this.musicPiPlaying=res.data.musicPiPlaying;
+                this.playRatePi=res.data.playRatePi;
                 this.musicPiPlayMode=res.data.musicPiPlayMode;
                 this.fileList = res.data.fileList;
                 this.radioPiPlayingNo = res.data.radioPiPlayingNo;   
@@ -215,14 +218,23 @@ const vm = createApp({
                 this.filePc=this.fileList[this.indexPc];
                 dirfilePc=this.dir+this.fileList[this.indexPc];
                 console.log(dirfilePc);
-                document.getElementById("my-audio").pause();
-                document.getElementById("my-audio").setAttribute('src',dirfilePc);
-                document.getElementById("my-audio").load();
+                var vid = document.getElementById("my-audio");
+                vid.pause();
+                vid.setAttribute('src',dirfilePc);
+                vid.load();
                 document.getElementById("my-audio").play();
                 this.musicPcPlaying = true;
                 console.log(this.indexPc);
                 console.log(this.filePc);
                 console.log("playNextPc works");
+              },
+             setPlayRatePc(){
+                var vid = document.getElementById("my-audio");
+                this.playRatePc = this.playRatePc +0.5;
+                if (this.playRatePc > 2.5){
+                    this.playRatePc = 0.5;
+                }
+                vid.playbackRate = this.playRatePc;
               },
             volumeDownPc(event){
                 var vid1 = document.getElementById("my-audio");
@@ -364,6 +376,14 @@ const vm = createApp({
                 this.keytimerPi=setTimeout(this.playSelectedPi,3000);
                 this.keytimerPiRunning = true;
               },
+             setPlayRatePi(){
+                axios.post('/setPlayRatePi').then(res => {
+                this.playRatePi = res.data.playRatePi;
+                })
+                .catch(error => {
+                console.log("handle error =>", error);
+                })
+             },
              setPlayModePi(mode){
                 this.musicPiPlayMode = this.musicPiPlayMode + 1;
                 this.musicPiPlayMode = this.musicPiPlayMode % 2;

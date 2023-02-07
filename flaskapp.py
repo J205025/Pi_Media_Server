@@ -11,9 +11,6 @@ from datetime import date,timedelta,datetime
 from multiprocessing.pool import ThreadPool
 
 #import logging
-
-
-
 import getpodcast
 import os
 import json
@@ -25,7 +22,6 @@ import subprocess
 import time
 import threading
 import vlc
-
 #
 #------------------------------------------------------------------
 __dir__ = "./static/assets/"
@@ -55,6 +51,7 @@ __musicPiPlayMode__ = 0
 __down_thread__ = None
 __downStatus__ = False
 __return_code__ = None
+__playRatePi__ = 1
 radioUrl={
           "url01":"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
           "url02":"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -229,6 +226,14 @@ def handlePlayPausePi():
         __musicPiPlaying__ = True
         print("PlayPause- Play:"+file)
         
+def handlePlayRatePi():
+    global __musicVlcPi__
+    global __playRatePi__
+    __playRatePi__ = __playRatePi__ + 0.5
+    if __playRatePi__ > 2.5:
+        __playRatePi__ = 0.5
+    __musicVlcPi__.set_rate(__playRatePi__)
+    
 def handleMutePi():
     global __musicVlcPi__
     global __radioVlcPi__
@@ -454,7 +459,10 @@ def index():
     global __radioPiPlayingNo__ 
     global __volumePi__
     global __volumePiMute__
+    global __playRatePi__
     if request.method == 'GET':
+        __playRatePi__ = 1
+        __musicVlcPi__.set_rate(__playRatePi__)
         return render_template('index.html')
     if request.method =='POST':
         return jsonify({
@@ -464,7 +472,8 @@ def index():
         "musicPiPlayMode" : __musicPiPlayMode__,
         "radioPiPlayingNo" : __radioPiPlayingNo__,
         "volumePi" : __volumePi__,
-        "volumePiMute" : __volumePiMute__
+        "volumePiMute" : __volumePiMute__,
+        "playRatePi" : __playRatePi__
          })
     
 @app.route('/playPrePi', methods=['POST'])
@@ -513,6 +522,15 @@ def playPausePi():
         "indexPi" : __indexPi__
          })
 
+@app.route('/setPlayRatePi', methods=['POST'])
+def setPlayRatePi():
+    global __playRatePi__
+    print("playRatePi: " + str(__playRatePi__))
+    handlePlayRatePi()
+    return jsonify({
+        "playRatePi" : __playRatePi__
+         })
+    
 @app.route('/setPlayModePi', methods=['POST'])
 def setPlayModePi():
     global __musicPiPlayMode__
