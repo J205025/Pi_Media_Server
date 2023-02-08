@@ -12,8 +12,7 @@ deleteold = True,
 run = True)
 podcasts = {
    "BBC" : "http://podcasts.files.bbci.co.uk/p02nq0gn.rss",
-   "Daily" :"https://feeds.simplecast.com/54nAGcIl",
-   "Sutra":"https://feeds.soundon.fm/podcasts/5440c9b1-f88c-4d30-b493-8a1f3a941d35.xml" 
+   "Daily" :"https://feeds.simplecast.com/54nAGcIl"
    }
 getpodcast.getpodcast(podcasts, opt)
 

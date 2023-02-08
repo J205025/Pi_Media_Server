@@ -52,6 +52,7 @@ __down_thread__ = None
 __downStatus__ = False
 __return_code__ = None
 __playRatePi__ = 1
+__sleepTimePi__ = 5
 radioUrl={
           "url01":"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
           "url02":"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -290,7 +291,7 @@ def continuePlaying():
     global __vlcEnded__
     global __vlcPlaying__
     state = __musicVlcPi__.get_state()
-    print(state)
+    #print(state)
     if (__musicPiPlaying__ == True ):
         if (state == __vlcEnded__):
             handleNextPi();
@@ -298,6 +299,10 @@ def continuePlaying():
     else:
         threading.Timer( 10 , continuePlaying ).start()
 
+def stopPlaying():
+    global __musicVlcPi__
+    global __musicPiPlaying__
+    __musicVlcPi__.stop()
 
 def genFileList_sh(style):
     global __fileList__
@@ -690,7 +695,7 @@ def downPodcastFile():
         "downStatus" : __downStatus__
          })
 
-
+#this method fork a proceess run  getpodcast_sh.py
 @app.route('/downPodcastFile2', methods=['POST'])
 def downPodcastFile2():
     global __down_thread__
@@ -711,24 +716,38 @@ def downPodcastFile2():
         "downStatus" : __downStatus__
          })
 
+@app.route('/setSleepTimePi', methods=['POST'])
+def setSleepTimePi():
+    global __musicVlcPi__
+    global __radioVlcPi__
+    global __musicPlayingPi__
+    global __sleepTimePi__
+    __sleepTimePi__ = __sleepTimePi__ + 1
+    if(__sleepTimePi__> 3 ):
+        __sleepTimePi__ = 0
+    
+    threading.Timer( 10 , stopPlaying).start()
+    return jsonify({
+        "musicPiPlaying" : __musicPiPlaying__,
+        "sleepTimePi" : __sleepTimePi__,
+         })
+    
 
 
-
-
-@scheduler.task('cron', id='myjob1', day='*', hour='14', minute='05', second='00')
-def myjob1():
+@scheduler.task('cron', id='myjoba', day='*', hour='14', minute='05', second='00')
+def myjoba():
     global __indexPi__
     global __indexMax__
     __indexPi__ = 7
     #handleSelectedPi()
     print("myPlayJob executed")
 
-@scheduler.task('cron', id='myjob2', day='*', hour='14', minute='06', second='00')
-def myjob2():
+@scheduler.task('cron', id='myjobb2', day='*', hour='14', minute='06', second='00')
+def myjobb2():
     global __indexPi__
     global __indexMax__
     __indexPi__ = 7
-    downPodcastFile_sh()
+    downPodcastFile_sh2()
     print("myDownPodcastFileJob executed")
     
     

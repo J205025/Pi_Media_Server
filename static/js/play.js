@@ -31,6 +31,12 @@ const vm = createApp({
                volumePcMute : false,
                volumePiMute : false,
                downStatus : false,
+               sleepTimePc: 5,
+               sleepTimePcShow: "No Sleep",
+               sleepTimerPc: null,
+               sleepTimePi: 5,
+               sleepTimePiShow: "No Sleep",
+               sleepTimerPi: null,
                //broswer audio play src
                url01:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
                url02:"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -95,7 +101,8 @@ const vm = createApp({
                 vid1.volumePc = this.volumePc; 
                 var vid2 = document.getElementById("my-radio");
                 vid2.volumePc = this.volumePc;
-
+                this.contuineplaying();
+                this.metadata();
                 if(this.radioPiPlayingNo==0){
                   element = document.getElementById("sel10Pi");
                   element.value = "0"
@@ -128,8 +135,96 @@ const vm = createApp({
                   element = document.getElementById("sel30");
                   element.value = this.radioPiPlayingNo 
                 }
-
+                
               });
+             },
+             contuineplaying(){
+                var self = this;
+                document.getElementById('my-audio').addEventListener("ended",function() {
+                if(self.musicPcPlaying == true){
+                   console.log("Continue Playing");
+                   self.playNextPc();
+                }
+              });
+             },
+             setSleepTimePc(){
+              a=[10,20,30,1000];
+              clearTimeout(this.sleepTimer);
+              this.sleepTimePc = this.sleepTimePc + 1
+              if(this.sleepTimePc> 3 ){ this.sleepTimePc = 0};
+              switch (this.sleepTimePc) {
+                      case 0 : { this.sleepTimePcShow = "10 mins Sleep";  break;}
+                      case 1 : { this.sleepTimePcShow = "20 mins Sleep";  break;}
+                      case 2 : { this.sleepTimePcShow = "30 mins Sleep";  break;}
+                      case 3 : { this.sleepTimePcShow = "Never   Sleep";  break;}
+                     }
+              ts=a[this.sleepTimePc]*1000*60;
+              console.log(ts);
+              this.sleepTimerPc=setTimeout(this.stopPlayingPc,ts)
+             },
+             stopPlayingPc(){
+              document.getElementById("my-audio").pause();
+              this.musicPcPlaying = false;
+             },
+             metadata(){
+              //const audio = document.querySelector('audio');
+              const audio = document.getElementById('my-audio');
+              const durationContainer = document.getElementById('duration');
+              
+              const calculateTime = (secs) => {
+                const minutes = Math.floor(secs / 60);
+                const seconds = Math.floor(secs % 60);
+                const returnedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
+                return `${minutes}:${returnedSeconds}`;
+              }
+              
+              const displayDuration = () => {
+                durationContainer.textContent = calculateTime(audio.duration);
+              }
+              
+              if (audio.readyState > 0) {
+                displayDuration();
+              } else {
+                audio.addEventListener('loadedmetadata', () => {
+                  displayDuration();
+                });
+              }
+              const seekSlider = document.getElementById('seek-slider');
+
+              const setSliderMax = () => {
+                seekSlider.max = Math.floor(audio.duration);
+              }
+              
+              if (audio.readyState > 0) {
+                displayDuration();
+                setSliderMax();
+              } else {
+                audio.addEventListener('loadedmetadata', () => {
+                  displayDuration();
+                  setSliderMax();
+                });
+              }
+              const bufferedAmount = audio.buffered.end(audio.buffered.length - 1);
+              const seekableAmount = audio.seekable.end(audio.seekable.length - 1);
+
+              const currentTimeContainer = document.getElementById('current-time');
+
+              seekSlider.addEventListener('input', () => {
+                currentTimeContainer.textContent = calculateTime(seekSlider.value);
+              });
+
+              seekSlider.addEventListener('change', () => {
+                audio.currentTime = seekSlider.value;
+              });
+
+              audio.addEventListener('timeupdate', () => {
+                seekSlider.value = Math.floor(audio.currentTime);
+              });
+
+
+
+
+
              },
              playSelectedPc(){
                 num=this.num4dPc.join("");
@@ -168,7 +263,7 @@ const vm = createApp({
                 this.keytimerPc=setTimeout(this.playSelectedPc,3000);
                 this.keytimerPcRunning = true;
                 },
-            playPausePc(event){
+            playPausePc(){
                 dirfilePc=this.dir+this.fileList[this.indexPc];
                 console.log(dirfilePc); 
                 document.getElementById("my-audio").setAttribute('src',dirfilePc);
@@ -176,6 +271,7 @@ const vm = createApp({
                 document.getElementById("my-audio").play();
                 this.musicPcPlaying = true;
                 console.log("playPausePc to Play"); 
+                console.log(this.musicPcPlaying);
                 }
                 else{
                 document.getElementById("my-audio").pause();
@@ -183,7 +279,7 @@ const vm = createApp({
                 console.log("playPausePc to Pause"); 
                 }
            	  },
-            playPrePc(event){
+            playPrePc(){
                 if(this.musicPcPlayMode==1){
                 rn = this.getRandom(this.indexMax-1, 0);
                 this.indexPc = rn
@@ -204,7 +300,7 @@ const vm = createApp({
                 console.log(this.filePc);
                 console.log("playPrePc works");
               },
-            playNextPc(event){
+            playNextPc(){
                 if(this.musicPcPlayMode==1){
                 rn = this.getRandom(this.indexMax-1, 0);
                 this.indexPc = rn
@@ -236,7 +332,7 @@ const vm = createApp({
                 }
                 vid.playbackRate = this.playRatePc;
               },
-            volumeDownPc(event){
+            volumeDownPc(){
                 var vid1 = document.getElementById("my-audio");
                 var vid2 = document.getElementById("my-radio");
                 this.volumePc = this.volumePc - 0.2;
@@ -245,7 +341,7 @@ const vm = createApp({
                 vid2.volume = this.volumePc; 
                 console.log("volumeDownPc works");
               },
-            volumeUpPc(event){
+            volumeUpPc(){
                 var vid1 = document.getElementById("my-audio");
                 var vid2 = document.getElementById("my-radio");
                 this.volumePc = this.volumePc + 0.2;
@@ -254,7 +350,7 @@ const vm = createApp({
                 vid2.volume = this.volumePc; 
                 console.log("volumeUpPc works");
               },
-            volumeMutePc(event){
+            volumeMutePc(){
                 var vid1 = document.getElementById("my-audio");
                 var vid2 = document.getElementById("my-radio");
                 if(this.volumePc != 0 ){this.volumePc =0;}
@@ -395,7 +491,20 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
              },
-             playPausePi(event){
+            setSleepTimePi(){
+              axios.post('/setSleepTimePi').then(res => {
+                this.sleepTimePi = res.data.sleepTimePi; 
+                this.musicPiPlaying = res.data.musicPiPlaying; 
+              switch (this.sleepTimePi) {
+                case 0 : { this.sleepTimePiShow = "10 mins Sleep";  break;}
+                case 1 : { this.sleepTimePiShow = "20 mins Sleep";  break;}
+                case 2 : { this.sleepTimePiShow = "30 mins Sleep";  break;}
+                case 3 : { this.sleepTimePiShow = "Never   Sleep";  break;}
+                     }
+                console.log("works setSleepTimePi");
+                })
+             },
+             playPausePi(){
                 axios.post('/playPausePi').then(res => {
                 this.musicPiPlaying = res.data.musicPiPlaying; 
                 this.indexPi = res.data.indexPi;
@@ -407,7 +516,7 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
            	  },
-             playPrePi(event){
+             playPrePi(){
                 axios.post('/playPrePi').then(res => {
                 this.indexPi = res.data.indexPi;
                 this.filePi = this.fileList[res.data.indexPi];
@@ -419,7 +528,7 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
               },
-            playNextPi(event){
+            playNextPi(){
                 axios.post('/playNextPi').then(res => {
                 this.indexPi = res.data.indexPi;
                 this.filePi = this.fileList[res.data.indexPi];
@@ -478,7 +587,7 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
               },
-            volumeDownPi(event){
+            volumeDownPi(){
                 axios.post('/volumeDownPi').then(res => {
                 this.volumePi= res.data.volumePi;
                 this.volumePiMute= res.data.volumePiMute;
@@ -490,7 +599,7 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
               },
-            volumeUpPi(event){
+            volumeUpPi(){
                 axios.post('/volumeUpPi').then(res => {
                 this.volumePi= res.data.volumePi;
                 this.volumePiMute= res.data.volumePiMute;
@@ -502,7 +611,7 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
               },
-            volumeMutePi(event){
+            volumeMutePi(){
                 axios.post('/volumeMutePi').then(res => {
                 this.volumePi= res.data.volumePi;
                 this.volumePiMute= res.data.volumePiMute;
@@ -514,7 +623,7 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
               },
-            refreshList(event){
+            refreshList(){
                 this.indexMax = this.fileList.length;
                 rn = this.getRandom(this.indexMax-1, 0);
                 this.indexPc=rn;
@@ -528,7 +637,7 @@ const vm = createApp({
                 axios.post('/getFileList',{"style":style}).then(res => {
                 this.fileList = res.data.fileList;
                 this.indexPi = res.data.indexPi;
-                this.refreshList(event);
+                this.refreshList();
                 console.log(this.fileList);
                 console.log("FileList Refresh");
                 })
@@ -536,7 +645,7 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
               },
-            downPodcastFile(event){
+            downPodcastFile(){
                 axios.post('/downPodcastFile2').then(res => {
                 this.downStatus = res.data.downStatus;
                 console.log("downStatus:" + this.downStatus);
