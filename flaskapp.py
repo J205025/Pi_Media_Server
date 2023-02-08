@@ -53,6 +53,7 @@ __downStatus__ = False
 __return_code__ = None
 __playRatePi__ = 1
 __sleepTimePi__ = 5
+__timer_Sleep__ = None
 radioUrl={
           "url01":"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
           "url02":"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -301,8 +302,18 @@ def continuePlaying():
 
 def stopPlaying():
     global __musicVlcPi__
+    global __radioVlcPi__
     global __musicPiPlaying__
-    __musicVlcPi__.stop()
+    global __radioPiPlayingNo__
+    global __sleepTimePi__
+    if (__musicPiPlaying__ ==True or __radioPiPlayingNo__ != 0):
+        __musicVlcPi__.stop()
+        __radioVlcPi__.stop()
+        __musicPiPlaying__ = False
+        __radioPiPlayingNo__ = 0
+        # set SleepTimePi to NonSleep
+        __sleeTimePi__ =3
+        
 
 def genFileList_sh(style):
     global __fileList__
@@ -436,7 +447,6 @@ if not (len(__fileList__) > 0):
 print ('--- Press button #play to start playing mp3 ---')
 
 threading.Timer( 10 , continuePlaying ).start()
-
 #==============================================================================================
 app = Flask(__name__)
 CORS(app)
@@ -720,15 +730,21 @@ def downPodcastFile2():
 def setSleepTimePi():
     global __musicVlcPi__
     global __radioVlcPi__
-    global __musicPlayingPi__
+    global __musicPiPlaying__
+    global __radioPiPlayingNo__
     global __sleepTimePi__
+    global __timer_Sleep__
     __sleepTimePi__ = __sleepTimePi__ + 1
     if(__sleepTimePi__> 3 ):
         __sleepTimePi__ = 0
-    
-    threading.Timer( 10 , stopPlaying).start()
+    a= [10,20,30,1000]
+    if (__timer_Sleep__ != None):
+        __timer_Sleep__.cancel()
+    __timer_Sleep__= threading.Timer( a[__sleepTimePi__]*60 , stopPlaying)
+    __timer_Sleep__.start()
     return jsonify({
         "musicPiPlaying" : __musicPiPlaying__,
+        "radioPiPlayingNo" : __radioPiPlayingNo__,
         "sleepTimePi" : __sleepTimePi__,
          })
     

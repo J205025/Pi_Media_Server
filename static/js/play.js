@@ -32,10 +32,10 @@ const vm = createApp({
                volumePiMute : false,
                downStatus : false,
                sleepTimePc: 5,
-               sleepTimePcShow: "No Sleep",
+               sleepTimePcShow: "非睡眠模式",
                sleepTimerPc: null,
                sleepTimePi: 5,
-               sleepTimePiShow: "No Sleep",
+               sleepTimePiShow: "非睡眠模式",
                sleepTimerPi: null,
                //broswer audio play src
                url01:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
@@ -153,10 +153,10 @@ const vm = createApp({
               this.sleepTimePc = this.sleepTimePc + 1
               if(this.sleepTimePc> 3 ){ this.sleepTimePc = 0};
               switch (this.sleepTimePc) {
-                      case 0 : { this.sleepTimePcShow = "10 mins Sleep";  break;}
-                      case 1 : { this.sleepTimePcShow = "20 mins Sleep";  break;}
-                      case 2 : { this.sleepTimePcShow = "30 mins Sleep";  break;}
-                      case 3 : { this.sleepTimePcShow = "Never   Sleep";  break;}
+                      case 0 : { this.sleepTimePcShow = "10分鐘後停止";  break;}
+                      case 1 : { this.sleepTimePcShow = "20分鐘後停止";  break;}
+                      case 2 : { this.sleepTimePcShow = "30分鐘後停止";  break;}
+                      case 3 : { this.sleepTimePcShow = "非睡眠模式";  break;}
                      }
               ts=a[this.sleepTimePc]*1000*60;
               console.log(ts);
@@ -165,6 +165,8 @@ const vm = createApp({
              stopPlayingPc(){
               document.getElementById("my-audio").pause();
               this.musicPcPlaying = false;
+              document.getElementById("my-radio").pause();
+              this.radioPcPlayingNo = 0;
              },
              metadata(){
               //const audio = document.querySelector('audio');
@@ -495,11 +497,12 @@ const vm = createApp({
               axios.post('/setSleepTimePi').then(res => {
                 this.sleepTimePi = res.data.sleepTimePi; 
                 this.musicPiPlaying = res.data.musicPiPlaying; 
+                this.radioPiPlayingNo = res.data.radioPiPlayingNo; 
               switch (this.sleepTimePi) {
-                case 0 : { this.sleepTimePiShow = "10 mins Sleep";  break;}
-                case 1 : { this.sleepTimePiShow = "20 mins Sleep";  break;}
-                case 2 : { this.sleepTimePiShow = "30 mins Sleep";  break;}
-                case 3 : { this.sleepTimePiShow = "Never   Sleep";  break;}
+                case 0 : { this.sleepTimePiShow = "10分鐘後停止";  break;}
+                case 1 : { this.sleepTimePiShow = "20分鐘後停止";  break;}
+                case 2 : { this.sleepTimePiShow = "30分鐘後停止";  break;}
+                case 3 : { this.sleepTimePiShow = "非睡眠模式";  break;}
                      }
                 console.log("works setSleepTimePi");
                 })
