@@ -25,8 +25,9 @@ import vlc
 #
 #------------------------------------------------------------------
 __dir__ = "./static/assets/"
-__fileList__ = [] 
-__typeList__ = ["all","pop","podcast","classical","sutra","red","jacky"] 
+__fileList__ = []
+#                 0     1       2          3        4           5       6        7       8    9
+__typeList__ = ["all","pop","podcast","classical","taiwanese","jacky","andy","queenie","red","sutra"] 
 __fileList_Rn__ = []
 __indexMax__ = 0
 __indexPi__ = 0
@@ -54,6 +55,9 @@ __return_code__ = None
 __playRatePi__ = 1
 __sleepTimePi__ = 5
 __timer_Sleep__ = None
+__cronTimeHour__ = '09'
+__cronTimeMin__ = '01',
+__cronStatus__= True,
 radioUrl={
           "url01":"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
           "url02":"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -338,6 +342,12 @@ def genFileList_sh(style):
            subdir = __typeList__[5]
         case 6:
            subdir = __typeList__[6]
+        case 7:
+           subdir = __typeList__[7]
+        case 8:
+           subdir = __typeList__[8]
+        case 9:
+           subdir = __typeList__[9]
         case _:
            subdir = __typeList__[0]
     __musicVlcPi__.stop()
@@ -451,9 +461,9 @@ threading.Timer( 10 , continuePlaying ).start()
 app = Flask(__name__)
 CORS(app)
 #-----------------------
+#https://viniciuschiele.github.io/flask-apscheduler/index.html
 class Config(object):
     SCHEDULER_API_ENABLED = True
-
 scheduler = APScheduler()
 #-----------------------
 #APScheduler start
@@ -508,6 +518,26 @@ def playNextPi():
     global __indexMax__
     global __musicPiPlaying__
     handleNextPi();
+    return jsonify({ 
+           "indexPi":__indexPi__,
+           "musicPiPlaying" :__musicPiPlaying__
+          })
+@app.route('/playIndexPi', methods=['POST'])
+def playIndexPi():
+    global __indexPi__
+    global __indexMax__
+    global __musicPiPlaying__
+    data=request.get_json()
+    num=int(data["indexPi"])
+    __indexPi__= num
+    file = __dir__ + __fileList__[__indexPi__]
+    __musicVlcPi__.stop()
+    vlcmedia  = __musicVlcInstance__.media_new(file)
+    __musicVlcPi__.set_media(vlcmedia)
+    __musicVlcPi__.play()
+    __musicPiPlaying__ = True
+    print("__indexPi__:"+str(__indexPi__))
+    print("Next play:"+file)
     return jsonify({ 
            "indexPi":__indexPi__,
            "musicPiPlaying" :__musicPiPlaying__
@@ -689,6 +719,7 @@ def getFileList():
 def downPodcastFile():
     global __down_thread__
     global __downStatus__
+    msg = "" 
     if __downStatus__ == 0:
         __downStatus__ = 1 
         print("downStatus: "+str(__downStatus__))
@@ -699,10 +730,13 @@ def downPodcastFile():
         __down_thread__.join()
         __downStatus__ = 0 
         print("DownPodcast thread finished--> downStatus: "+str(__downStatus__))
+        msg ="DownPodcast thread finished--> downStatus: "+str(__downStatus__)
     else:
         print("DonwPodcast thread is Running, please wait")
+        msg= "DonwPodcast thread is Running, please wait"
     return jsonify({
-        "downStatus" : __downStatus__
+        "downStatus" : __downStatus__,
+        "msg" : msg
          })
 
 #this method fork a proceess run  getpodcast_sh.py
@@ -710,6 +744,7 @@ def downPodcastFile():
 def downPodcastFile2():
     global __down_thread__
     global __downStatus__
+    msg =""
     if __downStatus__ == False:
         __downStatus__ = True 
         print("downStatus: "+str(__downStatus__))
@@ -719,11 +754,14 @@ def downPodcastFile2():
         monitor_thread.start()
         print("DownPodcast thread start to run")
         print("DownPodcast thread finished--> downStatus: "+str(__downStatus__))
+        msg ="DownPodcast thread finished--> downStatus: "+str(__downStatus__)
     else:
         print("DonwPodcast thread is Running, please wait")
+        msg="DonwPodcast thread is Running, please wait"
         
     return jsonify({
-        "downStatus" : __downStatus__
+        "downStatus" : __downStatus__,
+        "msg" : msg
          })
 
 @app.route('/setSleepTimePi', methods=['POST'])
@@ -749,27 +787,40 @@ def setSleepTimePi():
          })
     
 
+@app.route('/setCron', methods=['POST'])
+def setCron():
+    global __cronTimeHour__
+    global __cronTimeMin__
+    global __cronStatus__
+    data=request.get_json()
+    __cronTimeHour__=int(data["Hour"])
+    __cronTimeMin__=int(data["Min"])
+    __cronStatus__ = not __cronStatus__
+    scheduler.add_job(playNextPi,'cron', hour=__cronTimeHour__, minute=__cronTimeMin__, end_date='2029-05-30')
+    scheduler.start()
+    return jsonify({
+        "cronTimeHour" : __cronTimeHour__,
+        "cronTimeMin" : __cronTimeMin__,
+        "cronStatus" : __cronStatus__,
+         })
 
-@scheduler.task('cron', id='myjoba', day='*', hour='14', minute='05', second='00')
+@scheduler.task('cron', id='myjoba', day='*', hour=__cronTimeHour__, minute="00", second='00')
 def myjoba():
+    global __cronStatus__
     global __indexPi__
     global __indexMax__
     __indexPi__ = 7
-    #handleSelectedPi()
+    if (__cronStatus__ == True):
+        handleSelectedPi()
     print("myPlayJob executed")
 
-@scheduler.task('cron', id='myjobb2', day='*', hour='14', minute='06', second='00')
+@scheduler.task('cron', id='myjobb2', day='*', hour='06', minute='00', second='00')
 def myjobb2():
     global __indexPi__
     global __indexMax__
     __indexPi__ = 7
     downPodcastFile_sh2()
     print("myDownPodcastFileJob executed")
-    
-    
-#parser = argparse.ArgumentParser()
-#parser.add_argument("--workers 1 --threads 4,--worker-class gevent", type=str, default=False)
-#parser.parse_args()
 
 if __name__ == '__main__':
     #import argparse

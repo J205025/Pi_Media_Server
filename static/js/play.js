@@ -3,6 +3,13 @@ const vm = createApp({
   delimiters:['%{', '}%'],
   data(){
                return {
+               elementAudioPC: null,
+               element10Pi : null,
+               element20Pi : null,
+               element30Pi : null,
+               element10Pc : null,
+               element20Pc : null,
+               element30Pc : null,
                musicPcPlaying : false,
                musicPiPlaying : false,
                musicPcPlayMode : 0,
@@ -32,11 +39,14 @@ const vm = createApp({
                volumePiMute : false,
                downStatus : false,
                sleepTimePc: 5,
-               sleepTimePcShow: "非睡眠模式",
+               sleepTimePcShow: "No ",
                sleepTimerPc: null,
                sleepTimePi: 5,
-               sleepTimePiShow: "非睡眠模式",
+               sleepTimePiShow: "No ",
                sleepTimerPi: null,
+               cronTimeHour: 6,
+               cronTimeMin :0,
+               cronStatus: false,
                //broswer audio play src
                url01:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
                url02:"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -97,50 +107,48 @@ const vm = createApp({
                 console.log("radioPiPlayingNo: "+this.radioPiPlayingNo);
                 console.log("volumePi: "+this.volumePi);
                 console.log("volumePiMute: "+this.volumePiMute);
-                var vid1 = document.getElementById("my-audio");
-                vid1.volumePc = this.volumePc; 
-                var vid2 = document.getElementById("my-radio");
-                vid2.volumePc = this.volumePc;
+                
+                this.elementAudioPC = document.getElementById("my-audio");
+                this.elementAudioPC.volumePc = this.volumePc; 
+                this.elementRadioPC = document.getElementById("my-radio");
+                this.elementRadioPC.volumePc = this.volumePc;
+
                 this.contuineplaying();
                 this.metadata();
+
+                this.element10Pi = document.getElementById("sel10Pi");
+                this.element20Pi = document.getElementById("sel20Pi");
+                this.element30Pi = document.getElementById("sel30Pi");
+                this.element10Pc = document.getElementById("sel10Pc");
+                this.element20Pc = document.getElementById("sel20Pc");
+                this.element30Pc = document.getElementById("sel30Pc");
+
                 if(this.radioPiPlayingNo==0){
-                  element = document.getElementById("sel10Pi");
-                  element.value = "0"
-                  element = document.getElementById("sel20Pi");
-                  element.value = "0"
-                  element = document.getElementById("sel30Pi");
-                  element.value = "0"
+                  this.element10Pi.value = "0"
+                  this.element20Pi.value = "0"
+                  this.element30Pi.value = "0"
                 }
                 else if(this.radioPiPlayingNo>0 && this.radioPiPlayingNo <11){
-                  element = document.getElementById("sel20Pi");
-                  element.value = "0"
-                  element = document.getElementById("sel30Pi");
-                  element.value = "0"
-                  element = document.getElementById("sel10Pi");
-                  element.value = this.radioPiPlayingNo 
+                  this.element10Pi.value = this.radioPiPlayingNo
+                  this.element20Pi.value = "0"
+                  this.element30Pi.value = "0"
                 }
-                else if(  this.radioPiPlayingNo>11 &&this.radioPiPlayingNo<21){
-                  element = document.getElementById("sel10Pi");
-                  element.value = "0"
-                  element = document.getElementById("sel30Pi");
-                  element.value = "0"
-                  element = document.getElementById("sel20Pi");
-                  element.value = this.radioPiPlayingNo 
+                else if(  this.radioPiPlayingNo>11 && this.radioPiPlayingNo<21){
+                  this.element10Pi.value = "0"
+                  this.element20Pi.value = this.radioPiPlayingNo
+                  this.element30Pi.value = "0"
                 }
                 else{
-                  element = document.getElementById("sel10");
-                  element.value = "0"
-                  element = document.getElementById("sel20");
-                  element.value = "0"
-                  element = document.getElementById("sel30");
-                  element.value = this.radioPiPlayingNo 
+                  this.element10Pi.value = "0"
+                  this.element20Pi.value = "0"
+                  this.element30Pi.value = this.radioPiPlayingNo
                 }
                 
               });
              },
              contuineplaying(){
                 var self = this;
-                document.getElementById('my-audio').addEventListener("ended",function() {
+                this.elementAudioPC.addEventListener("ended",function() {
                 if(self.musicPcPlaying == true){
                    console.log("Continue Playing");
                    self.playNextPc();
@@ -153,80 +161,97 @@ const vm = createApp({
               this.sleepTimePc = this.sleepTimePc + 1
               if(this.sleepTimePc> 3 ){ this.sleepTimePc = 0};
               switch (this.sleepTimePc) {
-                      case 0 : { this.sleepTimePcShow = "10分鐘後停止";  break;}
-                      case 1 : { this.sleepTimePcShow = "20分鐘後停止";  break;}
-                      case 2 : { this.sleepTimePcShow = "30分鐘後停止";  break;}
-                      case 3 : { this.sleepTimePcShow = "非睡眠模式";  break;}
+                      case 0 : { this.sleepTimePcShow = "10 min";  break;}
+                      case 1 : { this.sleepTimePcShow = "20 min";  break;}
+                      case 2 : { this.sleepTimePcShow = "30 min";  break;}
+                      case 3 : { this.sleepTimePcShow = "No";  break;}
                      }
               ts=a[this.sleepTimePc]*1000*60;
               console.log(ts);
               this.sleepTimerPc=setTimeout(this.stopPlayingPc,ts)
              },
              stopPlayingPc(){
-              document.getElementById("my-audio").pause();
+              this.elementAudioPC.pause();
               this.musicPcPlaying = false;
-              document.getElementById("my-radio").pause();
+              this.elementRadioPC.pause();
               this.radioPcPlayingNo = 0;
              },
              metadata(){
-              //const audio = document.querySelector('audio');
-              const audio = document.getElementById('my-audio');
-              const durationContainer = document.getElementById('duration');
-              
-              const calculateTime = (secs) => {
-                const minutes = Math.floor(secs / 60);
-                const seconds = Math.floor(secs % 60);
-                const returnedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
-                return `${minutes}:${returnedSeconds}`;
-              }
-              
-              const displayDuration = () => {
-                durationContainer.textContent = calculateTime(audio.duration);
-              }
-              
-              if (audio.readyState > 0) {
-                displayDuration();
-              } else {
-                audio.addEventListener('loadedmetadata', () => {
-                  displayDuration();
-                });
-              }
+              /* Implementation of the presentation of the audio player */
+              const audioPlayerContainer = document.getElementById('audio-player-container');
               const seekSlider = document.getElementById('seek-slider');
+              const volumeSlider = document.getElementById('volume-slider');
+              let playState = 'play';
+              let muteState = 'unmute';
 
-              const setSliderMax = () => {
-                seekSlider.max = Math.floor(audio.duration);
+              const showRangeProgress = (rangeInput) => {
+                  if(rangeInput === seekSlider) audioPlayerContainer.style.setProperty('--seek-before-width', rangeInput.value / rangeInput.max * 100 + '%');
+                  else audioPlayerContainer.style.setProperty('--volume-before-width', rangeInput.value / rangeInput.max * 100 + '%');
               }
-              
+              seekSlider.addEventListener('input', (e) => {
+                  showRangeProgress(e.target);
+              });
+              volumeSlider.addEventListener('input', (e) => {
+                  showRangeProgress(e.target);
+              });
+
+
+              /** Implementation of the functionality of the audio player */
+              const audio = this.elementAudioPC;
+              const durationContainer = document.getElementById('duration');
+              const currentTimeContainer = document.getElementById('current-time');
+              const outputContainer = document.getElementById('volume-output');
+              let raf = null;
+              const calculateTime = (secs) => {
+                  const minutes = Math.floor(secs / 60);
+                  const seconds = Math.floor(secs % 60);
+                  const returnedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
+                  return `${minutes}:${returnedSeconds}`;
+              }
+              const displayDuration = () => {
+                  durationContainer.textContent = calculateTime(audio.duration);
+              }
+              const setSliderMax = () => {
+                  seekSlider.max = Math.floor(audio.duration);
+              }
+              const displayBufferedAmount = () => {
+                  //const bufferedAmount = Math.floor(audio.buffered.end(audio.buffered.length - 1));
+                  const bufferedAmount = Math.floor(audio.buffered.length);
+                  audioPlayerContainer.style.setProperty('--buffered-width', `${(bufferedAmount / seekSlider.max) * 100}%`);
+              }
+              const whilePlaying = () => {
+                  seekSlider.value = Math.floor(audio.currentTime);
+                  currentTimeContainer.textContent = calculateTime(seekSlider.value);
+                  audioPlayerContainer.style.setProperty('--seek-before-width', `${seekSlider.value / seekSlider.max * 100}%`);
+                  raf = requestAnimationFrame(whilePlaying);
+              }
               if (audio.readyState > 0) {
-                displayDuration();
-                setSliderMax();
-              } else {
-                audio.addEventListener('loadedmetadata', () => {
                   displayDuration();
                   setSliderMax();
-                });
+                  displayBufferedAmount();
+              } else {
+                  audio.addEventListener('loadedmetadata', () => {
+                      displayDuration();
+                      setSliderMax();
+                      displayBufferedAmount();
+                  });
               }
-              const bufferedAmount = audio.buffered.end(audio.buffered.length - 1);
-              const seekableAmount = audio.seekable.end(audio.seekable.length - 1);
-
-              const currentTimeContainer = document.getElementById('current-time');
-
+              audio.addEventListener('progress', displayBufferedAmount);
               seekSlider.addEventListener('input', () => {
-                currentTimeContainer.textContent = calculateTime(seekSlider.value);
+                  currentTimeContainer.textContent = calculateTime(seekSlider.value);
+                  if(!audio.paused) {
+                      cancelAnimationFrame(raf);
+                     }
+                 });
+              audio.currentTime = seekSlider.value;
+              if(!audio.paused) {
+                  requestAnimationFrame(whilePlaying);
+                  }
+              volumeSlider.addEventListener('input', (e) => {
+                  const value = e.target.value;
+                  outputContainer.textContent = value;
+                  audio.volume = value / 100;
               });
-
-              seekSlider.addEventListener('change', () => {
-                audio.currentTime = seekSlider.value;
-              });
-
-              audio.addEventListener('timeupdate', () => {
-                seekSlider.value = Math.floor(audio.currentTime);
-              });
-
-
-
-
-
              },
              playSelectedPc(){
                 num=this.num4dPc.join("");
@@ -235,10 +260,10 @@ const vm = createApp({
                 this.filePc=this.fileList[this.indexPc];
                 console.log(this.dir+this.fileList[this.indexPc]);
                 dirfilePc=this.dir+this.fileList[this.indexPc];
-                document.getElementById("my-audio").pause();
-                document.getElementById("my-audio").setAttribute('src',dirfilePc);
-                document.getElementById("my-audio").load();
-                document.getElementById("my-audio").play();
+                this.elementAudioPC.pause();
+                this.elementAudioPC.setAttribute('src',dirfilePc);
+                this.elementAudioPC.load();
+                this.elementAudioPC.play();
                 this.musicPcPlaying = true;
                 this.num4dPc[0]=0;
                 this.num4dPc[1]=0;
@@ -246,7 +271,17 @@ const vm = createApp({
                 this.num4dPc[3]=0;
                 this.keytimerPcRunning = false;
              },
-             setPlayModePc(mode){
+            playIndexPc(event){
+                this.indexPc = event.target.selectedIndex - 1;
+                this.filePc=this.fileList[this.indexPc];
+                dirfilePc=this.dir+this.fileList[this.indexPc];
+                this.elementAudioPC.pause();
+                this.elementAudioPC.setAttribute('src',dirfilePc);
+                this.elementAudioPC.load();
+                this.elementAudioPC.play();
+                this.musicPcPlaying = true;
+             },
+             setPlayModePc(){
                 this.musicPcPlayMode = this.musicPcPlayMode +1
                 this.musicPcPlayMode = this.musicPcPlayMode % 2;
              },
@@ -268,15 +303,15 @@ const vm = createApp({
             playPausePc(){
                 dirfilePc=this.dir+this.fileList[this.indexPc];
                 console.log(dirfilePc); 
-                document.getElementById("my-audio").setAttribute('src',dirfilePc);
+                this.elementAudioPC.setAttribute('src',dirfilePc);
                 if(this.musicPcPlaying == false){
-                document.getElementById("my-audio").play();
+                this.elementAudioPC.play();
                 this.musicPcPlaying = true;
                 console.log("playPausePc to Play"); 
                 console.log(this.musicPcPlaying);
                 }
                 else{
-                document.getElementById("my-audio").pause();
+                this.elementAudioPC.pause();
                 this.musicPcPlaying = false;
                 console.log("playPausePc to Pause"); 
                 }
@@ -294,9 +329,9 @@ const vm = createApp({
                   }
                 this.filePc=this.fileList[this.indexPc];
                 dirfilePc=this.dir+this.fileList[this.indexPc];
-                document.getElementById("my-audio").setAttribute('src',dirfilePc);
-                document.getElementById("my-audio").load();
-                document.getElementById("my-audio").play();
+                this.elementAudioPC.setAttribute('src',dirfilePc);
+                this.elementAudioPC.load();
+                this.elementAudioPC.play();
                 this.musicPcPlaying = true; 
                 console.log(this.indexPc);
                 console.log(this.filePc);
@@ -316,91 +351,70 @@ const vm = createApp({
                 this.filePc=this.fileList[this.indexPc];
                 dirfilePc=this.dir+this.fileList[this.indexPc];
                 console.log(dirfilePc);
-                var vid = document.getElementById("my-audio");
-                vid.pause();
-                vid.setAttribute('src',dirfilePc);
-                vid.load();
-                document.getElementById("my-audio").play();
+                this.elementAudioPC.pause();
+                this.elementAudioPC.setAttribute('src',dirfilePc);
+                this.elementAudioPC.load();
+                this.elementAudioPC.play();
                 this.musicPcPlaying = true;
                 console.log(this.indexPc);
                 console.log(this.filePc);
                 console.log("playNextPc works");
               },
              setPlayRatePc(){
-                var vid = document.getElementById("my-audio");
                 this.playRatePc = this.playRatePc +0.5;
                 if (this.playRatePc > 2.5){
                     this.playRatePc = 0.5;
                 }
-                vid.playbackRate = this.playRatePc;
+                this.elementAudioPC.playbackRate = this.playRatePc;
               },
             volumeDownPc(){
-                var vid1 = document.getElementById("my-audio");
-                var vid2 = document.getElementById("my-radio");
                 this.volumePc = this.volumePc - 0.2;
                 if(this.volumePc < 0 ){this.volumePc =0;}
-                vid1.volume = this.volumePc; 
-                vid2.volume = this.volumePc; 
+                this.elementAudioPC.volume= this.volumePc;
+                this.elementRadioPC.volume= this.volumePc;
                 console.log("volumeDownPc works");
               },
             volumeUpPc(){
-                var vid1 = document.getElementById("my-audio");
-                var vid2 = document.getElementById("my-radio");
                 this.volumePc = this.volumePc + 0.2;
                 if(this.volumePc > 1){this.volumePc =1;}
-                vid1.volume = this.volumePc; 
-                vid2.volume = this.volumePc; 
+                this.elementAudioPC.volume = this.volumePc; 
+                this.elementRadioPC.volume = this.volumePc; 
                 console.log("volumeUpPc works");
               },
             volumeMutePc(){
-                var vid1 = document.getElementById("my-audio");
-                var vid2 = document.getElementById("my-radio");
                 if(this.volumePc != 0 ){this.volumePc =0;}
-                vid1.volume = 0; 
-                vid2.volume = 0; 
+                this.elementAudioPC.volume = 0; 
+                this.elementRadioPC.volume = 0; 
                 console.log("volumeMutePc works");
               },
             playRadioPc(event){
                 this.radioPcPlayingNo = event.target.value;
                 console.log("this.radioPcPlayingNo:"+this.radioPcPlayingNo);
                 if(this.radioPcPlayingNo==0){
-                  element = document.getElementById("sel10Pc");
-                  element.value = 0;
-                  element = document.getElementById("sel20Pc");
-                  element.value = 0;
-                  element = document.getElementById("sel30Pc");
-                  element.value = 0;
+                  this.element10Pc.value = "0";
+                  this.element20Pc.value = "0";
+                  this.element30Pc.value = "0";
                 }
                 else if(this.radioPcPlayingNo>0 && this.radioPcPlayingNo<11){
-                  element = document.getElementById("sel20Pc");
-                  element.value = 0;
-                  element = document.getElementById("sel30Pc");
-                  element.value = 0;
-                  element = document.getElementById("sel10Pc");
-                  element.value = this.radioPcPlayingNo; 
+                  this.element10Pc.value = this.radioPcPlayingNo;
+                  this.element20Pc.value = "0";
+                  this.element30Pc.value = "0";
                 }
                 else if(this.radioPcPlayingNo>10 && this.radioPcPlayingNo<21){
-                  element = document.getElementById("sel10Pc");
-                  element.value = 0;
-                  element = document.getElementById("sel30Pc");
-                  element.value = 0;
-                  element = document.getElementById("sel20Pc");
-                  element.value = this.radioPcPlayingNo; 
+                  this.element10Pc.value = "0";
+                  this.element20Pc.value = this.radioPcPlayingNo;
+                  this.element30Pc.value = "0";
                 }
                 else{
-                  element = document.getElementById("sel10Pc");
-                  element.value = 0;
-                  element = document.getElementById("sel20Pc");
-                  element.value = 0;
-                  element = document.getElementById("sel30Pc");
-                  element.value = this.radioPcPlayingNo;
+                  this.element10Pc.value = "0";
+                  this.element20Pc.value = "0";
+                  this.element30Pc.value = this.radioPcPlayingNo;
                 }
                 let url = "";
                 if(this.radioPcPlayingNo == 0){
-                document.getElementById("my-radio").pause();
+                this.elementRadioPC.pause();
                       }
                 else{
-                document.getElementById("my-radio").pause();
                 switch (this.radioPcPlayingNo) {
                       case "1" : { url = this.url01;  break;}
                       case "2" : { url = this.url02;  break;}
@@ -435,9 +449,10 @@ const vm = createApp({
                       default : {url = this.url01; break;}
                       }
                 console.log("url:"+url);
-                document.getElementById("my-radio").setAttribute('src',url);
-                document.getElementById("my-radio").load();
-                document.getElementById("my-radio").play();
+                this.elementRadioPC.pause();
+                this.elementRadioPC.setAttribute('src',url);
+                this.elementRadioPC.load();
+                this.elementRadioPC.play();
                 console.log("radioPcPlayingNo: "+this.radioPcPlayingNo);
                 }
               },
@@ -499,10 +514,10 @@ const vm = createApp({
                 this.musicPiPlaying = res.data.musicPiPlaying; 
                 this.radioPiPlayingNo = res.data.radioPiPlayingNo; 
               switch (this.sleepTimePi) {
-                case 0 : { this.sleepTimePiShow = "10分鐘後停止";  break;}
-                case 1 : { this.sleepTimePiShow = "20分鐘後停止";  break;}
-                case 2 : { this.sleepTimePiShow = "30分鐘後停止";  break;}
-                case 3 : { this.sleepTimePiShow = "非睡眠模式";  break;}
+                case 0 : { this.sleepTimePiShow = "10 min";  break;}
+                case 1 : { this.sleepTimePiShow = "20 min";  break;}
+                case 2 : { this.sleepTimePiShow = "30 min";  break;}
+                case 3 : { this.sleepTimePiShow = "No ";  break;}
                      }
                 console.log("works setSleepTimePi");
                 })
@@ -544,6 +559,22 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
               },
+            playIndexPi(event){
+                var indexPi = event.target.selectedIndex - 1;
+                axios.post('/playIndexPi',{"indexPi":indexPi}).then(res => {
+                this.indexPi = res.data.indexPi;
+                this.filePi = this.fileList[res.data.indexPi];
+                console.log(this.filePi)
+                dir_filePi = this.dir+this.fileList[this.indexPi];
+                this.musicPiPlaying = res.data.musicPiPlaying; 
+                console.log("playNextPi works");
+                })
+                .catch(error => {
+                console.log("handle error =>", error);
+                })
+                
+              
+              },
             playRadioPi(event){
                 radioNo=event.target.value;
                 if(this.radioPiPlayingNo == radioNo){
@@ -552,36 +583,24 @@ const vm = createApp({
                 axios.post('/playRadioPi',{"radioNo":this.radioPiPlayingNo}).then(res => {
                 this.radioPiPlayingNo = res.data.radioPiPlayingNo;
                 if(this.radioPiPlayingNo==0){
-                  element = document.getElementById("sel10Pi");
-                  element.value = 0;
-                  element = document.getElementById("sel20Pi");
-                  element.value = 0;
-                  element = document.getElementById("sel30Pi");
-                  element.value = 0;
+                  this.element10Pi.value = "0";
+                  this.element20Pi.value = "0";
+                  this.element30Pi.value = "0";
                 }
                 else if(this.radioPiPlayingNo>0 && this.radioPiPlayingNo <11){
-                  element = document.getElementById("sel20Pi");
-                  element.value = 0;
-                  element = document.getElementById("sel30Pi");
-                  element.value = 0;
-                  element = document.getElementById("sel10Pi");
-                  element.value = this.radioPiPlayingNo; 
+                  this.element10Pi.value = this.radioPiPlayingNo; 
+                  this.element20Pi.value = "0";
+                  this.element30Pi.value = "0";
                 }
                 else if(this.radioPiPlayingNo>10 && this.radioPiPlayingNo<21){
-                  element = document.getElementById("sel10Pi");
-                  element.value = 0;
-                  element = document.getElementById("sel30Pi");
-                  element.value = 0;
-                  element = document.getElementById("sel20Pi");
-                  element.value = this.radioPiPlayingNo;
+                  this.element10Pi.value = "0";
+                  this.element20Pi.value = this.radioPiPlayingNo; 
+                  this.element30Pi.value = "0";
                 }
                 else{
-                  element = document.getElementById("sel10Pi");
-                  element.value = 0;
-                  element = document.getElementById("sel20Pi");
-                  element.value = 0;
-                  element = document.getElementById("sel30Pi");
-                  element.value = this.radioPiPlayingNo; 
+                  this.element10Pi.value = "0";
+                  this.element20Pi.value = "0";
+                  this.element30Pi.value = this.radioPiPlayingNo; 
                 }
                 console.log("After radioPiPlayingNo:"+ this.radioPiPlayingNo);
                 console.log("playRadioPi works");
@@ -651,11 +670,34 @@ const vm = createApp({
             downPodcastFile(){
                 axios.post('/downPodcastFile2').then(res => {
                 this.downStatus = res.data.downStatus;
+                var msg = res.data.msg;
                 console.log("downStatus:" + this.downStatus);
+                console.log(msg);
                 })
                 .catch(error => {
                 console.log("handle error =>", error);
                 })
+              },
+            setCronHour(){
+              },
+            setCronMin(){
+              },
+            setCron(){
+              var Hour =document.getElementById("cronHour").value;
+              var Min =document.getElementById("cronMin").value;
+              var cronStatus= true;
+              axios.post('/setCron',{"Hour":Hour,"Min":Min}).then(res => {
+                this.cronTimeHour = res.data.cronTimeHour;
+                this.cronTimeMin = res.data.cronTimeMin;
+                this.cronStatus = res.data.cronStatus;
+                console.log("set Time Hour as:"+ this.cronTimeHour); 
+                console.log("set Time Min as:"+ this.cronTimeMin); 
+                console.log("cron Status :"+ this.cronStatus); 
+                })
+                .catch(error => {
+                console.log("handle error =>", error);
+                })
+
               }
           },
   created:  function(){
