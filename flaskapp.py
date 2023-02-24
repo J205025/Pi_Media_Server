@@ -786,7 +786,6 @@ def setSleepTimePi():
         "sleepTimePi" : __sleepTimePi__,
          })
     
-
 @app.route('/setCron', methods=['POST'])
 def setCron():
     global __cronTimeHour__
@@ -816,9 +815,6 @@ def myjoba():
 
 @scheduler.task('cron', id='myjobb2', day='*', hour='06', minute='00', second='00')
 def myjobb2():
-    global __indexPi__
-    global __indexMax__
-    __indexPi__ = 7
     downPodcastFile_sh2()
     print("myDownPodcastFileJob executed")
 
@@ -827,5 +823,4 @@ if __name__ == '__main__':
     #parser = argparse.ArgumentParser()
     #parser.add_argument("--workers 1 --threads 4,--worker-class gevent", type=str, default=False)
     #parser.parse_args()
-    
     app.run(host='0.0.0.0',port=2000,debug=False,threaded=True)

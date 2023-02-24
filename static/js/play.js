@@ -3,7 +3,8 @@ const vm = createApp({
   delimiters:['%{', '}%'],
   data(){
                return {
-               elementAudioPC: null,
+               elementAudioPc: null,
+               elementAudioPcBar: null,
                element10Pi : null,
                element20Pi : null,
                element30Pi : null,
@@ -84,78 +85,17 @@ const vm = createApp({
             getRandom(min,max){
               return Math.floor(Math.random()*(max-min+1))+min;
             },
-            loading(){
-                axios.post('/').then(res => {
-                this.indexPi=res.data.indexPi;
-                this.musicPiPlaying=res.data.musicPiPlaying;
-                this.playRatePi=res.data.playRatePi;
-                this.musicPiPlayMode=res.data.musicPiPlayMode;
-                this.fileList = res.data.fileList;
-                this.radioPiPlayingNo = res.data.radioPiPlayingNo;   
-                this.indexMax = this.fileList.length;
-                this.volumePi= res.data.volumePi;
-                this.volumePiMute= res.data.volumePiMute;
-                rn = this.getRandom(this.indexMax-1, 0);
-                //rn = rn % this.indexMax;
-                this.indexPc=rn;
-                this.filePc=this.fileList[rn];
-                this.filePi=this.fileList[this.indexPi];
-                console.log("filePc: "+this.filePc);
-                console.log("filePi: "+this.filePi);
-                console.log("musicPiPlaying: "+this.musicPiPlaying);
-                console.log("musicPiPlayMode: "+this.musicPiPlayMode);
-                console.log("radioPiPlayingNo: "+this.radioPiPlayingNo);
-                console.log("volumePi: "+this.volumePi);
-                console.log("volumePiMute: "+this.volumePiMute);
-                
-                this.elementAudioPC = document.getElementById("my-audio");
-                this.elementAudioPC.volumePc = this.volumePc; 
-                this.elementRadioPC = document.getElementById("my-radio");
-                this.elementRadioPC.volumePc = this.volumePc;
-
-                this.contuineplaying();
-                this.metadata();
-
-                this.element10Pi = document.getElementById("sel10Pi");
-                this.element20Pi = document.getElementById("sel20Pi");
-                this.element30Pi = document.getElementById("sel30Pi");
-                this.element10Pc = document.getElementById("sel10Pc");
-                this.element20Pc = document.getElementById("sel20Pc");
-                this.element30Pc = document.getElementById("sel30Pc");
-
-                if(this.radioPiPlayingNo==0){
-                  this.element10Pi.value = "0"
-                  this.element20Pi.value = "0"
-                  this.element30Pi.value = "0"
-                }
-                else if(this.radioPiPlayingNo>0 && this.radioPiPlayingNo <11){
-                  this.element10Pi.value = this.radioPiPlayingNo
-                  this.element20Pi.value = "0"
-                  this.element30Pi.value = "0"
-                }
-                else if(  this.radioPiPlayingNo>11 && this.radioPiPlayingNo<21){
-                  this.element10Pi.value = "0"
-                  this.element20Pi.value = this.radioPiPlayingNo
-                  this.element30Pi.value = "0"
-                }
-                else{
-                  this.element10Pi.value = "0"
-                  this.element20Pi.value = "0"
-                  this.element30Pi.value = this.radioPiPlayingNo
-                }
-                
-              });
-             },
-             contuineplaying(){
-                var self = this;
-                this.elementAudioPC.addEventListener("ended",function() {
-                if(self.musicPcPlaying == true){
-                   console.log("Continue Playing");
-                   self.playNextPc();
+           
+            contuineplaying(){
+              var self = this;
+              this.elementAudioPc.addEventListener("ended",function() {
+              if(self.musicPcPlaying == true){
+                 console.log("Continue Playing");
+                 self.playNextPc();
                 }
               });
              },
-             setSleepTimePc(){
+            setSleepTimePc(){
               a=[10,20,30,1000];
               clearTimeout(this.sleepTimer);
               this.sleepTimePc = this.sleepTimePc + 1
@@ -171,87 +111,10 @@ const vm = createApp({
               this.sleepTimerPc=setTimeout(this.stopPlayingPc,ts)
              },
              stopPlayingPc(){
-              this.elementAudioPC.pause();
+              this.elementAudioPc.pause();
               this.musicPcPlaying = false;
-              this.elementRadioPC.pause();
+              this.elementRadioPc.pause();
               this.radioPcPlayingNo = 0;
-             },
-             metadata(){
-              /* Implementation of the presentation of the audio player */
-              const audioPlayerContainer = document.getElementById('audio-player-container');
-              const seekSlider = document.getElementById('seek-slider');
-              const volumeSlider = document.getElementById('volume-slider');
-              let playState = 'play';
-              let muteState = 'unmute';
-
-              const showRangeProgress = (rangeInput) => {
-                  if(rangeInput === seekSlider) audioPlayerContainer.style.setProperty('--seek-before-width', rangeInput.value / rangeInput.max * 100 + '%');
-                  else audioPlayerContainer.style.setProperty('--volume-before-width', rangeInput.value / rangeInput.max * 100 + '%');
-              }
-              seekSlider.addEventListener('input', (e) => {
-                  showRangeProgress(e.target);
-              });
-              volumeSlider.addEventListener('input', (e) => {
-                  showRangeProgress(e.target);
-              });
-
-
-              /** Implementation of the functionality of the audio player */
-              const audio = this.elementAudioPC;
-              const durationContainer = document.getElementById('duration');
-              const currentTimeContainer = document.getElementById('current-time');
-              const outputContainer = document.getElementById('volume-output');
-              let raf = null;
-              const calculateTime = (secs) => {
-                  const minutes = Math.floor(secs / 60);
-                  const seconds = Math.floor(secs % 60);
-                  const returnedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
-                  return `${minutes}:${returnedSeconds}`;
-              }
-              const displayDuration = () => {
-                  durationContainer.textContent = calculateTime(audio.duration);
-              }
-              const setSliderMax = () => {
-                  seekSlider.max = Math.floor(audio.duration);
-              }
-              const displayBufferedAmount = () => {
-                  //const bufferedAmount = Math.floor(audio.buffered.end(audio.buffered.length - 1));
-                  const bufferedAmount = Math.floor(audio.buffered.length);
-                  audioPlayerContainer.style.setProperty('--buffered-width', `${(bufferedAmount / seekSlider.max) * 100}%`);
-              }
-              const whilePlaying = () => {
-                  seekSlider.value = Math.floor(audio.currentTime);
-                  currentTimeContainer.textContent = calculateTime(seekSlider.value);
-                  audioPlayerContainer.style.setProperty('--seek-before-width', `${seekSlider.value / seekSlider.max * 100}%`);
-                  raf = requestAnimationFrame(whilePlaying);
-              }
-              if (audio.readyState > 0) {
-                  displayDuration();
-                  setSliderMax();
-                  displayBufferedAmount();
-              } else {
-                  audio.addEventListener('loadedmetadata', () => {
-                      displayDuration();
-                      setSliderMax();
-                      displayBufferedAmount();
-                  });
-              }
-              audio.addEventListener('progress', displayBufferedAmount);
-              seekSlider.addEventListener('input', () => {
-                  currentTimeContainer.textContent = calculateTime(seekSlider.value);
-                  if(!audio.paused) {
-                      cancelAnimationFrame(raf);
-                     }
-                 });
-              audio.currentTime = seekSlider.value;
-              if(!audio.paused) {
-                  requestAnimationFrame(whilePlaying);
-                  }
-              volumeSlider.addEventListener('input', (e) => {
-                  const value = e.target.value;
-                  outputContainer.textContent = value;
-                  audio.volume = value / 100;
-              });
              },
              playSelectedPc(){
                 num=this.num4dPc.join("");
@@ -260,10 +123,10 @@ const vm = createApp({
                 this.filePc=this.fileList[this.indexPc];
                 console.log(this.dir+this.fileList[this.indexPc]);
                 dirfilePc=this.dir+this.fileList[this.indexPc];
-                this.elementAudioPC.pause();
-                this.elementAudioPC.setAttribute('src',dirfilePc);
-                this.elementAudioPC.load();
-                this.elementAudioPC.play();
+                this.elementAudioPc.pause();
+                this.elementAudioPc.setAttribute('src',dirfilePc);
+                this.elementAudioPc.load();
+                this.elementAudioPc.play();
                 this.musicPcPlaying = true;
                 this.num4dPc[0]=0;
                 this.num4dPc[1]=0;
@@ -275,10 +138,10 @@ const vm = createApp({
                 this.indexPc = event.target.selectedIndex - 1;
                 this.filePc=this.fileList[this.indexPc];
                 dirfilePc=this.dir+this.fileList[this.indexPc];
-                this.elementAudioPC.pause();
-                this.elementAudioPC.setAttribute('src',dirfilePc);
-                this.elementAudioPC.load();
-                this.elementAudioPC.play();
+                this.elementAudioPc.pause();
+                this.elementAudioPc.setAttribute('src',dirfilePc);
+                this.elementAudioPc.load();
+                this.elementAudioPc.play();
                 this.musicPcPlaying = true;
              },
              setPlayModePc(){
@@ -303,15 +166,17 @@ const vm = createApp({
             playPausePc(){
                 dirfilePc=this.dir+this.fileList[this.indexPc];
                 console.log(dirfilePc); 
-                this.elementAudioPC.setAttribute('src',dirfilePc);
+                this.elementAudioPc.setAttribute('src',dirfilePc);
                 if(this.musicPcPlaying == false){
-                this.elementAudioPC.play();
+                //this.elementAudioPc.currentTime=this.elementAudioPcBar.value;
+                this.elementAudioPc.play();
                 this.musicPcPlaying = true;
                 console.log("playPausePc to Play"); 
                 console.log(this.musicPcPlaying);
                 }
                 else{
-                this.elementAudioPC.pause();
+                //this.elementAudioPcBar.value=this.elementAudioPc.currentTime;
+                this.elementAudioPc.pause();
                 this.musicPcPlaying = false;
                 console.log("playPausePc to Pause"); 
                 }
@@ -329,9 +194,9 @@ const vm = createApp({
                   }
                 this.filePc=this.fileList[this.indexPc];
                 dirfilePc=this.dir+this.fileList[this.indexPc];
-                this.elementAudioPC.setAttribute('src',dirfilePc);
-                this.elementAudioPC.load();
-                this.elementAudioPC.play();
+                this.elementAudioPc.setAttribute('src',dirfilePc);
+                this.elementAudioPc.load();
+                this.elementAudioPc.play();
                 this.musicPcPlaying = true; 
                 console.log(this.indexPc);
                 console.log(this.filePc);
@@ -351,10 +216,10 @@ const vm = createApp({
                 this.filePc=this.fileList[this.indexPc];
                 dirfilePc=this.dir+this.fileList[this.indexPc];
                 console.log(dirfilePc);
-                this.elementAudioPC.pause();
-                this.elementAudioPC.setAttribute('src',dirfilePc);
-                this.elementAudioPC.load();
-                this.elementAudioPC.play();
+                this.elementAudioPc.pause();
+                this.elementAudioPc.setAttribute('src',dirfilePc);
+                this.elementAudioPc.load();
+                this.elementAudioPc.play();
                 this.musicPcPlaying = true;
                 console.log(this.indexPc);
                 console.log(this.filePc);
@@ -365,26 +230,26 @@ const vm = createApp({
                 if (this.playRatePc > 2.5){
                     this.playRatePc = 0.5;
                 }
-                this.elementAudioPC.playbackRate = this.playRatePc;
+                this.elementAudioPc.playbackRate = this.playRatePc;
               },
             volumeDownPc(){
                 this.volumePc = this.volumePc - 0.2;
                 if(this.volumePc < 0 ){this.volumePc =0;}
-                this.elementAudioPC.volume= this.volumePc;
-                this.elementRadioPC.volume= this.volumePc;
+                this.elementAudioPc.volume= this.volumePc;
+                this.elementRadioPc.volume= this.volumePc;
                 console.log("volumeDownPc works");
               },
             volumeUpPc(){
                 this.volumePc = this.volumePc + 0.2;
                 if(this.volumePc > 1){this.volumePc =1;}
-                this.elementAudioPC.volume = this.volumePc; 
-                this.elementRadioPC.volume = this.volumePc; 
+                this.elementAudioPc.volume = this.volumePc; 
+                this.elementRadioPc.volume = this.volumePc; 
                 console.log("volumeUpPc works");
               },
             volumeMutePc(){
                 if(this.volumePc != 0 ){this.volumePc =0;}
-                this.elementAudioPC.volume = 0; 
-                this.elementRadioPC.volume = 0; 
+                this.elementAudioPc.volume = 0; 
+                this.elementRadioPc.volume = 0; 
                 console.log("volumeMutePc works");
               },
             playRadioPc(event){
@@ -412,7 +277,7 @@ const vm = createApp({
                 }
                 let url = "";
                 if(this.radioPcPlayingNo == 0){
-                this.elementRadioPC.pause();
+                this.elementRadioPc.pause();
                       }
                 else{
                 switch (this.radioPcPlayingNo) {
@@ -449,10 +314,10 @@ const vm = createApp({
                       default : {url = this.url01; break;}
                       }
                 console.log("url:"+url);
-                this.elementRadioPC.pause();
-                this.elementRadioPC.setAttribute('src',url);
-                this.elementRadioPC.load();
-                this.elementRadioPC.play();
+                this.elementRadioPc.pause();
+                this.elementRadioPc.setAttribute('src',url);
+                this.elementRadioPc.load();
+                this.elementRadioPc.play();
                 console.log("radioPcPlayingNo: "+this.radioPcPlayingNo);
                 }
               },
@@ -697,14 +562,125 @@ const vm = createApp({
                 .catch(error => {
                 console.log("handle error =>", error);
                 })
+              },
+              //--------------------------------------------------------------------------------------------------
+            mDur(){
+                console.log("mDur")
+                this.elementAudioPcBar.max= this.elementAudioPc.duration
+                let totalDuration= this.calculateTotalValue(this.elementAudioPc.duration)
+                console.log(totalDuration)
+                a=document.getElementById("endText");
+                a.textContent=totalDuration;
 
+               },
+            mUpdate(){
+                console.log("mUpdate")
+                this.elementAudioPcBar.value=this.elementAudioPc.currentTime
+                let currentTime = this.calculateCurrentValue(this.elementAudioPc.currentTime);
+                console.log(currentTime)
+                b=document.getElementById("startText");
+                if(this.musicPcPlaying== true){
+                b.textContent=currentTime;
+                }
+               },
+            mSet(){
+                console.log("mSet")
+                this.elementAudioPc.currentTime=this.elementAudioPcBar.value
+               },
+            mPlay(){
+                console.log("mPlay")
+                //this.elementAudioPc.currentTime=this.elementAudioPcBar.value
+               },
+            mPause(){
+                console.log("mPause")
+                //thes.elementAudioPc.currentTime=this.elementAudioPcBar.value
+                //let currentTime = this.calculateCurrentValue(this.elementAudioPc.currentTime);
+                //b=document.getElementById("startText");
+                //b.textContent=currentTime;
+               },
+              //--------------------------------------------------------------------------------------------------
+            calculateTotalValue(length) {
+                let minutes = Math.floor(length / 60),
+                seconds_int = length - minutes * 60,
+                seconds_str = seconds_int.toString(),
+                seconds = seconds_str.substr(0, 2),
+                time = minutes + ':' + seconds
+                return time;
+                },
+            calculateCurrentValue(currentTime) {
+                let current_hour = parseInt(currentTime / 3600) % 24,
+                current_minute = parseInt(currentTime / 60) % 60,
+                current_seconds_long = currentTime % 60,
+                current_seconds = current_seconds_long.toFixed(),
+                current_time = (current_minute < 10 ? "0" + current_minute : current_minute) + ":" + (current_seconds < 10 ? "0" + current_seconds : current_seconds);
+                return current_time;
+                },
+              //--------------------------------------------------------------------------------------------------
+            loading(){
+              axios.post('/').then(res => {
+              this.indexPi=res.data.indexPi;
+              this.musicPiPlaying=res.data.musicPiPlaying;
+              this.playRatePi=res.data.playRatePi;
+              this.musicPiPlayMode=res.data.musicPiPlayMode;
+              this.fileList = res.data.fileList;
+              this.radioPiPlayingNo = res.data.radioPiPlayingNo;   
+              this.indexMax = this.fileList.length;
+              this.volumePi= res.data.volumePi;
+              this.volumePiMute= res.data.volumePiMute;
+              rn = this.getRandom(this.indexMax-1, 0);
+              //rn = rn % this.indexMax;
+              this.indexPc=rn;
+              this.filePc=this.fileList[rn];
+              this.filePi=this.fileList[this.indexPi];
+              console.log("filePc: "+this.filePc);
+              console.log("filePi: "+this.filePi);
+              console.log("musicPiPlaying: "+this.musicPiPlaying);
+              console.log("musicPiPlayMode: "+this.musicPiPlayMode);
+              console.log("radioPiPlayingNo: "+this.radioPiPlayingNo);
+              console.log("volumePi: "+this.volumePi);
+              console.log("volumePiMute: "+this.volumePiMute);
+              
+              this.elementAudioPc = document.getElementById("my-audio");
+              this.elementAudioPcBar = document.getElementById("my-audio-bar");
+              this.elementAudioPc.volume = this.volumePc; 
+
+              this.elementRadioPc = document.getElementById("my-radio");
+              this.elementRadioPc.volume = this.volumePc;
+              
+              this.contuineplaying();
+              this.element10Pi = document.getElementById("sel10Pi");
+              this.element20Pi = document.getElementById("sel20Pi");
+              this.element30Pi = document.getElementById("sel30Pi");
+              this.element10Pc = document.getElementById("sel10Pc");
+              this.element20Pc = document.getElementById("sel20Pc");
+              this.element30Pc = document.getElementById("sel30Pc");
+
+              if(this.radioPiPlayingNo==0){
+                this.element10Pi.value = "0"
+                this.element20Pi.value = "0"
+                this.element30Pi.value = "0"
               }
+              else if(this.radioPiPlayingNo>0 && this.radioPiPlayingNo <11){
+                this.element10Pi.value = this.radioPiPlayingNo
+                this.element20Pi.value = "0"
+                this.element30Pi.value = "0"
+              }
+              else if(  this.radioPiPlayingNo>11 && this.radioPiPlayingNo<21){
+                this.element10Pi.value = "0"
+                this.element20Pi.value = this.radioPiPlayingNo
+                this.element30Pi.value = "0"
+              }
+              else{
+                this.element10Pi.value = "0"
+                this.element20Pi.value = "0"
+                this.element30Pi.value = this.radioPiPlayingNo
+              }
+            });
+            }
           },
-  created:  function(){
-                this.loading();
+  created:function(){
+               this.loading();
           }
-           
        })
-
   vm.mount('#app');
 //   my-Audio.addEventListener("ended", playnext);
