@@ -26,17 +26,15 @@
     <div class="section"><p>Audio Output to PC's Speaker</p></div>
 
 <div id="audio-player-container" style="text-align:center">
-    <audio id="my-audio"  v-on:loadedmetadata="mDur($event)" v-on:timeupdate="mUpdate($event)" v-on:play="mPlay($event)" v-on:pause="mPause($event)" preload="metadata" loop> <source src="{{filePc}}" type="audio/mpeg">你的瀏覽器不支援 audio tag！</audio>
-
+    <audio id="audioPc"  v-on:loadedmetadata="mLoadPc($event)" v-on:timeupdate="mUpdatePc($event)" v-on:play="mPlayPc($event)" v-on:pause="mPausePc($event)"> <source src="{{filePc}}" type="audio/mpeg">你的瀏覽器不支援 audio tag！</audio>
     <div id="startText">00:00</div>
     <div id="endText">99:99</div>
-<input id="my-audio-bar" type="range" name="rng" min="0" step="0.25" value="0" v-on:change="mSet($event)" style="width:320px">
+<input id="audioPc-bar" type="range" min="0" step="0.25" value="0" v-on:change="mSetPc($event)" style="width:60vw">
 
 
 <div style="text-align:center">
-    <div id="volume-output">0</div>
-    <div id="volume-output">100</div>
-    <input type="range" id="volume-slider" style="width:320px" max="100" value="100">
+    <div id="volPcText">100</div>
+    <input id="volPc-bar" type="range" min="0" setp="0.25" max="100" value="100" v-on:change=mVolSetPc($event) style="width:60vw">
 </div>
 </div>
 
@@ -75,7 +73,7 @@
 </div>
 
 
-<div style="display:none" ><audio id="my-radio"> <source src="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service" type="audio/mpeg">    你的瀏覽器不支援 audio tag！ </audio></div>
+<div style="display:none" ><audio id="radioPc"> <source src="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service" type="audio/mpeg">    你的瀏覽器不支援 audio tag！ </audio></div>
 
 <div class="button-container" >
     <select id="sel10Pc"  class="select-button"  v-on:Change="playRadioPc($event)">
@@ -137,13 +135,13 @@
     <div class="section"><p>Audio Output to Pi's Speaker</p></div>
 </div>
 
+<div style="text-align:center">
 <div id="audio-player-container" style="text-align:center">
-    <span id="current-time" class="time">0:00</span>
-    <input type="range" id="seek-slider" max="100" value="0">
-    <span id="duration" class="time">0:00</span>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <output id="volume-output">100</output>
-    <input type="range" id="volume-slider" max="100" value="100">
+    <div id="PistartText">00:00</div>
+    <div id="PiendText">99:99</div>
+    <input id="audioPi-bar" type="range" min="0" setp="0.25" max="100" value="100" v-on:change=mPiSet($event) style="width:60vw">
+    <div id="volPiText">100</div>
+    <input id="volPi-bar" type="range" min="0" setp="0.25" max="100" value="100" v-on:change=mVolSetPi($event) style="width:60vw">
 </div>
 
 <div class="banner-container">
@@ -261,16 +259,21 @@
 
 <div style="text-align:center">
 <button type="button" v-on:click="getFileList(0)">全  部</button>
-<button type="button" v-on:click="getFileList(1)">流  行</button>
-<button type="button" v-on:click="getFileList(2)">播  客<i class="fa-solid fa-podcast"></i></button>
-<button type="button" v-on:click="getFileList(3)">古  典</button>
-<button type="button" v-on:click="getFileList(4)">台  語</button>
+<button type="button" v-on:click="getFileList(1)">播  客</button>
+<button type="button" v-on:click="getFileList(2)">國  語</button>
+<button type="button" v-on:click="getFileList(3)">台  語</button>
+<button type="button" v-on:click="getFileList(4)">古  典</button>
+<button type="button" v-on:click="getFileList(9)">日  語</button>
+</div>
+<div style="text-align:center">
 <button type="button" v-on:click="getFileList(5)">張學友</button>
 <button type="button" v-on:click="getFileList(6)">劉德華</button>
 <button type="button" v-on:click="getFileList(7)">方宥心</button>
-<button type="button" v-on:click="getFileList(8)">紅樓夢</button>
-<button type="button" v-on:click="getFileList(9)">佛  說</button>
+<button type="button" v-on:click="getFileList(18)">紅樓夢</button>
+<button type="button" v-on:click="getFileList(19)">佛  說</button>
+</div>
 &nbsp;&nbsp;&nbsp;&nbsp;
+<div style="text-align:center">
 <button type="button" v-on:click="downPodcastFile($event)">播客下載</button>
 </div>
 

@@ -26,8 +26,8 @@ import vlc
 #------------------------------------------------------------------
 __dir__ = "./static/assets/"
 __fileList__ = []
-#                 0     1       2          3        4           5       6        7       8    9
-__typeList__ = ["all","pop","podcast","classical","taiwanese","jacky","andy","queenie","red","sutra"] 
+#                 0     1       2       3        4    5       6        7       8    9      10     11      12    13    14   15     16     17   18   19
+__typeList__ = ["all","podcast","國語","台語","古典","張學友","劉德華","方宥心","原子邦妮","日語","周杰倫","鄭進一","原子邦妮","pop","pop","pop","pop","pop","紅樓夢","佛說"] 
 __fileList_Rn__ = []
 __indexMax__ = 0
 __indexPi__ = 0
@@ -46,7 +46,7 @@ __musicVlcPi__ = __musicVlcInstance__.media_player_new()
 __radioVlcPi__ = __radioVlcInstance__.media_player_new()
 __musicPiPlaying__ = False
 __radioPiPlayingNo__ =  0
-__volumePi__ = 70
+__volumePi__ = 65
 __volumePiMute__ = False
 __musicPiPlayMode__ = 0
 __down_thread__ = None
@@ -226,8 +226,8 @@ def handlePlayPausePi():
         __musicPiPlaying__ = False
     else:
         file = __dir__ + __fileList__[__indexPi__]
-        vlcmedia  = __musicVlcInstance__.media_new(file)
-        __musicVlcPi__.set_media(vlcmedia)
+       # vlcmedia  = __musicVlcInstance__.media_new(file)
+       # __musicVlcPi__.set_media(vlcmedia)
         __musicVlcPi__.play()
         __musicPiPlaying__ = True
         print("PlayPause- Play:"+file)
@@ -255,11 +255,22 @@ def handleMutePi():
         __radioVlcPi__.audio_set_volume(vlcvolume)
         __volumePiMute__ = False
 
+def handleVolumeControlPi():
+    global __musicVlcPi__
+    global __radioVlcPi__
+    global __volumePi__
+    __volumePi__ = __volumePi__ -15
+    if __volumePi__ < 0:
+        __volumePi__ = 0 
+        
+    vlcvolume = __volumePi__
+    __radioVlcPi__.audio_set_volume(vlcvolume)
+    __musicVlcPi__.audio_set_volume(vlcvolume)
 def handleVolumeDownPi():
     global __musicVlcPi__
     global __radioVlcPi__
     global __volumePi__
-    __volumePi__ = __volumePi__ -12
+    __volumePi__ = __volumePi__ -15
     if __volumePi__ < 0:
         __volumePi__ = 0 
         
@@ -271,7 +282,7 @@ def handleVolumeUpPi():
     global __musicVlcPi__
     global __radioVlcPi__
     global __volumePi__
-    __volumePi__= __volumePi__ + 12
+    __volumePi__= __volumePi__ + 15
     if __volumePi__ > 100:
         __volumePi__ = 99 
     vlcvolume = __volumePi__
@@ -348,6 +359,26 @@ def genFileList_sh(style):
            subdir = __typeList__[8]
         case 9:
            subdir = __typeList__[9]
+        case 10:
+           subdir = __typeList__[10]
+        case 11:
+           subdir = __typeList__[11]
+        case 12:
+           subdir = __typeList__[12]
+        case 13:
+           subdir = __typeList__[13]
+        case 14:
+           subdir = __typeList__[14]
+        case 15:
+           subdir = __typeList__[15]
+        case 16:
+           subdir = __typeList__[16]
+        case 17:
+           subdir = __typeList__[17]
+        case 18:
+           subdir = __typeList__[18]
+        case 19:
+           subdir = __typeList__[19]
         case _:
            subdir = __typeList__[0]
     __musicVlcPi__.stop()
@@ -365,6 +396,9 @@ def genFileList_sh(style):
     __fileList__ = mp3s;
     __indexMax__ = len(__fileList__) 
     __indexPi__ = random.randrange(__indexMax__)
+    file = __dir__ + __fileList__[__indexPi__]
+    vlcmedia  = __musicVlcInstance__.media_new(file)
+    __musicVlcPi__.set_media(vlcmedia)
     
 def downPodcastFile_sh():
     N = 3
@@ -455,6 +489,12 @@ genFileList_sh(0)
 if not (len(__fileList__) > 0):
     print ("No mp3 files found!")
 print ('--- Press button #play to start playing mp3 ---')
+
+
+file1 = __dir__ + __fileList__[__indexPi__]
+vlcmedia1  = __musicVlcInstance__.media_new(file1)
+__musicVlcPi__.set_media(vlcmedia1)
+
 
 threading.Timer( 10 , continuePlaying ).start()
 #==============================================================================================
@@ -671,6 +711,15 @@ def playRadioPi():
         "radioPiPlayingNo" : __radioPiPlayingNo__
          })
 
+@app.route('/volumeControlPi', methods=['POST'])
+def volumeDownPi():
+    global __volumePi__
+    global __volumePiMute__
+    handleVolumeControlPi()
+    return jsonify({
+        "volumePi" : __volumePi__,
+        "volumePiMute" : __volumePiMute__
+         })
 @app.route('/volumeDownPi', methods=['POST'])
 def volumeDownPi():
     global __volumePi__

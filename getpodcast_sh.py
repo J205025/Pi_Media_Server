@@ -6,7 +6,8 @@ N = 3
 Ndays_ago = date.today()- timedelta(days=N)
 Ndays_ago.strftime("%Y-%m-%d")
 opt = getpodcast.options(
-root_dir = '/home/ubuntu/Music/podcast',
+#root_dir = '/home/ubuntu/Music/podcast',
+root_dir = '/media/usb1/podcast',
 date_from = str(Ndays_ago),
 deleteold = True,
 run = True)
