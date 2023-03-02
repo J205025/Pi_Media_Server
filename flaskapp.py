@@ -30,8 +30,8 @@ __fileList__ = []
 __typeList__ = ["all","podcast","國語","台語","古典","張學友","劉德華","方宥心","原子邦妮","日語","周杰倫","鄭進一","原子邦妮","pop","pop","pop","pop","pop","紅樓夢","佛說"] 
 __fileList_Rn__ = []
 __indexMax__ = 0
-__indexPi__ = 0
-__indexPc__ = 0 
+__indexPi__ = 1
+__indexPc__ = 1 
 __num4dPi_i__ = 4
 __num4dPi__ = [ 0, 0, 0, 0 ]
 __keyTimerPi__= False
@@ -42,7 +42,9 @@ __radioVlcInstance__ = vlc.Instance(opt)
 __vlcEnded__ = vlc.State.Ended
 __vlcPaused__ = vlc.State.Paused
 __vlcPlaying__ = vlc.State.Playing
+__vlcmedia__ = None 
 __musicVlcPi__ = __musicVlcInstance__.media_player_new()
+__musicVlcPiDuration__ = 0
 __radioVlcPi__ = __radioVlcInstance__.media_player_new()
 __musicPiPlaying__ = False
 __radioPiPlayingNo__ =  0
@@ -125,10 +127,11 @@ def handleSelectedPi():
     global __num4dPi__
     global __indexPi__
     global __num4dPi_i__
+    global __vlcmedia__
     file = __dir__ + __fileList__[__indexPi__]
     __musicVlcPi__.stop()
-    vlcmedia  = __musicVlcInstance__.media_new(file)
-    __musicVlcPi__.set_media(vlcmedia)
+    __vlcmedia__  = __musicVlcInstance__.media_new(file)
+    __musicVlcPi__.set_media(__vlcmedia__)
     __musicVlcPi__.play()
     __musicPiPlaying__ = True
     print("play:"+file)
@@ -174,6 +177,7 @@ def handleNextPi():
     global __dir__
     global __musicVlcInstance__
     global __musicVlcPi__
+    global __vlcmedia__
     global __musicPiPlaying__
     global __musicPiPlayMode__
     if (__musicPiPlayMode__ == 1):
@@ -184,8 +188,8 @@ def handleNextPi():
             __indexPi__ = 0; 
     file = __dir__ + __fileList__[__indexPi__]
     __musicVlcPi__.stop()
-    vlcmedia  = __musicVlcInstance__.media_new(file)
-    __musicVlcPi__.set_media(vlcmedia)
+    __vlcmedia__  = __musicVlcInstance__.media_new(file)
+    __musicVlcPi__.set_media(__vlcmedia__)
     __musicVlcPi__.play()
     __musicPiPlaying__ = True
     print("__indexPi__:"+str(__indexPi__))
@@ -197,6 +201,7 @@ def handlePrePi():
     global __fileList__
     global __dir__
     global __musicVlcInstance__
+    global __vlcmedia__
     global __musicVlcPi__
     global __musicPiPlaying__
     if (__musicPiPlayMode__ == 1):
@@ -206,9 +211,9 @@ def handlePrePi():
     if (__indexPi__ < 0):
        __indexPi__= __indexMax__ - 1
     file = __dir__ + __fileList__[__indexPi__]
-    vlcmedia  = __musicVlcInstance__.media_new(file)
+    __vlcmedia__  = __musicVlcInstance__.media_new(file)
     __musicVlcPi__.stop()
-    __musicVlcPi__.set_media(vlcmedia)
+    __musicVlcPi__.set_media(__vlcmedia__)
     __musicVlcPi__.play()
     __musicPiPlaying__ = True
     print("__indexPi__:"+str(__indexPi__))
@@ -240,29 +245,20 @@ def handlePlayRatePi():
         __playRatePi__ = 0.5
     __musicVlcPi__.set_rate(__playRatePi__)
     
-def handleMutePi():
-    global __musicVlcPi__
-    global __radioVlcPi__
-    global __volumePi__
-    global __volumePiMute__
-    if __volumePiMute__ == False :  
-        __musicVlcPi__.audio_set_volume(0)
-        __radioVlcPi__.audio_set_volume(0)
-        __volumePiMute__ = True
-    else:
-        vlcvolume = __volumePi__
-        __musicVlcPi__.audio_set_volume(vlcvolume)
-        __radioVlcPi__.audio_set_volume(vlcvolume)
-        __volumePiMute__ = False
 
-def handleVolumeControlPi():
+def handleVolumeControlPi(vol):
     global __musicVlcPi__
     global __radioVlcPi__
     global __volumePi__
-    __volumePi__ = __volumePi__ -15
+    __volumePi__ = __volumePi__ + vol
     if __volumePi__ < 0:
         __volumePi__ = 0 
-        
+    if __volumePi__ > 100:
+        __volumePi__ = 100 
+    if __volumePi__ ==  0:
+        __volumePiMute__ = True
+    else:      
+        __volumePiMute__ = False
     vlcvolume = __volumePi__
     __radioVlcPi__.audio_set_volume(vlcvolume)
     __musicVlcPi__.audio_set_volume(vlcvolume)
@@ -274,17 +270,6 @@ def handleVolumeDownPi():
     if __volumePi__ < 0:
         __volumePi__ = 0 
         
-    vlcvolume = __volumePi__
-    __radioVlcPi__.audio_set_volume(vlcvolume)
-    __musicVlcPi__.audio_set_volume(vlcvolume)
-
-def handleVolumeUpPi():
-    global __musicVlcPi__
-    global __radioVlcPi__
-    global __volumePi__
-    __volumePi__= __volumePi__ + 15
-    if __volumePi__ > 100:
-        __volumePi__ = 99 
     vlcvolume = __volumePi__
     __radioVlcPi__.audio_set_volume(vlcvolume)
     __musicVlcPi__.audio_set_volume(vlcvolume)
@@ -334,6 +319,7 @@ def genFileList_sh(style):
     global __fileList__
     global __dir__
     global __musicVlcPi__
+    global __vlcmedia__
     global __musicPiPlaying__
     global __indexMax__
     global __indexPi__
@@ -397,8 +383,8 @@ def genFileList_sh(style):
     __indexMax__ = len(__fileList__) 
     __indexPi__ = random.randrange(__indexMax__)
     file = __dir__ + __fileList__[__indexPi__]
-    vlcmedia  = __musicVlcInstance__.media_new(file)
-    __musicVlcPi__.set_media(vlcmedia)
+    __vlcmedia__  = __musicVlcInstance__.media_new(file)
+    __musicVlcPi__.set_media(__vlcmedia__)
     
 def downPodcastFile_sh():
     N = 3
@@ -458,7 +444,7 @@ if(True):
     GPIO.add_event_detect(29, GPIO.FALLING, callback=handlePlayPausePi, bouncetime=500)
     GPIO.add_event_detect(31, GPIO.FALLING, callback=handleNextPi, bouncetime=500)
     GPIO.add_event_detect(33, GPIO.FALLING, callback=handlePrePi, bouncetime=500)
-    GPIO.add_event_detect(37, GPIO.FALLING, callback=handleMutePi, bouncetime=500)
+   #GPIO.add_event_detect(37, GPIO.FALLING, callback=handlevolumePi, bouncetime=500)
     
 #---------------------------------------------------------------------
 #file list Method 1
@@ -492,10 +478,9 @@ print ('--- Press button #play to start playing mp3 ---')
 
 
 file1 = __dir__ + __fileList__[__indexPi__]
-vlcmedia1  = __musicVlcInstance__.media_new(file1)
-__musicVlcPi__.set_media(vlcmedia1)
-
-
+__vlcmedia__  = __musicVlcInstance__.media_new(file1)
+__musicVlcPi__.set_media(__vlcmedia__)
+__musicVlcPiDuration__ = __vlcmedia__.get_duration()
 threading.Timer( 10 , continuePlaying ).start()
 #==============================================================================================
 app = Flask(__name__)
@@ -538,7 +523,8 @@ def index():
         "radioPiPlayingNo" : __radioPiPlayingNo__,
         "volumePi" : __volumePi__,
         "volumePiMute" : __volumePiMute__,
-        "playRatePi" : __playRatePi__
+        "playRatePi" : __playRatePi__,
+        "musicPiDuration":__musicVlcPiDuration__
          })
     
 @app.route('/playPrePi', methods=['POST'])
@@ -567,15 +553,18 @@ def playIndexPi():
     global __indexPi__
     global __indexMax__
     global __musicPiPlaying__
+    global __vlcmedia__
+    global __musicVlcPiDuration__
     data=request.get_json()
     num=int(data["indexPi"])
     __indexPi__= num
     file = __dir__ + __fileList__[__indexPi__]
     __musicVlcPi__.stop()
-    vlcmedia  = __musicVlcInstance__.media_new(file)
-    __musicVlcPi__.set_media(vlcmedia)
+    __vlcmedia__  = __musicVlcInstance__.media_new(file)
+    __musicVlcPi__.set_media(__vlcmedia__)
     __musicVlcPi__.play()
     __musicPiPlaying__ = True
+    __musicVlcPiDuration__ = __vlcmedia__.get_duration()
     print("__indexPi__:"+str(__indexPi__))
     print("Next play:"+file)
     return jsonify({ 
@@ -588,10 +577,15 @@ def playSelectedPi():
     global __indexPi__
     global __musicPiPlaying__
     global __indexMax__
+    global __vlcmedia__
+    global __musicVlcPiDuration__
     data=request.get_json()
     num=int(data["num"])
     __indexPi__= num % __indexMax__
     handleSelectedPi();
+    __musicVlcPiDuration__ = __vlcmedia__.get_duration()
+    print("musicPiDuration")
+    print(__musicVlcPiDuration__)
     return jsonify({ 
            "indexPi":__indexPi__,
            "musicPiPlaying" :__musicPiPlaying__
@@ -623,6 +617,17 @@ def setPlayModePi():
     __musicPiPlayMode__=int(data["mode"])
     return jsonify({
         "musicPiPlayMode" : __musicPiPlayMode__
+         })
+    
+@app.route('/setTimePi', methods=['POST'])
+def setTimePi():
+    global __musicVlcPi__
+    data=request.get_json()
+    setTimePi=int(data["time"])
+    __musicVlcPi__.set_time(setTimePi*1000)
+    print("setTimePi:")
+    return jsonify({
+        "setTimePi" : setTimePi
          })
     
 @app.route('/playRadioPi', methods=['POST'])
@@ -702,8 +707,8 @@ def playRadioPi():
     else:
         if(__radioPiPlayingNo__ != 0):
            __radioVlcPi__.stop()
-        vlcmedia  = __radioVlcInstance__.media_new(url)
-        __radioVlcPi__.set_media(vlcmedia)
+        vlcmediaRadio  = __radioVlcInstance__.media_new(url)
+        __radioVlcPi__.set_media(vlcmediaRadio)
         __radioVlcPi__.play()
         __radioPiPlayingNo__ = radioNo
         print("Radio Stream URL :"+url)        
@@ -712,42 +717,26 @@ def playRadioPi():
          })
 
 @app.route('/volumeControlPi', methods=['POST'])
-def volumeDownPi():
+def volumeControlPi():
     global __volumePi__
     global __volumePiMute__
-    handleVolumeControlPi()
-    return jsonify({
-        "volumePi" : __volumePi__,
-        "volumePiMute" : __volumePiMute__
-         })
-@app.route('/volumeDownPi', methods=['POST'])
-def volumeDownPi():
-    global __volumePi__
-    global __volumePiMute__
-    handleVolumeDownPi()
+    data=request.get_json()
+    vol=int(data["vol"])
+    handleVolumeControlPi(vol)
     return jsonify({
         "volumePi" : __volumePi__,
         "volumePiMute" : __volumePiMute__
          })
     
-@app.route('/volumeUpPi', methods=['POST'])
-def volumeUpPi():
-    global __volumePi__
-    global __volumePiMute__
-    handleVolumeUpPi()
+@app.route('/getMetaPi', methods=['POST'])
+def getMetaPi():
+    global __musicVlcPiDuration__
+    global __musicVlcPi__
+    musicVlcPiCurrent =__musicVlcPi__.get_time()
+    __musicVlcPiDuration__ = __vlcmedia__.get_duration()
     return jsonify({
-        "volumePi" : __volumePi__,
-        "volumePiMute" : __volumePiMute__
-         })
-    
-@app.route('/volumeMutePi', methods=['POST'])
-def volumeMutePi():
-    global __volumePi__
-    global __volumePiMute__
-    handleMutePi()
-    return jsonify({
-        "volumePi" : __volumePi__,
-        "volumePiMute" : __volumePiMute__
+        "durationPi" : __musicVlcPiDuration__,
+        "currentPi" : musicVlcPiCurrent
          })
     
 @app.route('/getFileList', methods=['POST'])

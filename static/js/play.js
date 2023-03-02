@@ -4,9 +4,11 @@ const vm = createApp({
   data(){
                return {
                elementAudioPc: null,
-               elementAudioPcBar: null,
                elementAudioPc_Cur: null,
-               elementVolPcBar: null,
+               elementAudioBarPc: null,
+               elementVolBarPc: null,
+               elementAudioBarPi: null,
+               elementVolBarPi: null,
                element10Pi : null,
                element20Pi : null,
                element30Pi : null,
@@ -88,15 +90,32 @@ const vm = createApp({
               return Math.floor(Math.random()*(max-min+1))+min;
             },
            
-            contuineplaying(){
+            continuePlayingPc(){
               var self = this;
               this.elementAudioPc.addEventListener("ended",function() {
               if(self.musicPcPlaying == true){
                  console.log("Continue Playing");
                  self.playNextPc();
-                }
-              });
-             },
+                 }
+               });
+            },
+
+            continueMetaPi(){
+              axios.post('/getMetaPi').then(res => {
+              durationPi = res.data.durationPi;
+              currentPi = res.data.currentPi;
+              this.elementAudioBarPi.max= durationPi/1000;
+              this.elementAudioBarPi.value= currentPi/1000;
+              document.getElementById("startTextPi").textContent=this.calCurrentTime(currentPi/1000);
+              console.log(this.calCurrentTime(currentPi/1000));
+              document.getElementById("endTextPi").textContent=this.calTotalTime(durationPi/1000);
+              console.log(this.calTotalTime(durationPi/1000));
+               })
+              .catch(error => {
+              console.log("handle error =>", error);
+               })
+              setTimeout(this.continueMetaPi,2*1000);
+              },
             setSleepTimePc(){
               a=[10,20,30,1000];
               clearTimeout(this.sleepTimer);
@@ -137,7 +156,7 @@ const vm = createApp({
                 this.num4dPc[3]=0;
                 this.keytimerPcRunning = false;
              },
-            playIndexPc(event){
+             playIndexPc(event){
                 this.indexPc = event.target.selectedIndex - 1;
                 this.filePc=this.fileList[this.indexPc];
                 dirfilePc=this.dir+this.fileList[this.indexPc];
@@ -237,31 +256,15 @@ const vm = createApp({
                 }
                 this.elementAudioPc.playbackRate = this.playRatePc;
               },
-            volumeDownPc(){
-                this.volumePc = this.volumePc - 0.15;
-                if(this.volumePc < 0 ){this.volumePc =0;}
+            volCtlPc(vol){
+                this.volumePc = this.volumePc + (vol/100);
+                if(this.volumePc < 0){this.volumePc = 0;}
+                if(this.volumePc > 1){this.volumePc = 1;}
                 this.elementAudioPc.volume= this.volumePc;
                 this.elementRadioPc.volume= this.volumePc;
-                console.log("volumeDownPc works");
-                this.elementVolPcBar.value = this.volumePc*100;
-                document.getElementById("volPcText").textContent=(Math.trunc(this.volumePc*100)).toString();
-              },
-            volumeUpPc(){
-                this.volumePc = this.volumePc + 0.15;
-                if(this.volumePc > 1){this.volumePc =1;}
-                this.elementAudioPc.volume = this.volumePc; 
-                this.elementRadioPc.volume = this.volumePc; 
-                console.log("volumeUpPc works");
-                this.elementVolPcBar.value = this.volumePc*100;
-                document.getElementById("volPcText").textContent=(Math.trunc(this.volumePc*100)).toString();
-              },
-            volumeMutePc(){
-                if(this.volumePc != 0 ){this.volumePc =0;}
-                this.elementAudioPc.volume = 0; 
-                this.elementRadioPc.volume = 0; 
-                console.log("volumeMutePc works");
-                this.elementVolPcBar.value = this.volumePc*100;
-                document.getElementById("volPcText").textContent=(Math.trunc(this.volumePc*100)).toString();
+                console.log("volumeControlPc works");
+                this.elementVolBarPc.value = this.volumePc*100;
+                document.getElementById("volTextPc").textContent=(Math.trunc(this.volumePc*100)).toString();
               },
             playRadioPc(event){
                 this.radioPcPlayingNo = event.target.value;
@@ -448,7 +451,6 @@ const vm = createApp({
                 .catch(error => {
                 console.log("handle error =>", error);
                 })
-                
               
               },
             playRadioPi(event){
@@ -485,46 +487,16 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
               },
-            volumeDownPi(){
-                axios.post('/volumeDownPi').then(res => {
+            volCtlPi(vol){
+                axios.post('/volumeControlPi',{"vol":vol}).then(res => {
                 this.volumePi= res.data.volumePi;
                 this.volumePiMute= res.data.volumePiMute;
                 console.log("Volume: " + this.volumePi); 
                 console.log("Mute: "+ this.volumePiMute); 
-                console.log("VolumeDownPi works");
-                this.elementVolPiBar = document.getElementById("volPi-bar");
-                this.elementVolPiBar.value = this.volumePi;
-                document.getElementById("volPiText").textContent=(this.volumePi).toString();
-                })
-                .catch(error => {
-                console.log("handle error =>", error);
-                })
-              },
-            volumeUpPi(){
-                axios.post('/volumeUpPi').then(res => {
-                this.volumePi= res.data.volumePi;
-                this.volumePiMute= res.data.volumePiMute;
-                console.log("Volume: " + this.volumePi); 
-                console.log("Mute: "+ this.volumePiMute); 
-                console.log("VolumeUpPi works");
-                this.elementVolPiBar = document.getElementById("volPi-bar");
-                this.elementVolPiBar.value = this.volumePi;
-                document.getElementById("volPiText").textContent=(this.volumePi).toString();
-                })
-                .catch(error => {
-                console.log("handle error =>", error);
-                })
-              },
-            volumeMutePi(){
-                axios.post('/volumeMutePi').then(res => {
-                this.volumePi= res.data.volumePi;
-                this.volumePiMute= res.data.volumePiMute;
-                console.log("Volume: " + this.volumePi); 
-                console.log("Mute: "+ this.volumePiMute); 
-                console.log("VolumeMutePi works");
-                this.elementVolPiBar = document.getElementById("volPi-bar");
-                this.elementVolPiBar.value = this.volumePi;
-                document.getElementById("volPiText").textContent=(this.volumePi).toString();
+                console.log("VolumeControlPi works");
+                this.elementVolBarPi = document.getElementById("volBarPi");
+                this.elementVolBarPi.value = this.volumePi;
+                document.getElementById("volTextPi").textContent=(this.volumePi).toString();
                 })
                 .catch(error => {
                 console.log("handle error =>", error);
@@ -538,7 +510,7 @@ const vm = createApp({
                 this.filePi=this.fileList[this.indexPi];
               },
             getFileList(style){
-                document.getElementById("my-audio").pause();
+                document.getElementById("audioPc").pause();
                 this.musicPcPlaying = false;
                 this.musicPiPlaying = false;
                 axios.post('/getFileList',{"style":style}).then(res => {
@@ -585,28 +557,28 @@ const vm = createApp({
               },
               //--------------------------------------------------------------------------------------------------
             mLoadPc(){
-                this.elementAudioPcBar.max= this.elementAudioPc.duration;
-                let totalDuration= this.calculateTotalValue(this.elementAudioPc.duration);
-                document.getElementById("endText").textContent=totalDuration;
+                this.elementAudioBarPc.max= this.elementAudioPc.duration;
+                let totalDuration= this.calTotalTime(this.elementAudioPc.duration);
+                document.getElementById("endTextPc").textContent=totalDuration;
                 console.log("mLoad Done--> totalDuration:"+totalDuration);
                },
             mUpdatePc(){
                 if(this.musicPcPlaying == true){
-                this.elementAudioPcBar.value=this.elementAudioPc.currentTime;
-                let calTime = this.calculateCurrentValue(this.elementAudioPc.currentTime);
-                document.getElementById("startText").textContent=calTime;
+                this.elementAudioBarPc.value=this.elementAudioPc.currentTime;
+                let calTime = this.calCurrentTime(this.elementAudioPc.currentTime);
+                document.getElementById("startTextPc").textContent=calTime;
                 console.log("mUpdate done -- > update Bar time Value"+ calTime)
                 }
                },
             mPlayPc(){
                 console.log("mPlay");
                 this.elementAudioPc.currentTime = this.elementAudioPc_Cur;
-                let currentTime = this.calculateCurrentValue(this.elementAudioPc.currentTime);
-                document.getElementById("startText").textContent=currentTime;
+                let currentTime = this.calCurrentTime(this.elementAudioPc.currentTime);
+                document.getElementById("startTextPc").textContent=currentTime;
                },
             mSetPc(){
                 console.log("mSet");
-                this.elementAudioPc.currentTime=this.elementAudioPcBar.value;
+                this.elementAudioPc.currentTime=this.elementAudioBarPc.value;
                },
             mPausePc(){
                 console.log("mPause");
@@ -614,16 +586,36 @@ const vm = createApp({
                },
             mVolSetPc(){
                 console.log("mVolset");
-                console.log(this.elementVolPcBar.value);
-                this.elementAudioPc.volume =this.elementVolPcBar.value/100;
-                document.getElementById("volPcText").textContent=this.elementVolPcBar.value;
+                console.log(this.elementVolBarPc.value);
+                this.elementAudioPc.volume =this.elementVolBarPc.value/100;
+                document.getElementById("volTextPc").textContent=this.elementVolBarPc.value;
                },
+            mSetTimePi(){
+                let time=this.elementAudioBarPi.value;  
+                axios.post('/setTimePi',{"time":time}).then(res => {
+                let time2 = res.data.setTimePi;
+                console.log("time2:"+time2);
+                })
+                .catch(error => {
+                console.log("handle error =>", error);
+                })
+              },
+           // GetMetaPi(){
+           //     axios.post('/getMetaPi').then(res => {
+           //     console.log("mGetMetaPi")
+           //     })
+           //     .catch(error => {
+           //     console.log("handle error =>", error);
+           //     })
+           //    },
             mVolSetPi(){
-                console.log("mVolset");
-                document.getElementById("volPiText").textContent=this.elementVolPiBar.value;
+                vol= this.elementVolBarPi.value-this.volumePi;
+                this.volCtlPi(vol);
+                document.getElementById("volTextPi").textContent=this.elementVolBarPi.value;
+                console.log("mVolsetPi");
                },
               //--------------------------------------------------------------------------------------------------
-            calculateTotalValue(length) {
+            calTotalTime(length) {
                 let minutes = Math.floor(length / 60);
                 minutes = (minutes).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
                 seconds_float = length - minutes * 60;
@@ -634,7 +626,7 @@ const vm = createApp({
                 time = minutes + ':' + seconds;
                 return time;
                 },
-            calculateCurrentValue(currentTime) {
+            calCurrentTime(currentTime) {
                 let current_hour = parseInt(currentTime / 3600) % 24;
                 current_minute = parseInt(currentTime / 60) % 60;
                 current_seconds_long = currentTime % 60;
@@ -668,23 +660,23 @@ const vm = createApp({
               console.log("volumePiMute: "+this.volumePiMute);
               
               this.elementAudioPc = document.getElementById("audioPc");
-              this.elementAudioPcBar = document.getElementById("audioPc-bar");
+              this.elementAudioBarPc = document.getElementById("audioBarPc");
               this.elementAudioPc.volume = this.volumePc; 
 
               this.elementRadioPc = document.getElementById("radioPc");
               this.elementRadioPc.volume = this.volumePc;
 
-              this.elementVolPcBar = document.getElementById("volPc-bar");
-              this.elementVolPcBar.value = this.volumePc*100;
-              document.getElementById("volPcText").textContent=(this.volumePc*100).toString();
+              this.elementVolBarPc = document.getElementById("volBarPc");
+              this.elementVolBarPc.value = this.volumePc*100;
+              document.getElementById("volTextPc").textContent=(this.volumePc*100).toString();
 
-              this.elementVolPiBar = document.getElementById("volPi-bar");
-              this.elementVolPiBar.value = this.volumePi;
-              document.getElementById("volPiText").textContent=(this.volumePi).toString();
+              document.getElementById("volTextPi").textContent=(this.volumePi).toString();
+              this.elementAudioBarPi = document.getElementById("audioBarPi");
+              this.elementVolBarPi = document.getElementById("volBarPi");
+              this.elementVolBarPi.value = this.volumePi;
+              this.continuePlayingPc();
+              this.continueMetaPi();
 
-
-
-              this.contuineplaying();
               this.element10Pi = document.getElementById("sel10Pi");
               this.element20Pi = document.getElementById("sel20Pi");
               this.element30Pi = document.getElementById("sel30Pi");
@@ -716,8 +708,7 @@ const vm = createApp({
             }
           },
   mounted:function(){
-               this.loading();
+              this.loading();
           }
        })
   vm.mount('#app');
-//   my-Audio.addEventListener("ended", playnext);

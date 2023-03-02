@@ -27,14 +27,14 @@
 
 <div id="audio-player-container" style="text-align:center">
     <audio id="audioPc"  v-on:loadedmetadata="mLoadPc($event)" v-on:timeupdate="mUpdatePc($event)" v-on:play="mPlayPc($event)" v-on:pause="mPausePc($event)"> <source src="{{filePc}}" type="audio/mpeg">你的瀏覽器不支援 audio tag！</audio>
-    <div id="startText">00:00</div>
-    <div id="endText">99:99</div>
-<input id="audioPc-bar" type="range" min="0" step="0.25" value="0" v-on:change="mSetPc($event)" style="width:60vw">
+    <div id="startTextPc">00:00</div>
+    <div id="endTextPc">00:00</div>
+<input id="audioBarPc" type="range" min="0" step="0.25" value="0" v-on:change="mSetPc($event)" style="width:60vw">
 
 
 <div style="text-align:center">
-    <div id="volPcText">100</div>
-    <input id="volPc-bar" type="range" min="0" setp="0.25" max="100" value="100" v-on:change=mVolSetPc($event) style="width:60vw">
+    <div id="volTextPc">100</div>
+    <input id="volBarPc" type="range" min="0" setp="0.25" max="100" value="100" v-on:change=mVolSetPc($event) style="width:60vw">
 </div>
 </div>
 
@@ -117,9 +117,9 @@
     </select>
 </div>
 <div class="button-container" >
-        <button type="button" class="key-button" v-on:click="volumeDownPc"><i class="fa fa-volume-low"></i></button>
-        <button type="button" class="key-button" v-on:click="volumeUpPc"><i class="fa fa-volume-high"></i></button>
-        <button type="button" class="key-button" v-on:click="volumeMutePc"><i class="fa fa-volume-xmark"></i></button>
+        <button type="button" class="key-button" v-on:click="volCtlPc(-15)"><i class="fa fa-volume-low"></i></button>
+        <button type="button" class="key-button" v-on:click="volCtlPc(15)"><i class="fa fa-volume-high"></i></button>
+        <button type="button" class="key-button" v-on:click="volCtlPc(-100)"><i class="fa fa-volume-xmark"></i></button>
 </div>
 
 <div class="button-container">
@@ -137,11 +137,11 @@
 
 <div style="text-align:center">
 <div id="audio-player-container" style="text-align:center">
-    <div id="PistartText">00:00</div>
-    <div id="PiendText">99:99</div>
-    <input id="audioPi-bar" type="range" min="0" setp="0.25" max="100" value="100" v-on:change=mPiSet($event) style="width:60vw">
-    <div id="volPiText">100</div>
-    <input id="volPi-bar" type="range" min="0" setp="0.25" max="100" value="100" v-on:change=mVolSetPi($event) style="width:60vw">
+    <div id="startTextPi">00:00</div>
+    <div id="endTextPi">00:00</div>
+    <input id="audioBarPi" type="range" min="0" setp="0.25" value="0" v-on:change="mSetTimePi($event)" style="width:60vw">
+    <div id="volTextPi">100</div>
+    <input id="volBarPi" type="range" min="0" setp="0.25" max="100" value="100" v-on:change=mVolSetPi($event) style="width:60vw">
 </div>
 
 <div class="banner-container">
@@ -245,9 +245,9 @@
 
 
 <div class="button-container">
-    <button type="button" class="key-button" v-on:click="volumeDownPi"><i class="fa fa-volume-low"></i></button>
-    <button type="button" class="key-button" v-on:click="volumeUpPi"><i class="fa fa-volume-high"></i></button>
-    <button type="button" class="key-button" v-on:click="volumeMutePi"><i class="fa-solid fa-volume-xmark"></i></button>
+    <button type="button" class="key-button" v-on:click="volCtlPi(-15)"><i class="fa fa-volume-low"></i></button>
+    <button type="button" class="key-button" v-on:click="volCtlPi(15)"><i class="fa fa-volume-high"></i></button>
+    <button type="button" class="key-button" v-on:click="volCtlPi(-100)"><i class="fa-solid fa-volume-xmark"></i></button>
 </div>
 
 <div class="button-container">
@@ -278,7 +278,7 @@
 </div>
 
 </div>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script><script  src="./script.js"></script>
+<!--script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script-->
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="./static/js/play.js"></script>
