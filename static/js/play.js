@@ -4,7 +4,6 @@ const vm = createApp({
   data(){
                return {
                elementAudioPc: null,
-               elementAudioPc_Cur: null,
                elementAudioBarPc: null,
                elementVolBarPc: null,
                elementAudioBarPi: null,
@@ -52,6 +51,8 @@ const vm = createApp({
                cronTimeHour: 6,
                cronTimeMin :0,
                cronStatus: false,
+               PCShow: true,
+               PIShow: false,
                //broswer audio play src
                url01:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
                url02:"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -85,6 +86,9 @@ const vm = createApp({
                url30:"http://media-ice.musicradio.com:80/ClassicFMMP3"
                 }
           },
+               computed: {
+             total() { return this.filePc }
+          },
   methods:{
             getRandom(min,max){
               return Math.floor(Math.random()*(max-min+1))+min;
@@ -101,6 +105,7 @@ const vm = createApp({
             },
 
             continueMetaPi(){
+              if(this.musicPiPlaying == true){
               axios.post('/getMetaPi').then(res => {
               durationPi = res.data.durationPi;
               currentPi = res.data.currentPi;
@@ -114,7 +119,8 @@ const vm = createApp({
               .catch(error => {
               console.log("handle error =>", error);
                })
-              setTimeout(this.continueMetaPi,2*1000);
+              }
+              setTimeout(this.continueMetaPi,1*1000);
               },
             setSleepTimePc(){
               a=[10,20,30,1000];
@@ -148,7 +154,6 @@ const vm = createApp({
                 this.elementAudioPc.setAttribute('src',dirfilePc);
                 this.elementAudioPc.load();
                 this.elementAudioPc.play();
-                this.elementAudioPc_Cur=0;
                 this.musicPcPlaying = true;
                 this.num4dPc[0]=0;
                 this.num4dPc[1]=0;
@@ -165,7 +170,6 @@ const vm = createApp({
                 this.elementAudioPc.load();
                 this.elementAudioPc.play();
                 this.musicPcPlaying = true;
-                this.elementAudioPc_Cur=0;
              },
              setPlayModePc(){
                 this.musicPcPlayMode = this.musicPcPlayMode +1
@@ -193,11 +197,10 @@ const vm = createApp({
                 if(this.musicPcPlaying == false){
                 this.elementAudioPc.play();
                 this.musicPcPlaying = true;
+                this.elementAudioPc.currentTime=this.elementAudioBarPc.value;
                 console.log("playPausePc to Play--> "+"musicPcPlaying:"+this.musicPcPlaying);
                 }
                 else{
-                this.elementAudioPc_Cur=this.elementAudioPcBar.value;
-                console.log("Cur:"+this.elementAudioPc_Cur);
                 this.elementAudioPc.pause();
                 this.musicPcPlaying = false;
                 console.log("playPausePc to Pause--> "+"musicPcPlaying:"+this.musicPcPlaying);
@@ -223,7 +226,6 @@ const vm = createApp({
                 console.log(this.indexPc);
                 console.log(this.filePc);
                 console.log("playPrePc works");
-                this.elementAudioPc_Cur=0;
               },
             playNextPc(){
                 if(this.musicPcPlayMode==1){
@@ -247,7 +249,6 @@ const vm = createApp({
                 console.log(this.indexPc);
                 console.log(this.filePc);
                 console.log("playNextPc works");
-                this.elementAudioPc_Cur=0;
               },
              setPlayRatePc(){
                 this.playRatePc = this.playRatePc +0.5;
@@ -567,14 +568,15 @@ const vm = createApp({
                 this.elementAudioBarPc.value=this.elementAudioPc.currentTime;
                 let calTime = this.calCurrentTime(this.elementAudioPc.currentTime);
                 document.getElementById("startTextPc").textContent=calTime;
-                console.log("mUpdate done -- > update Bar time Value"+ calTime)
+                console.log("mUpdate done -- > update Bar time Value: "+ calTime)
                 }
                },
             mPlayPc(){
                 console.log("mPlay");
-                this.elementAudioPc.currentTime = this.elementAudioPc_Cur;
+                this.elementAudioPc.currentTime = this.elementAudioBarPc.value;
                 let currentTime = this.calCurrentTime(this.elementAudioPc.currentTime);
                 document.getElementById("startTextPc").textContent=currentTime;
+                console.log("CurrentTime"+this.elementAudioPc.currentTime);
                },
             mSetPc(){
                 console.log("mSet");
@@ -613,7 +615,7 @@ const vm = createApp({
                 this.volCtlPi(vol);
                 document.getElementById("volTextPi").textContent=this.elementVolBarPi.value;
                 console.log("mVolsetPi");
-               },
+              },
               //--------------------------------------------------------------------------------------------------
             calTotalTime(length) {
                 let minutes = Math.floor(length / 60);
@@ -625,7 +627,7 @@ const vm = createApp({
                 seconds = seconds_str.substring(0, 2);
                 time = minutes + ':' + seconds;
                 return time;
-                },
+              },
             calCurrentTime(currentTime) {
                 let current_hour = parseInt(currentTime / 3600) % 24;
                 current_minute = parseInt(currentTime / 60) % 60;
@@ -633,7 +635,11 @@ const vm = createApp({
                 current_seconds = current_seconds_long.toFixed();
                 current_time = (current_minute < 10 ? "0" + current_minute : current_minute) + ":" + (current_seconds < 10 ? "0" + current_seconds : current_seconds);
                 return current_time;
-                },
+              },
+            PCPIShow() {
+                this.PCShow = !this.PCShow;
+                this.PIShow = !this.PIShow;
+              },
               //--------------------------------------------------------------------------------------------------
             loading(){
               axios.post('/').then(res => {
@@ -704,11 +710,13 @@ const vm = createApp({
                 this.element20Pi.value = "0"
                 this.element30Pi.value = this.radioPiPlayingNo
               }
-            });
-            }
+                  });
+               },
           },
-  mounted:function(){
+  mounted(){
               this.loading();
+
           }
+
        })
   vm.mount('#app');

@@ -11,10 +11,10 @@ body {
   }
 .title{
   font-size: 1.5em; 
-  color:rgb(9, 20, 230); 
+  color:rgb(31, 44, 158); 
  } 
 .banner-container{
-  color: hsla(219, 61%, 57%, 0.5);
+  color: hsla(22, 85%, 43%, 0.5);
   width: 100vw;
   display: flex;
   flex-direction:column;
@@ -30,6 +30,7 @@ body {
 .section-container{
   justify-content: center;
   align-items: center;  
+  color:rgb(108, 81, 204);
  }
  
 .section{
