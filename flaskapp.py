@@ -31,6 +31,7 @@ __typeList__ = ["all","podcast","國語","台語","古典","張學友","劉德�
 __fileList_Rn__ = []
 __indexMax__ = 0
 __indexPi__ = 1
+__cronIndexPi__ = 1
 __indexPc__ = 1 
 __num4dPi_i__ = 4
 __num4dPi__ = [ 0, 0, 0, 0 ]
@@ -59,7 +60,7 @@ __sleepTimePi__ = 5
 __timer_Sleep__ = None
 __cronTimeHour__ = '09'
 __cronTimeMin__ = '01',
-__cronStatus__= True,
+__cronStatus__= False,
 radioUrl={
           "url01":"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
           "url02":"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -128,21 +129,44 @@ def handleSelectedPi():
     global __indexPi__
     global __num4dPi_i__
     global __vlcmedia__
-    file = __dir__ + __fileList__[__indexPi__]
-    __musicVlcPi__.stop()
-    __vlcmedia__  = __musicVlcInstance__.media_new(file)
-    __musicVlcPi__.set_media(__vlcmedia__)
-    __musicVlcPi__.play()
-    __musicPiPlaying__ = True
-    print("play:"+file)
+    #file = __dir__ + __fileList__[__indexPi__]
+    handlePlayPi(__indexPi__)
+    #__musicVlcPi__.stop()
+    #__vlcmedia__  = __musicVlcInstance__.media_new(file)
+    #__musicVlcPi__.set_media(__vlcmedia__)
+    #__musicVlcPi__.play()
+    #__musicPiPlaying__ = True
+    #print("play:"+file)
     __keyTimerPi__= False
     __num4dPi__ = [0, 0, 0, 0]
     __num4dPi_i__ = 4
+    
 #Convert int array to decimal interger
 def convert(list):
     no = sum(d * 10**i for i, d in enumerate(list[::-1]))
     return(no)
 
+def handlePlayPi(index):
+    global __fileList__
+    global __dir__
+    global __musicVlcInstance__
+    global __vlcmedia__
+    global __musicVlcPi__
+    file = __dir__ + __fileList__[index]
+    __musicVlcPi__.stop()
+    __vlcmedia__  = __musicVlcInstance__.media_new(file)
+    __musicVlcPi__.set_media(__vlcmedia__)
+    __musicVlcPi__.play()
+    __musicPiPlaying__ = True
+    print("play: "+file)
+    
+def handleCronPlayPi():
+    global __cronIndexPi__
+    global __indexPi__
+    handlePlayPi(__cronIndexPi__)
+    __indexPi = __cronIndexPi__
+    
+    
 def handleKeyInputPi(channel):
     global __indexPi__
     global __indexMax__
@@ -173,51 +197,53 @@ def handleKeyInputPi(channel):
 def handleNextPi():
     global __indexPi__
     global __indexMax__
-    global __fileList__
-    global __dir__
-    global __musicVlcInstance__
-    global __musicVlcPi__
-    global __vlcmedia__
-    global __musicPiPlaying__
-    global __musicPiPlayMode__
+    #global __fileList__
+    #global __dir__
+    #global __musicVlcInstance__
+    #global __musicVlcPi__
+    #global __vlcmedia__
+    #global __musicPiPlaying__
+    #global __musicPiPlayMode__
     if (__musicPiPlayMode__ == 1):
         __indexPi__ = random.randrange(__indexMax__)
     else:
         __indexPi__ = __indexPi__ + 1
         if (__indexPi__ == __indexMax__):
             __indexPi__ = 0; 
-    file = __dir__ + __fileList__[__indexPi__]
-    __musicVlcPi__.stop()
-    __vlcmedia__  = __musicVlcInstance__.media_new(file)
-    __musicVlcPi__.set_media(__vlcmedia__)
-    __musicVlcPi__.play()
-    __musicPiPlaying__ = True
+    #file = __dir__ + __fileList__[__indexPi__]
+    handlePlayPi(__indexPi__)
+    #__musicVlcPi__.stop()
+    #__vlcmedia__  = __musicVlcInstance__.media_new(file)
+    #__musicVlcPi__.set_media(__vlcmedia__)
+    #__musicVlcPi__.play()
+    #__musicPiPlaying__ = True
     print("__indexPi__:"+str(__indexPi__))
-    print("Next play:"+file)
+    #print("Next play:"+file)
 
 def handlePrePi():
     global __indexPi__
     global __indexMax__
-    global __fileList__
-    global __dir__
-    global __musicVlcInstance__
-    global __vlcmedia__
-    global __musicVlcPi__
-    global __musicPiPlaying__
+    #global __fileList__
+    #global __dir__
+    #global __musicVlcInstance__
+    #global __vlcmedia__
+    #global __musicVlcPi__
+    #global __musicPiPlaying__
     if (__musicPiPlayMode__ == 1):
         __indexPi__ = random.randrange(__indexMax__)
     else:
         __indexPi__ = __indexPi__ - 1
     if (__indexPi__ < 0):
        __indexPi__= __indexMax__ - 1
-    file = __dir__ + __fileList__[__indexPi__]
-    __vlcmedia__  = __musicVlcInstance__.media_new(file)
-    __musicVlcPi__.stop()
-    __musicVlcPi__.set_media(__vlcmedia__)
-    __musicVlcPi__.play()
-    __musicPiPlaying__ = True
+    #file = __dir__ + __fileList__[__indexPi__]
+    handlePlayPi(__indexPi__)
+    #__vlcmedia__  = __musicVlcInstance__.media_new(file)
+    #__musicVlcPi__.stop()
+    #__musicVlcPi__.set_media(__vlcmedia__)
+    #__musicVlcPi__.play()
+    #__musicPiPlaying__ = True
     print("__indexPi__:"+str(__indexPi__))
-    print("Pre play:"+file)
+    #print("Pre play:"+file)
 
 def handlePlayPausePi():
     global __indexPi__
@@ -246,7 +272,7 @@ def handlePlayRatePi():
     __musicVlcPi__.set_rate(__playRatePi__)
     
 
-def handleVolumeControlPi(vol):
+def handleVolCtlPi(vol):
     global __musicVlcPi__
     global __radioVlcPi__
     global __volumePi__
@@ -259,17 +285,6 @@ def handleVolumeControlPi(vol):
         __volumePiMute__ = True
     else:      
         __volumePiMute__ = False
-    vlcvolume = __volumePi__
-    __radioVlcPi__.audio_set_volume(vlcvolume)
-    __musicVlcPi__.audio_set_volume(vlcvolume)
-def handleVolumeDownPi():
-    global __musicVlcPi__
-    global __radioVlcPi__
-    global __volumePi__
-    __volumePi__ = __volumePi__ -15
-    if __volumePi__ < 0:
-        __volumePi__ = 0 
-        
     vlcvolume = __volumePi__
     __radioVlcPi__.audio_set_volume(vlcvolume)
     __musicVlcPi__.audio_set_volume(vlcvolume)
@@ -489,11 +504,9 @@ CORS(app)
 #https://viniciuschiele.github.io/flask-apscheduler/index.html
 class Config(object):
     SCHEDULER_API_ENABLED = True
-scheduler = APScheduler()
-#-----------------------
-#APScheduler start
 app.config.from_object(Config())
 # it is also possible to enable the API directly
+scheduler = APScheduler()
 # scheduler.api_enabled = True
 scheduler.init_app(app)
 scheduler.start()
@@ -510,6 +523,7 @@ def index():
     global __volumePi__
     global __volumePiMute__
     global __playRatePi__
+    global __cronStatus__
     if request.method == 'GET':
         __playRatePi__ = 1
         __musicVlcPi__.set_rate(__playRatePi__)
@@ -524,7 +538,8 @@ def index():
         "volumePi" : __volumePi__,
         "volumePiMute" : __volumePiMute__,
         "playRatePi" : __playRatePi__,
-        "musicPiDuration":__musicVlcPiDuration__
+        "musicPiDuration":__musicVlcPiDuration__,
+        "cronStatus":__cronStatus__
          })
     
 @app.route('/playPrePi', methods=['POST'])
@@ -558,15 +573,16 @@ def playIndexPi():
     data=request.get_json()
     num=int(data["indexPi"])
     __indexPi__= num
-    file = __dir__ + __fileList__[__indexPi__]
-    __musicVlcPi__.stop()
-    __vlcmedia__  = __musicVlcInstance__.media_new(file)
-    __musicVlcPi__.set_media(__vlcmedia__)
-    __musicVlcPi__.play()
-    __musicPiPlaying__ = True
-    __musicVlcPiDuration__ = __vlcmedia__.get_duration()
+   # file = __dir__ + __fileList__[__indexPi__]
+    handlePlayPi(__indexPi__)
+   # __musicVlcPi__.stop()
+   # __vlcmedia__  = __musicVlcInstance__.media_new(file)
+   # __musicVlcPi__.set_media(__vlcmedia__)
+   # __musicVlcPi__.play()
+   # __musicPiPlaying__ = True
+   # __musicVlcPiDuration__ = __vlcmedia__.get_duration()
     print("__indexPi__:"+str(__indexPi__))
-    print("Next play:"+file)
+    #print("Next play:"+file)
     return jsonify({ 
            "indexPi":__indexPi__,
            "musicPiPlaying" :__musicPiPlaying__
@@ -722,7 +738,7 @@ def volumeControlPi():
     global __volumePiMute__
     data=request.get_json()
     vol=int(data["vol"])
-    handleVolumeControlPi(vol)
+    handleVolCtlPi(vol)
     return jsonify({
         "volumePi" : __volumePi__,
         "volumePiMute" : __volumePiMute__
@@ -829,18 +845,43 @@ def setCron():
     global __cronTimeHour__
     global __cronTimeMin__
     global __cronStatus__
+    global __cronIndexPi__
+    global __dir__
+    global __fileList__
     data=request.get_json()
+    __cronStatus__=data["cronStatus"]
+    __cronIndePi__=data["cronIndexPi"]
+    print(__cronStatus__)
+    print(type(__cronStatus__))
+    num=int(data["cronIndexPi"])
+    file = __dir__ + __fileList__[num]
+    print(file+"will be played")
     __cronTimeHour__=int(data["Hour"])
     __cronTimeMin__=int(data["Min"])
-    __cronStatus__ = not __cronStatus__
-    scheduler.add_job(playNextPi,'cron', hour=__cronTimeHour__, minute=__cronTimeMin__, end_date='2029-05-30')
-    scheduler.start()
+    if __cronStatus__ == False:
+        scheduler.remove_job('my_task')
+        __cronStatus__ = False
+        print("scheduler job removed")
+    else:
+        scheduler.add_job(id='my_task', func=handleCronPlayPi, trigger='cron', hour=__cronTimeHour__, minute=__cronTimeMin__)
+        __cronStatus__ = True
+        print("scheduler job added")
     return jsonify({
         "cronTimeHour" : __cronTimeHour__,
         "cronTimeMin" : __cronTimeMin__,
         "cronStatus" : __cronStatus__,
          })
 
+@app.route('/setCronSong', methods=['POST'])
+def setCronSong():
+    global __cronIndexPi__
+    data=request.get_json()
+    __cronIndexPi__=int(data["cronIndexPi"])
+    return jsonify({
+        "cronIndexPi" : __cronIndexPi__
+         })
+    
+    
 @scheduler.task('cron', id='myjoba', day='*', hour=__cronTimeHour__, minute="00", second='00')
 def myjoba():
     global __cronStatus__
@@ -851,8 +892,8 @@ def myjoba():
         handleSelectedPi()
     print("myPlayJob executed")
 
-@scheduler.task('cron', id='myjobb2', day='*', hour='06', minute='00', second='00')
-def myjobb2():
+@scheduler.task('cron', id='myjobb', day='*', hour='06', minute='00', second='00')
+def myjobb():
     downPodcastFile_sh2()
     print("myDownPodcastFileJob executed")
 

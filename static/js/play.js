@@ -51,6 +51,7 @@ const vm = createApp({
                cronTimeHour: 6,
                cronTimeMin :0,
                cronStatus: false,
+               cronIndexPi:1,
                PCShow: true,
                PIShow: false,
                //broswer audio play src
@@ -439,6 +440,7 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
               },
+
             playIndexPi(event){
                 var indexPi = event.target.selectedIndex - 1;
                 axios.post('/playIndexPi',{"indexPi":indexPi}).then(res => {
@@ -452,8 +454,8 @@ const vm = createApp({
                 .catch(error => {
                 console.log("handle error =>", error);
                 })
-              
               },
+
             playRadioPi(event){
                 radioNo=event.target.value;
                 if(this.radioPiPlayingNo == radioNo){
@@ -536,21 +538,32 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
               },
-            setCronHour(){
-              },
-            setCronMin(){
-              },
             setCron(){
               var Hour =document.getElementById("cronHour").value;
               var Min =document.getElementById("cronMin").value;
-              var cronStatus= true;
-              axios.post('/setCron',{"Hour":Hour,"Min":Min}).then(res => {
+              this.cronIndexPi=document.getElementById("cronSelIndexPi").selectedIndex;
+              console.log("Hour:"+Hour);
+              console.log("Min:"+Hour);
+              this.cronStatus = ! this.cronStatus
+              console.log("frontend cronStatus:"+this.cronStatus);
+              axios.post('/setCron',{"cronStatus":this.cronStatus,"cronIndexPi":this.cronIndexPi,"Hour":Hour,"Min":Min}).then(res => {
                 this.cronTimeHour = res.data.cronTimeHour;
                 this.cronTimeMin = res.data.cronTimeMin;
                 this.cronStatus = res.data.cronStatus;
                 console.log("set Time Hour as:"+ this.cronTimeHour); 
                 console.log("set Time Min as:"+ this.cronTimeMin); 
-                console.log("cron Status :"+ this.cronStatus); 
+                console.log("Backend cronStatus :"+ this.cronStatus); 
+                })
+                .catch(error => {
+                console.log("handle error =>", error);
+                })
+              },
+
+            setCronSong(event){
+                this.cronIndexPi = event.target.selectedIndex - 1;
+                axios.post('/setCronSong',{"cronIndexPi":this.cronIndexPi}).then(res => {
+                this.cronIndexPi = res.data.cronIndexPi;
+                console.log(this.fileList[this.cronIndexPi]+" will be played");
                 })
                 .catch(error => {
                 console.log("handle error =>", error);
@@ -652,6 +665,7 @@ const vm = createApp({
               this.indexMax = this.fileList.length;
               this.volumePi= res.data.volumePi;
               this.volumePiMute= res.data.volumePiMute;
+              this.cronStatus= res.data.cronStatus;
               rn = this.getRandom(this.indexMax-1, 0);
               //rn = rn % this.indexMax;
               this.indexPc=rn;
@@ -660,10 +674,15 @@ const vm = createApp({
               console.log("filePc: "+this.filePc);
               console.log("filePi: "+this.filePi);
               console.log("musicPiPlaying: "+this.musicPiPlaying);
+              console.log("musicPiPlaying Type: "+typeof(this.musicPiPlaying));
               console.log("musicPiPlayMode: "+this.musicPiPlayMode);
+              console.log("musicPiPlayMode Type: "+typeof(this.musicPiPlayMode));
               console.log("radioPiPlayingNo: "+this.radioPiPlayingNo);
               console.log("volumePi: "+this.volumePi);
               console.log("volumePiMute: "+this.volumePiMute);
+              console.log("volumePiMute:Type  "+typeof(this.volumePiMute));
+              console.log("cronStatus: "+this.cronStatus);
+              console.log("cronStatus type: "+typeof(this.cronStatus));
               
               this.elementAudioPc = document.getElementById("audioPc");
               this.elementAudioBarPc = document.getElementById("audioBarPc");
