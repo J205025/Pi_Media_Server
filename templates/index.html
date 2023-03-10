@@ -20,7 +20,7 @@
 <div id="app" >
 
 <div class="title-container">
-    <div class="title" v-on:click="PCPIShow" ><p>Welcome to Music Server </p></div>
+    <div class="title" v-on:click="PCPIShow" v-model="timeDate"><p>Welcome to Music Server      %{timeDate}%</p></div>
 </div>
 
 <div id="PC" v-show="PCShow">
@@ -123,7 +123,7 @@
 
 <div class="button-container style="width="100vw;">
 <select v-on:Change="playIndexPc($event)">
-    <option type="button" class="key-button" style="font-size: 18px;" default value="-1">Please Select a Song to Play</option>
+    <option type="button" class="key-button" style="font-size: 18px;" default value="-1">請選擇要播放的歌曲</option>
     <option type="button" class="key-button" style="font-size: 18px" v-for="(file,index) in fileList" :key="index" value="file">  %{file}%</option>
 </select>
 </div>
@@ -228,14 +228,14 @@
 
 <div class="button-container" style="width: 80vw;">
 <select v-on:Change="playIndexPi($event)" style="direction:ltl">
-    <option type="button" class="key-button" style="font-size: 18px;" default value="-1">Please Select a Song to Play</option>
+    <option type="button" class="key-button" style="font-size: 18px;" default value="-1">請選擇要播放的歌曲</option>
     <option type="button" class="key-button" style="font-size: 18px" v-for="(file,index) in fileList" :key="index" value="file">  %{file}%</option>
 </select>
 </div>
 
-
+<hr>
 <div class="button-container" >
-    <button type="button" class="key-button" v-on:click="setCron" v-model="cronStatus"> %{cronStatus}%</button>
+    <button type="button" class="key-button" v-on:click="setCron"> 定時播放</button>
     <select id="cronHour" class="select-button">
         <option default value="0">Hour</option>
         <option value="05"> 05 </option>
@@ -275,13 +275,23 @@
     </select>
     </div>
 
+
 <div class="button-container" style="width: 100vw">
     <select id="cronSelIndexPi" v-on:Change="setCronSong($event)" style="direction:ltl">
     <option type="button" class="key-button" style="font-size: 18px;" default value="-1">請選一首要設定定時播放的曲目</option>
     <option type="button" class="key-button" style="font-size: 18px;" v-for="(file,index) in fileList" :key="index" value="file">  %{file}%</option>
 </select>
-
 </div>
+
+<div>
+ <div class="" v-if="cronStatus" v-model="cronTimeHour,cronTimeMin"><p> 設定定時播放 %{cronTimeHour}% : %{cronTimeMin}%</p></div>
+ <div class="" v-else v-model="cronTimeHour,cronTimeMin"><p> 無定時播放</p></div>
+ </div>
+ 
+<div class="banner-container">
+<div class="banner"><p style="font-size:24px" v-if="cronStatus" v-model="cronFilePi">%{cronFilePi}%</p></div>
+</div>
+
 </div>
 </div>
 <!------------------------------------------------------------------>

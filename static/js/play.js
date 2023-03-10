@@ -24,6 +24,7 @@ const vm = createApp({
                dir :"./static/assets/",
                filePc: '',
                filePi : '',
+               cronFilePi : '',
                indexPc : 0,
                indexPi : 0,
                indexMax : 0 ,
@@ -54,6 +55,7 @@ const vm = createApp({
                cronIndexPi:1,
                PCShow: true,
                PIShow: false,
+               timeDate: null,
                //broswer audio play src
                url01:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
                url02:"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -106,6 +108,8 @@ const vm = createApp({
             },
 
             continueMetaPi(){
+              tt = new Date();
+              this.timeDate = tt.toLocaleTimeString();
               if(this.musicPiPlaying == true){
               axios.post('/getMetaPi').then(res => {
               durationPi = res.data.durationPi;
@@ -526,6 +530,7 @@ const vm = createApp({
                 .catch(error => {
                 console.log("handle error =>", error);
                 })
+                //this.loading();
               },
             downPodcastFile(){
                 axios.post('/downPodcastFile2').then(res => {
@@ -539,14 +544,14 @@ const vm = createApp({
                 })
               },
             setCron(){
-              var Hour =document.getElementById("cronHour").value;
-              var Min =document.getElementById("cronMin").value;
-              this.cronIndexPi=document.getElementById("cronSelIndexPi").selectedIndex;
-              console.log("Hour:"+Hour);
-              console.log("Min:"+Hour);
-              this.cronStatus = ! this.cronStatus
+              let setHour =document.getElementById("cronHour").value;
+              let setMin =document.getElementById("cronMin").value;
+              console.log("setHour:"+setHour);
+              console.log("setMin:"+setHour);
+              this.cronStatus = ! this.cronStatus;
+              if(this.cronStatus == true){this.cronIndexPi=document.getElementById("cronSelIndexPi").selectedIndex;};
               console.log("frontend cronStatus:"+this.cronStatus);
-              axios.post('/setCron',{"cronStatus":this.cronStatus,"cronIndexPi":this.cronIndexPi,"Hour":Hour,"Min":Min}).then(res => {
+              axios.post('/setCron',{"cronStatus":this.cronStatus,"cronIndexPi":this.cronIndexPi,"setHour":setHour,"setMin":setMin}).then(res => {
                 this.cronTimeHour = res.data.cronTimeHour;
                 this.cronTimeMin = res.data.cronTimeMin;
                 this.cronStatus = res.data.cronStatus;
@@ -556,7 +561,11 @@ const vm = createApp({
                 })
                 .catch(error => {
                 console.log("handle error =>", error);
-                })
+                }
+                )
+                //this.loading();
+                this.cronIndexPi =document.getElementById("cronSelIndexPi").selectedIndex -1 ;
+                this.cronFilePi=this.fileList[this.cronIndexPi];
               },
 
             setCronSong(event){
@@ -564,6 +573,7 @@ const vm = createApp({
                 axios.post('/setCronSong',{"cronIndexPi":this.cronIndexPi}).then(res => {
                 this.cronIndexPi = res.data.cronIndexPi;
                 console.log(this.fileList[this.cronIndexPi]+" will be played");
+                this.cronFilePi=this.fileList[this.cronIndexPi];
                 })
                 .catch(error => {
                 console.log("handle error =>", error);
@@ -615,14 +625,6 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
               },
-           // GetMetaPi(){
-           //     axios.post('/getMetaPi').then(res => {
-           //     console.log("mGetMetaPi")
-           //     })
-           //     .catch(error => {
-           //     console.log("handle error =>", error);
-           //     })
-           //    },
             mVolSetPi(){
                 vol= this.elementVolBarPi.value-this.volumePi;
                 this.volCtlPi(vol);
@@ -657,15 +659,17 @@ const vm = createApp({
             loading(){
               axios.post('/').then(res => {
               this.indexPi=res.data.indexPi;
-              this.musicPiPlaying=res.data.musicPiPlaying;
-              this.playRatePi=res.data.playRatePi;
-              this.musicPiPlayMode=res.data.musicPiPlayMode;
+              this.musicPiPlaying = res.data.musicPiPlaying;
+              this.playRatePi = res.data.playRatePi;
+              this.musicPiPlayMode = res.data.musicPiPlayMode;
               this.fileList = res.data.fileList;
               this.radioPiPlayingNo = res.data.radioPiPlayingNo;   
               this.indexMax = this.fileList.length;
-              this.volumePi= res.data.volumePi;
-              this.volumePiMute= res.data.volumePiMute;
-              this.cronStatus= res.data.cronStatus;
+              this.volumePi = res.data.volumePi;
+              this.volumePiMute = res.data.volumePiMute;
+              this.cronStatus = res.data.cronStatus;
+              this.cronTimeHour = res.data.cronTimeHour;
+              this.cronTimeMin = res.data.cronTimeMin;
               rn = this.getRandom(this.indexMax-1, 0);
               //rn = rn % this.indexMax;
               this.indexPc=rn;
@@ -683,6 +687,8 @@ const vm = createApp({
               console.log("volumePiMute:Type  "+typeof(this.volumePiMute));
               console.log("cronStatus: "+this.cronStatus);
               console.log("cronStatus type: "+typeof(this.cronStatus));
+              console.log("set Time Hour as:"+ this.cronTimeHour); 
+              console.log("set Time Min as:"+ this.cronTimeMin); 
               
               this.elementAudioPc = document.getElementById("audioPc");
               this.elementAudioBarPc = document.getElementById("audioBarPc");

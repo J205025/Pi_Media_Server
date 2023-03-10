@@ -58,8 +58,8 @@ __return_code__ = None
 __playRatePi__ = 1
 __sleepTimePi__ = 5
 __timer_Sleep__ = None
-__cronTimeHour__ = '09'
-__cronTimeMin__ = '01',
+__cronTimeHour__ = '00'
+__cronTimeMin__ = '00',
 __cronStatus__= False,
 radioUrl={
           "url01":"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
@@ -152,6 +152,7 @@ def handlePlayPi(index):
     global __musicVlcInstance__
     global __vlcmedia__
     global __musicVlcPi__
+    global __musicPiPlaying__
     file = __dir__ + __fileList__[index]
     __musicVlcPi__.stop()
     __vlcmedia__  = __musicVlcInstance__.media_new(file)
@@ -524,6 +525,8 @@ def index():
     global __volumePiMute__
     global __playRatePi__
     global __cronStatus__
+    global __cronTimeHour__
+    global __cronTimeMin__
     if request.method == 'GET':
         __playRatePi__ = 1
         __musicVlcPi__.set_rate(__playRatePi__)
@@ -539,7 +542,9 @@ def index():
         "volumePiMute" : __volumePiMute__,
         "playRatePi" : __playRatePi__,
         "musicPiDuration":__musicVlcPiDuration__,
-        "cronStatus":__cronStatus__
+        "cronStatus":__cronStatus__,
+        "cronTimeHour":__cronTimeHour__,
+        "cronTimeMin":__cronTimeMin__
          })
     
 @app.route('/playPrePi', methods=['POST'])
@@ -851,13 +856,15 @@ def setCron():
     data=request.get_json()
     __cronStatus__=data["cronStatus"]
     __cronIndePi__=data["cronIndexPi"]
-    print(__cronStatus__)
+    print("__cronStatus: "+str(__cronStatus__))
     print(type(__cronStatus__))
     num=int(data["cronIndexPi"])
     file = __dir__ + __fileList__[num]
     print(file+"will be played")
-    __cronTimeHour__=int(data["Hour"])
-    __cronTimeMin__=int(data["Min"])
+    __cronTimeHour__=int(data["setHour"])
+    __cronTimeMin__=int(data["setMin"])
+    print("cronTimeHour: "+str(__cronTimeHour__))
+    print("cronTimeMin: "+str(__cronTimeMin__))
     if __cronStatus__ == False:
         scheduler.remove_job('my_task')
         __cronStatus__ = False
@@ -869,7 +876,7 @@ def setCron():
     return jsonify({
         "cronTimeHour" : __cronTimeHour__,
         "cronTimeMin" : __cronTimeMin__,
-        "cronStatus" : __cronStatus__,
+        "cronStatus" : __cronStatus__
          })
 
 @app.route('/setCronSong', methods=['POST'])
