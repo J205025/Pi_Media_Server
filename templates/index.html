@@ -130,9 +130,11 @@
 </select>
 </div>
 
+</div>
 
 
-<div id="PI" v-show="PIShow"> 
+<div id="PI" v-show="PIShow">
+
 <div class="section-container">
     <div class="section"><p>Audio Output to [ PI ] Speaker</p></div>
 </div>
@@ -219,9 +221,6 @@
     </select>
     </div>
 
-
-
-
 <div class="button-container">
     <button type="button" class="key-button" v-on:click="volCtlPi(-15)"><i class="fa fa-volume-low"></i></button>
     <button type="button" class="key-button" v-on:click="volCtlPi(15)"><i class="fa fa-volume-high"></i></button>
@@ -294,7 +293,6 @@
 <div class="banner"><p style="font-size:24px" v-if="cronStatus" v-model="cronFilePi">%{cronFilePi}%</p></div>
 </div>
 
-</div>
 </div>
 <!------------------------------------------------------------------>
 <div style="text-align:center">
