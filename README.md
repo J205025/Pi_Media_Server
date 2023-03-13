@@ -10,7 +10,7 @@ $ pip3 install virtualenv
 
 #Chceck Version
 $ virtualenv --version
-
+# add ubuntu group with "www-data"  
 #crear Virtual enviroment
 $ python3 -m venv .venv                     or      $ virtualenv venv ? 
 

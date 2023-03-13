@@ -887,17 +887,6 @@ def setCronSong():
     return jsonify({
         "cronIndexPi" : __cronIndexPi__
          })
-    
-    
-@scheduler.task('cron', id='myjoba', day='*', hour=__cronTimeHour__, minute="00", second='00')
-def myjoba():
-    global __cronStatus__
-    global __indexPi__
-    global __indexMax__
-    __indexPi__ = 7
-    if (__cronStatus__ == True):
-        handleSelectedPi()
-    print("myPlayJob executed")
 
 @scheduler.task('cron', id='myjobb', day='*', hour='06', minute='00', second='00')
 def myjobb():
