@@ -753,11 +753,54 @@ def volumeControlPi():
 def getMetaPi():
     global __musicVlcPiDuration__
     global __musicVlcPi__
+    global __indexPi__
+    global __volumePi__
+    global __volumePiMute__
+    global __musicPiPlaying__
+    
     musicVlcPiCurrent =__musicVlcPi__.get_time()
     __musicVlcPiDuration__ = __vlcmedia__.get_duration()
     return jsonify({
         "durationPi" : __musicVlcPiDuration__,
-        "currentPi" : musicVlcPiCurrent
+        "currentPi" : musicVlcPiCurrent,
+        "indexPi" : __indexPi__,
+        "volumePi" : __volumePi__,
+        "volumePiMute" : __volumePiMute__,
+        "musicPiPlaying" : __musicPiPlaying__
+         })
+@app.route('/refreshMetaPi', methods=['POST'])
+def refreshMetaPi():
+    global __dir__
+    global __fileList__
+    global __indexPi__
+    global __musicPiPlaying__ 
+    global __musicPiPlayMode__
+    global __radioPiPlayingNo__ 
+    global __volumePi__
+    global __volumePiMute__
+    global __playRatePi__
+    global __cronStatus__
+    global __cronTimeHour__
+    global __cronTimeMin__
+    global __musicVlcPiDuration__
+    global __musicVlcPi__
+    
+    musicVlcPiCurrent =__musicVlcPi__.get_time()
+    __musicVlcPiDuration__ = __vlcmedia__.get_duration()
+    return jsonify({
+        "fileList" : __fileList__,
+        "indexPi" : __indexPi__,
+        "musicPiPlaying" : __musicPiPlaying__,
+        "musicPiPlayMode" : __musicPiPlayMode__,
+        "radioPiPlayingNo" : __radioPiPlayingNo__,
+        "volumePi" : __volumePi__,
+        "volumePiMute" : __volumePiMute__,
+        "playRatePi" : __playRatePi__,
+        "musicPiDuration":__musicVlcPiDuration__,
+        "currentPi" : musicVlcPiCurrent,
+        "cronStatus":__cronStatus__,
+        "cronTimeHour":__cronTimeHour__,
+        "cronTimeMin":__cronTimeMin__
          })
     
 @app.route('/getFileList', methods=['POST'])

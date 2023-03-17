@@ -53,8 +53,8 @@ const vm = createApp({
                cronTimeMin :0,
                cronStatus: false,
                cronIndexPi:1,
-               PCShow: true,
-               PIShow: false,
+               PCShow: false,
+               PIShow: true,
                timeDate: null,
                //broswer audio play src
                url01:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
@@ -116,10 +116,25 @@ const vm = createApp({
               currentPi = res.data.currentPi;
               this.elementAudioBarPi.max= durationPi/1000;
               this.elementAudioBarPi.value= currentPi/1000;
+              this.indexPi = res.data.indexPi;
+              this.filePi= this.fileList[this.indexPi];
               document.getElementById("startTextPi").textContent=this.calCurrentTime(currentPi/1000);
               console.log(this.calCurrentTime(currentPi/1000));
               document.getElementById("endTextPi").textContent=this.calTotalTime(durationPi/1000);
               console.log(this.calTotalTime(durationPi/1000));
+              
+
+
+             // this.volumePi = res.data.volumePi;
+             // this.volumePiMute= res.data.volumePiMute;
+             // this.elementVolBarPi = document.getElementById("volBarPi");
+             // this.elementVolBarPi.value = this.volumePi;
+             // document.getElementById("volTextPi").textContent=(this.volumePi).toString();
+
+
+
+
+
                })
               .catch(error => {
               console.log("handle error =>", error);
@@ -715,6 +730,8 @@ const vm = createApp({
               this.element20Pc = document.getElementById("sel20Pc");
               this.element30Pc = document.getElementById("sel30Pc");
 
+              setInterval(this.refreshPiData, 10000);
+
               if(this.radioPiPlayingNo==0){
                 this.element10Pi.value = "0"
                 this.element20Pi.value = "0"
@@ -736,8 +753,50 @@ const vm = createApp({
                 this.element30Pi.value = this.radioPiPlayingNo
               }
                   });
+
                },
+            refreshPiData(){
+                //when pi stop playing, use this function to continue refresh metadata
+                console.log("refreshData funtcion works");
+                //this.loading();
+              axios.post('/refreshMetaPi').then(res => {
+                this.indexPi=res.data.indexPi;
+                this.musicPiPlaying = res.data.musicPiPlaying;
+                this.playRatePi = res.data.playRatePi;
+                this.musicPiPlayMode = res.data.musicPiPlayMode;
+                this.fileList = res.data.fileList;
+                this.radioPiPlayingNo = res.data.radioPiPlayingNo;   
+                this.indexMax = this.fileList.length;
+                this.volumePi = res.data.volumePi;
+                this.volumePiMute = res.data.volumePiMute;
+                this.cronStatus = res.data.cronStatus;
+                this.cronTimeHour = res.data.cronTimeHour;
+                this.cronTimeMin = res.data.cronTimeMin;
+                durationPi = res.data.durationPi;
+                currentPi = res.data.currentPi;
+                this.elementAudioBarPi.max= durationPi/1000;
+                this.elementAudioBarPi.value= currentPi/1000;
+                this.filePi= this.fileList[this.indexPi];
+                if(this.musicPcPlaying == true){
+                document.getElementById("startTextPi").textContent=this.calCurrentTime(currentPi/1000);
+                console.log(this.calCurrentTime(currentPi/1000));
+                document.getElementById("endTextPi").textContent=this.calTotalTime(durationPi/1000);
+                }
+                this.volumePi = res.data.volumePi;
+                this.volumePiMute= res.data.volumePiMute;
+                this.elementVolBarPi = document.getElementById("volBarPi");
+                this.elementVolBarPi.value = this.volumePi;
+                document.getElementById("volTextPi").textContent=(this.volumePi).toString();
+               })
+              .catch(error => {
+              console.log("handle error =>", error);
+               })
+
+               }
           },
+  computed:{
+
+          },        
   mounted(){
               this.loading();
 
