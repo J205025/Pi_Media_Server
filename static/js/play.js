@@ -53,9 +53,11 @@ const vm = createApp({
                cronTimeMin :0,
                cronStatus: false,
                cronIndexPi:1,
-               PCShow: false,
-               PIShow: true,
+               PCShow: true,
+               PIShow: false,
                timeDate: null,
+               albumStringPc: "",
+               albumStringPi: "",
                //broswer audio play src
                url01:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
                url02:"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -122,19 +124,11 @@ const vm = createApp({
               console.log(this.calCurrentTime(currentPi/1000));
               document.getElementById("endTextPi").textContent=this.calTotalTime(durationPi/1000);
               console.log(this.calTotalTime(durationPi/1000));
-              
-
-
              // this.volumePi = res.data.volumePi;
              // this.volumePiMute= res.data.volumePiMute;
              // this.elementVolBarPi = document.getElementById("volBarPi");
              // this.elementVolBarPi.value = this.volumePi;
              // document.getElementById("volTextPi").textContent=(this.volumePi).toString();
-
-
-
-
-
                })
               .catch(error => {
               console.log("handle error =>", error);
@@ -157,13 +151,13 @@ const vm = createApp({
               console.log(ts);
               this.sleepTimerPc=setTimeout(this.stopPlayingPc,ts)
              },
-             stopPlayingPc(){
+            stopPlayingPc(){
               this.elementAudioPc.pause();
               this.musicPcPlaying = false;
               this.elementRadioPc.pause();
               this.radioPcPlayingNo = 0;
              },
-             playSelectedPc(){
+            playSelectedPc(){
                 num=this.num4dPc.join("");
                 console.log("current keyno is: "+num);
                 this.indexPc= num % this.indexMax;
@@ -181,7 +175,7 @@ const vm = createApp({
                 this.num4dPc[3]=0;
                 this.keytimerPcRunning = false;
              },
-             playIndexPc(event){
+            playIndexPc(event){
                 this.indexPc = event.target.selectedIndex - 1;
                 this.filePc=this.fileList[this.indexPc];
                 dirfilePc=this.dir+this.fileList[this.indexPc];
@@ -191,11 +185,11 @@ const vm = createApp({
                 this.elementAudioPc.play();
                 this.musicPcPlaying = true;
              },
-             setPlayModePc(){
+            setPlayModePc(){
                 this.musicPcPlayMode = this.musicPcPlayMode +1
                 this.musicPcPlayMode = this.musicPcPlayMode % 2;
              },
-             keyInputPc(keyno){
+            keyInputPc(keyno){
                 if(this.keytimerPcRunning == true){
                   clearTimeout(this.keytimerPc);
                   this.keytimerPcRunning = false;
@@ -270,7 +264,7 @@ const vm = createApp({
                 console.log(this.filePc);
                 console.log("playNextPc works");
               },
-             setPlayRatePc(){
+            setPlayRatePc(){
                 this.playRatePc = this.playRatePc +0.5;
                 if (this.playRatePc > 2.5){
                     this.playRatePc = 0.5;
@@ -389,7 +383,7 @@ const vm = createApp({
                 this.keytimerPi=setTimeout(this.playSelectedPi,3000);
                 this.keytimerPiRunning = true;
               },
-             setPlayRatePi(){
+            setPlayRatePi(){
                 axios.post('/setPlayRatePi').then(res => {
                 this.playRatePi = res.data.playRatePi;
                 })
@@ -397,7 +391,7 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
              },
-             setPlayModePi(mode){
+            setPlayModePi(mode){
                 this.musicPiPlayMode = this.musicPiPlayMode + 1;
                 this.musicPiPlayMode = this.musicPiPlayMode % 2;
                 mode = this.musicPiPlayMode
@@ -422,7 +416,7 @@ const vm = createApp({
                 console.log("works setSleepTimePi");
                 })
              },
-             playPausePi(){
+            playPausePi(){
                 axios.post('/playPausePi').then(res => {
                 this.musicPiPlaying = res.data.musicPiPlaying; 
                 this.indexPi = res.data.indexPi;
@@ -434,7 +428,7 @@ const vm = createApp({
                 console.log("handle error =>", error);
                 })
            	  },
-             playPrePi(){
+            playPrePi(){
                 axios.post('/playPrePi').then(res => {
                 this.indexPi = res.data.indexPi;
                 this.filePi = this.fileList[res.data.indexPi];
@@ -730,7 +724,7 @@ const vm = createApp({
               this.element20Pc = document.getElementById("sel20Pc");
               this.element30Pc = document.getElementById("sel30Pc");
 
-              setInterval(this.refreshPiData, 10000);
+            setInterval(this.refreshPiData, 10000);
 
               if(this.radioPiPlayingNo==0){
                 this.element10Pi.value = "0"
@@ -795,11 +789,35 @@ const vm = createApp({
                }
           },
   computed:{
-
+            songPc(){
+              let str= this.filePc;
+              let index= str.lastIndexOf("/");
+              this.albumStringPc = str.substring(0, index); 
+              let str2 = str.substring(index + 1);
+              return str2;
+               },
+            songPi(){
+              let str= this.filePi;
+              let index= str.lastIndexOf("/");
+              this.albumStringPi = str.substring(0, index); 
+              let str2 = str.substring(index + 1);
+              return str2;
+               },
+            albumPc(){
+              let str= this.albumStringPc;
+              let index= str.lastIndexOf("/");
+              let str2 = str.substring(index + 1);
+              return str2;
+               },
+            albumPi(){
+              let str= this.albumStringPi;
+              let index= str.lastIndexOf("/");
+              let str2 = str.substring(index + 1);
+              return str2;
+               }
           },        
   mounted(){
               this.loading();
-
           }
 
        })
