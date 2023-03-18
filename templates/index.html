@@ -123,7 +123,7 @@
 <div class="button-container style="width="100vw;">
 <select v-on:Change="playIndexPc($event)">
     <option type="button" class="key-button" style="font-size: 18px;width:auto" default value="-1">請選擇要播放的歌曲</option>
-    <option type="button" class="key-button" style="font-size: 18px;width:auto" v-for="(file,index) in fileList" :key="index" value="file">%{file}%</option>
+    <option type="button" class="key-button" style="font-size: 18px;width:auto" v-for="(file,index) in modfileList" :key="index" value="file">%{file}%</option>
 </select>
 </div>
 
@@ -228,7 +228,7 @@
 <div class="button-container" style="width: 80vw;">
 <select v-on:Change="playIndexPi($event)">
     <option type="button" class="key-button" style="font-size: 18px;width:auto" default value="-1">請選擇要播放的歌曲</option>
-    <option type="button" class="key-button" style="font-size: 18pxwidth:auto" v-for="(file,index) in fileList" :key="index" value="file">%{file}%</option>
+    <option type="button" class="key-button" style="font-size: 18px;width:auto" v-for="(file,index) in modfileList" :key="index" value="file">%{file}%</option>
 </select>
 </div>
 
@@ -278,7 +278,7 @@
 <div class="button-container" style="width: 80vw">
     <select id="cronSelIndexPi" v-on:Change="setCronSong($event)">
     <option type="button" class="key-button" style="font-size: 18px;width:auto" default value="-1">請選一首要設定定時播放的曲目</option>
-    <option type="button" class="key-button" style="font-size: 18px;width:auto" v-for="(file,index) in fileList" :key="index" value="file">  %{file}%</option>
+    <option type="button" class="key-button" style="font-size: 18px;width:auto" v-for="(file,index) in modfileList" :key="index" value="file">  %{file}%</option>
 </select>
 </div>
 

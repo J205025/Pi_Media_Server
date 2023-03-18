@@ -21,6 +21,7 @@ const vm = createApp({
                playRatePc : 1 ,
                playRatePi : 1 ,
                fileList : [],
+               modfileList : [],
                dir :"./static/assets/",
                filePc: '',
                filePi : '',
@@ -524,6 +525,7 @@ const vm = createApp({
                 this.indexPc=rn;
                 this.filePc=this.fileList[rn];
                 this.filePi=this.fileList[this.indexPi];
+                this.calfileList();
               },
             getFileList(style){
                 document.getElementById("audioPc").pause();
@@ -664,6 +666,18 @@ const vm = createApp({
                 this.PCShow = !this.PCShow;
                 this.PIShow = !this.PIShow;
               },
+            calfileList() {
+               let arr = this.fileList;
+               let newArr = arr.map((str) => {
+               let index = str.lastIndexOf("/");
+               let str1 = str.substring(0, index);
+               let str2 = str.substring(index + 1);
+               let index2 = str1.lastIndexOf("/");
+               let str3 = str1.substring(index2 + 1);
+               return str3+"---"+str2;
+                 });
+                this.modfileList = newArr;
+              },
               //--------------------------------------------------------------------------------------------------
             loading(){
               axios.post('/').then(res => {
@@ -716,7 +730,7 @@ const vm = createApp({
               this.elementVolBarPi.value = this.volumePi;
               this.continuePlayingPc();
               this.continueMetaPi();
-
+              this.calfileList();
               this.element10Pi = document.getElementById("sel10Pi");
               this.element20Pi = document.getElementById("sel20Pi");
               this.element30Pi = document.getElementById("sel30Pi");
