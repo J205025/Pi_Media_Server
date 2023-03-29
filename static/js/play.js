@@ -69,7 +69,7 @@ const vm = createApp({
                url07:"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
                url08:"https://icrt.leanstream.co/ICRTFM-MP3?args=web",
                url09:"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_two",
-               url10:"http://192.168.1.146:8000/stream.ogg",
+               url10:"http://123.240.63.18:8000/stream.ogg",
                url11:"http://onair.family977.com.tw:8000/live.file",
                url12:"https://n09.rcs.revma.com/aw9uqyxy2tzuv?rj-ttl=5&rj-tok=AAABhZollCEACdvxzVVN61ARVg",
                url13:"https://n10.rcs.revma.com/ndk05tyy2tzuv?rj-ttl=5&rj-tok=AAABhZouFPAAQudE3-49-1PFHQ",
