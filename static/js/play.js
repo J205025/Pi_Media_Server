@@ -59,6 +59,7 @@ const vm = createApp({
                timeDate: null,
                albumStringPc: "",
                albumStringPi: "",
+               cronAlbumStringPi: "",
                //broswer audio play src
                url01:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
                url02:"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -525,6 +526,7 @@ const vm = createApp({
                 this.indexPc=rn;
                 this.filePc=this.fileList[rn];
                 this.filePi=this.fileList[this.indexPi];
+                this.cronFilePi=this.fileList[this.cronIndexPi];
                 this.calfileList();
               },
             getFileList(style){
@@ -534,6 +536,7 @@ const vm = createApp({
                 axios.post('/getFileList',{"style":style}).then(res => {
                 this.fileList = res.data.fileList;
                 this.indexPi = res.data.indexPi;
+                this.cronIndexPi = res.data.cronIndexPi;
                 this.refreshList();
                 console.log(this.fileList);
                 console.log("FileList Refresh");
@@ -693,6 +696,8 @@ const vm = createApp({
               this.cronStatus = res.data.cronStatus;
               this.cronTimeHour = res.data.cronTimeHour;
               this.cronTimeMin = res.data.cronTimeMin;
+              this.cronIndexPi = res.data.cronIndexPi;
+              this.cronFilePi= this.fileList[this.cronIndexPi];
               rn = this.getRandom(this.indexMax-1, 0);
               //rn = rn % this.indexMax;
               this.indexPc=rn;
@@ -780,6 +785,8 @@ const vm = createApp({
                 this.cronStatus = res.data.cronStatus;
                 this.cronTimeHour = res.data.cronTimeHour;
                 this.cronTimeMin = res.data.cronTimeMin;
+                this.cronIndexPi = res.data.cronIndexPi;
+                this.cronFilePi= this.fileList[this.cronIndexPi];
                 durationPi = res.data.durationPi;
                 currentPi = res.data.currentPi;
                 this.elementAudioBarPi.max= durationPi/1000;
@@ -825,6 +832,19 @@ const vm = createApp({
                },
             albumPi(){
               let str= this.albumStringPi;
+              let index= str.lastIndexOf("/");
+              let str2 = str.substring(index + 1);
+              return str2;
+               },
+            cronSongPi(){
+              let str= this.cronFilePi;
+              let index= str.lastIndexOf("/");
+              this.cronAlbumStringPi = str.substring(0, index); 
+              let str2 = str.substring(index + 1);
+              return str2;
+               },
+            cronAlbumPi(){
+              let str= this.cronAlbumStringPi;
               let index= str.lastIndexOf("/");
               let str2 = str.substring(index + 1);
               return str2;

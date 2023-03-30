@@ -527,6 +527,7 @@ def index():
     global __cronStatus__
     global __cronTimeHour__
     global __cronTimeMin__
+    global __cronIndexPi__
     if request.method == 'GET':
         __playRatePi__ = 1
         __musicVlcPi__.set_rate(__playRatePi__)
@@ -544,7 +545,8 @@ def index():
         "musicPiDuration":__musicVlcPiDuration__,
         "cronStatus":__cronStatus__,
         "cronTimeHour":__cronTimeHour__,
-        "cronTimeMin":__cronTimeMin__
+        "cronTimeMin":__cronTimeMin__,
+        "cronIndexPi":__cronIndexPi__
          })
     
 @app.route('/playPrePi', methods=['POST'])
@@ -751,6 +753,7 @@ def volumeControlPi():
     
 @app.route('/getMetaPi', methods=['POST'])
 def getMetaPi():
+    global __fileList__
     global __musicVlcPiDuration__
     global __musicVlcPi__
     global __indexPi__
@@ -782,6 +785,7 @@ def refreshMetaPi():
     global __cronStatus__
     global __cronTimeHour__
     global __cronTimeMin__
+    global __cronIndexPi__
     global __musicVlcPiDuration__
     global __musicVlcPi__
     
@@ -800,7 +804,8 @@ def refreshMetaPi():
         "currentPi" : musicVlcPiCurrent,
         "cronStatus":__cronStatus__,
         "cronTimeHour":__cronTimeHour__,
-        "cronTimeMin":__cronTimeMin__
+        "cronTimeMin":__cronTimeMin__,
+        "cronIndexPi":__cronIndexPi__
          })
     
 @app.route('/getFileList', methods=['POST'])
@@ -808,13 +813,15 @@ def getFileList():
     global __fileList__
     global __musicPiPlaying__
     global __indexPi__
+    global __cronIndexPi__
     data=request.get_json()
     style=int(data["style"])
     genFileList_sh(style)
     return jsonify({
         "fileList" : __fileList__,
         "musicPiPlaying" : __musicPiPlaying__,
-        "indexPi":__indexPi__
+        "indexPi":__indexPi__,
+        "cronIndexPi":__cronIndexPi__
          })
     
 @app.route('/downPodcastFile', methods=['POST'])
