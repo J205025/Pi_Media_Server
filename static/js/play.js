@@ -44,10 +44,10 @@ const vm = createApp({
                volumePcMute : false,
                volumePiMute : false,
                downStatus : false,
-               sleepTimePc: 5,
+               sleepTimePc: 0,
                sleepTimePcShow: "No ",
                sleepTimerPc: null,
-               sleepTimePi: 5,
+               sleepTimePi: 0,
                sleepTimePiShow: "No ",
                sleepTimerPi: null,
                cronTimeHour: 6,
@@ -139,15 +139,14 @@ const vm = createApp({
               setTimeout(this.continueMetaPi,1*1000);
               },
             setSleepTimePc(){
-              a=[10,20,30,1000];
-              clearTimeout(this.sleepTimer);
-              this.sleepTimePc = this.sleepTimePc + 1
-              if(this.sleepTimePc> 3 ){ this.sleepTimePc = 0};
+              a=[9999,10,20,30];
+              clearTimeout(this.sleepTimerPc);
+              this.sleepTimePc = (this.sleepTimePc + 1) % 4
               switch (this.sleepTimePc) {
-                      case 0 : { this.sleepTimePcShow = "10 min";  break;}
-                      case 1 : { this.sleepTimePcShow = "20 min";  break;}
-                      case 2 : { this.sleepTimePcShow = "30 min";  break;}
-                      case 3 : { this.sleepTimePcShow = "No";  break;}
+                      case 0 : { this.sleepTimePcShow = "No Sleep";  break;}
+                      case 1 : { this.sleepTimePcShow = "10 min";  break;}
+                      case 2 : { this.sleepTimePcShow = "20 min";  break;}
+                      case 3 : { this.sleepTimePcShow = "30 min";  break;}
                      }
               ts=a[this.sleepTimePc]*1000*60;
               console.log(ts);
@@ -416,10 +415,10 @@ const vm = createApp({
                 this.musicPiPlaying = res.data.musicPiPlaying; 
                 this.radioPiPlayingNo = res.data.radioPiPlayingNo; 
               switch (this.sleepTimePi) {
-                case 0 : { this.sleepTimePiShow = "10 min";  break;}
-                case 1 : { this.sleepTimePiShow = "20 min";  break;}
-                case 2 : { this.sleepTimePiShow = "30 min";  break;}
-                case 3 : { this.sleepTimePiShow = "No ";  break;}
+                case 0 : { this.sleepTimePiShow = "No Sleep ";  break;}
+                case 1 : { this.sleepTimePiShow = "10 min";  break;}
+                case 2: { this.sleepTimePiShow = "20 min";  break;}
+                case 3 : { this.sleepTimePiShow = "30 min";  break;}
                      }
                 console.log("works setSleepTimePi");
                 })

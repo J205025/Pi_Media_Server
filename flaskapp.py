@@ -56,11 +56,11 @@ __down_thread__ = None
 __downStatus__ = False
 __return_code__ = None
 __playRatePi__ = 1
-__sleepTimePi__ = 5
+__sleepTimePi__ = 0
 __timer_Sleep__ = None
 __cronTimeHour__ = '00'
-__cronTimeMin__ = '00',
-__cronStatus__= False,
+__cronTimeMin__ = '00'
+__cronStatus__= False
 radioUrl={
           "url01":"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
           "url02":"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -885,10 +885,8 @@ def setSleepTimePi():
     global __radioPiPlayingNo__
     global __sleepTimePi__
     global __timer_Sleep__
-    __sleepTimePi__ = __sleepTimePi__ + 1
-    if(__sleepTimePi__> 3 ):
-        __sleepTimePi__ = 0
-    a= [10,20,30,1000]
+    __sleepTimePi__ = (__sleepTimePi__ + 1 ) % 4
+    a= [999,10,20,30]
     if (__timer_Sleep__ != None):
         __timer_Sleep__.cancel()
     __timer_Sleep__= threading.Timer( a[__sleepTimePi__]*60 , stopPlaying)
