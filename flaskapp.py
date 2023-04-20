@@ -207,10 +207,12 @@ def handleNextPi():
     #global __musicPiPlayMode__
     if (__musicPiPlayMode__ == 1):
         __indexPi__ = random.randrange(__indexMax__)
-    else:
+    elif(__musicPiPlayMode__ == 0):
         __indexPi__ = __indexPi__ + 1
         if (__indexPi__ == __indexMax__):
             __indexPi__ = 0; 
+    else:
+        __indexPi__ = __indexPi__
     #file = __dir__ + __fileList__[__indexPi__]
     handlePlayPi(__indexPi__)
     #__musicVlcPi__.stop()
@@ -232,10 +234,12 @@ def handlePrePi():
     #global __musicPiPlaying__
     if (__musicPiPlayMode__ == 1):
         __indexPi__ = random.randrange(__indexMax__)
-    else:
+    if (__musicPiPlayMode__ == 0):
         __indexPi__ = __indexPi__ - 1
-    if (__indexPi__ < 0):
-       __indexPi__= __indexMax__ - 1
+        if (__indexPi__ < 0):
+           __indexPi__= __indexMax__ - 1
+    else:
+        __indexPi__ = __indexPi__
     #file = __dir__ + __fileList__[__indexPi__]
     handlePlayPi(__indexPi__)
     #__vlcmedia__  = __musicVlcInstance__.media_new(file)

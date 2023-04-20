@@ -189,7 +189,7 @@ const vm = createApp({
              },
             setPlayModePc(){
                 this.musicPcPlayMode = this.musicPcPlayMode +1
-                this.musicPcPlayMode = this.musicPcPlayMode % 2;
+                this.musicPcPlayMode = this.musicPcPlayMode % 3;
              },
             keyInputPc(keyno){
                 if(this.keytimerPcRunning == true){
@@ -227,8 +227,11 @@ const vm = createApp({
                 rn = this.getRandom(this.indexMax-1, 0);
                 this.indexPc = rn
                   }
-                else{
+                else if(this.musicPcPlayMode==0){
                 this.indexPc = this.indexPc - 1;
+                  }
+                else{
+                this.indexPc = this.indexPc;
                   }
                 if(this.indexPc < 0){
                   this.indexPc = this.indexMax - 1;
@@ -248,8 +251,11 @@ const vm = createApp({
                 rn = this.getRandom(this.indexMax-1, 0);
                 this.indexPc = rn
                   }
-                else{
+                else if(this.musicPcPlayMode==0){
                 this.indexPc = this.indexPc + 1;
+                  }
+                else{
+                this.indexPc = this.indexPc;
                   }
                 if(this.indexPc >= this.indexMax){
                   this.indexPc = 0;
@@ -395,7 +401,7 @@ const vm = createApp({
              },
             setPlayModePi(mode){
                 this.musicPiPlayMode = this.musicPiPlayMode + 1;
-                this.musicPiPlayMode = this.musicPiPlayMode % 2;
+                this.musicPiPlayMode = this.musicPiPlayMode % 3;
                 mode = this.musicPiPlayMode
                 axios.post('/setPlayModePi',{"mode":mode}).then(res => {
                 this.musicPiPlayMode = res.data.musicPiPlayMode;
