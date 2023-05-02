@@ -2,7 +2,7 @@
 from datetime import date,timedelta,datetime 
 import getpodcast
 
-N = 3
+N = 7
 Ndays_ago = date.today()- timedelta(days=N)
 Ndays_ago.strftime("%Y-%m-%d")
 opt = getpodcast.options(

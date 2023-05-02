@@ -93,9 +93,6 @@ const vm = createApp({
                url30:"http://media-ice.musicradio.com:80/ClassicFMMP3"
                 }
           },
-               computed: {
-             total() { return this.filePc }
-          },
   methods:{
             getRandom(min,max){
               return Math.floor(Math.random()*(max-min+1))+min;
