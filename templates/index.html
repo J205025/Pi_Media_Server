@@ -289,12 +289,13 @@
 </div>
 
 <div style="text-align:center">
- <div class="" v-if="cronStatus" v-model="cronTimeHour,cronTimeMin"><p> 設定定時播放 %{cronTimeHour}% : %{cronTimeMin}%</p></div>
- <div class="" v-else><p> 無定時播放</p></div>
+ <div class="" v-if="cronStatus" v-model="cronTimeHour,cronTimeMin"><p style="font-size:22px; color:rgb(13, 202, 70)"> 設定定時播放 %{cronTimeHour}% : %{cronTimeMin}%</p></div>
+ <div class="" v-else><p style="font-size:22px; color:rgb(46, 201, 26)"> 無定時播放</p></div>
  </div>
  
 <div class="banner-container">
-<div class="banner"><p style="font-size:24px" v-if="cronStatus" v-model="cronAlbumPi,cronSongPi">%{cronAlbumPi}% -- %{cronSongPi}%</p></div>
+<div class="banner"><p style="font-size:24px" v-if="cronStatus" v-model="cronAlbumPi">%{cronAlbumPi}%</p></div>
+<div class="banner"><p style="font-size:24px" v-if="cronStatus" v-model="cronSongPi">%{cronSongPi}%</p></div>
 </div>
 
 </div>

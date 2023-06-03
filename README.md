@@ -51,3 +51,14 @@ $ find . -name "* *" -type f | rename 's/ /_/g'
 -----------------------------------------------------
 # Description 
 Music player with 1. play on client_PC and 2. play on server_Raspberry  of the Server music Files
+
+
+
+# mount mp3 USB Drive to /media/usb1/
+$sudo lsblk -o NAME,FSTYPE,UUID,MOUNTPOINTS
+$ sudo vi /etc/fstab
+/dev/sda1: UUID="E654-E418" BLOCK_SIZE="512" TYPE="vfat"
+ sudo  mount -o iocharset=utf8 /dev/sda1 /media/usb-drive/
+UUID=E654-E418 /media/usb1/ vfat umask=0022,gid=1000,uid=1000,iocharset=utf8  0	0
+sudo findmnt --verify
+
