@@ -24,8 +24,8 @@ import vlc
 #------------------------------------------------------------------
 __dir__ = "./static/assets/"
 __fileList__ = []
-#                 0     1         2      3     4      5       6       7       8       9     10      11      12       13     14    15    16    17     18   19
-__typeList__ = ["all","podcast","國語","台語","古典","張學友","劉德華","方宥心","原子邦妮","日語","周杰倫","鄭進一","原子邦妮","英語","pop","pop","pop","pop","紅樓夢","佛說"] 
+#                 0     1         2      3     4         5       6        7         8        9     10         11       12        13     14     15    16     17     18    19
+__typeList__ = ["all","podcast","國語","台語","古典","張學友","劉德華","方宥心","原子邦妮","日語","周杰倫","鄭進一","原子邦妮","英語","流行","其它","pop","pop","紅樓夢","佛說"] 
 __fileList_Rn__ = []
 __indexMax__ = 0
 __indexPi__ = 1
@@ -49,7 +49,7 @@ __musicPiPlaying__ = False
 __radioPiPlayingNo__ =  0
 __volumePi__ = 65
 __volumePiMute__ = False
-__musicPiPlayMode__ = 0
+__musicPiPlayMode__ = 1
 __down_thread__ = None
 __downStatus__ = False
 __return_code__ = None
@@ -884,8 +884,8 @@ def setSleepTimePi():
     global __radioPiPlayingNo__
     global __sleepTimePi__
     global __timer_Sleep__
-    __sleepTimePi__ = (__sleepTimePi__ + 1 ) % 4
-    a= [999,10,20,30]
+    __sleepTimePi__ = (__sleepTimePi__ + 1 ) % 6
+    a= [999,10,20,30,40,50]
     if (__timer_Sleep__ != None):
         __timer_Sleep__.cancel()
     __timer_Sleep__= threading.Timer( a[__sleepTimePi__]*60 , stopPlaying)

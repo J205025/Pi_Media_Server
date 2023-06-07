@@ -97,7 +97,7 @@
         <option value="16">中廣新聞網</option>
         <option value="17">BBC Radio 3</option>
         <option value="18">BBC Radio 4</option>
-        <option value="19">BBC Radio 6Music </option>
+        <option value="19">BBC Radio 6 Music </option>
         <option value="20">Classic FM</option>
     </select>
     <select id="sel30Pc" class="select-button"  v-on:Change="playRadioPc($event)">
@@ -301,24 +301,74 @@
 </div>
 <!------------------------------------------------------------------>
 <div style="text-align:center">
-<button type="button" v-on:click="getFileList(0)">全  部</button>
-<button type="button" v-on:click="getFileList(2)">國  語</button>
-<button type="button" v-on:click="getFileList(3)">台  語</button>
-<button type="button" v-on:click="getFileList(13)">英  語</button>
-<button type="button" v-on:click="getFileList(9)">日  語</button>
-<button type="button" v-on:click="getFileList(4)">古  典</button>
-<button type="button" v-on:click="getFileList(1)">播  客</button>
+<button type="button" v-on:click="getFileList(0)" style="width:4em;height:2em">全  部</button>
 </div>
+
+&nbsp;
+<!------->
+<div>
 <div style="text-align:center">
-<button type="button" v-on:click="getFileList(5)">張學友</button>
-<button type="button" v-on:click="getFileList(6)">劉德華</button>
-<button type="button" v-on:click="getFileList(7)">方宥心</button>
-<button type="button" v-on:click="getFileList(18)">紅樓夢</button>
-<button type="button" v-on:click="getFileList(19)">佛  說</button>
+<button type="button" v-on:click="getFileList(2)" style="width:6em;height:2em">國  語</button>
+<b>--</b>
+<button type="button" v-on:click="getFileList(5)" style="width:6em;height:2em">張學友</button>
+<button type="button" v-on:click="getFileList(6)" style="width:6em;height:2em">劉德華</button>
+<b> ...</b>
 </div>
+
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(3)" style="width:6em;height:2em">台  語</button>
+<b>--</b>
+<button type="button" v-on:click="getFileList(7)" style="width:6em;height:2em">方宥心</button>
+<button type="button" v-on:click="getFileList(0)" style="width:6em;height:2em">      </button>
+<b> ...</b>
+</div>
+
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(9)" style="width:6em;height:2em">日  語</button>
+<b>--</b>
+<button type="button" v-on:click="getFileList(0)" style="width:6em;height:2em">      </button>
+<button type="button" v-on:click="getFileList(0)" style="width:6em;height:2em">      </button>
+<b> ...</b>
+</div>
+
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(13)" style="width:6em;height:2em">英  語</button>
+<b>--</b>
+<button type="button" v-on:click="getFileList(0)" style="width:6em;height:2em">      </button>
+<button type="button" v-on:click="getFileList(0)" style="width:6em;height:2em">      </button>
+<b> ...</b>
+</div>
+
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(14)" style="width:6em;height:2em">流  行</button>
+<b>--</b>
+<button type="button" v-on:click="getFileList(0)" style="width:6em;height:2em">      </button>
+<button type="button" v-on:click="getFileList(0)" style="width:6em;height:2em">      </button>
+<b> ...</b>
+</div>
+
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(1)" style="width:6em;height:2em">播  客</button>
+<b>--</b>
+<button type="button" v-on:click="getFileList(0)" style="width:6em;height:2em">      </button>
+<button type="button" v-on:click="getFileList(0)" style="width:6em;height:2em">      </button>
+<b> ...</b>
+</div>
+
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(15)" style="width:6em;height:2em">其  它</button>
+<b>--</b>
+<button type="button" v-on:click="getFileList(18)" style="width:6em;height:2em">紅樓夢</button>
+<button type="button" v-on:click="getFileList(19)" style="width:6em;height:2em">佛  說</button>
+<b> ...</b>
+</div>
+
+</div>
+<!------->
+&nbsp;
 &nbsp;
 <div style="text-align:center">
-<button type="button" v-on:click="downPodcastFile($event)">播客下載</button>
+<button type="button" v-on:click="downPodcastFile($event)" style="width:8em;height:2em">播客下載</button>
 </div>
 
 </div>

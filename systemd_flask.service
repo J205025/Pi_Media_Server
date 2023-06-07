@@ -8,7 +8,8 @@ Group=www-data
 WorkingDirectory=/home/ubuntu/Pi_Media_Server
 Environment="PATH=/home/ubuntu/Pi_Media_Server/.venv/bin"
 ExecStart=/home/ubuntu/Pi_Media_Server/.venv/bin/gunicorn -c gunicorn_cfg.py flaskapp:app
-#ExecStart=/home/ubuntu/Pi_Media_Server/.venv/bin/gunicorn --workers 1 --threads 4 --worker-class gevent --bind unix:/home/ubuntu/Pi_Media_Server/flaskapp.sock -m 777 flaskapp:app
+#ExecStart=/home/ubuntu/Pi_Media_Server/.venv/bin/gunicorn --workers 1 --threads 4 --bind unix:/home/ubuntu/Pi_Media_Server/flaskapp.sock -m 777 flaskapp:app
+#ExecStart=/home/ubuntu/Pi_Media_Server/.venv/bin/gunicorn --workers 1 --bind unix:flaskapp.sock -m 007 flaskapp:app 
 Restart=always
 RestartSec=10
 [Install]
