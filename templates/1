@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" >
+<title>Music Server</title>
+<!--link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" type="text/css"-->
+<!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"-->
+<link rel="stylesheet" href="./static/css/bootstrap.min.css" type="text/css">
+<link rel="stylesheet" href="./static/css/all.min.css" type="text/css">
+<link rel="stylesheet" href="./static/css/style.css" type="text/css">
+<link href="#"  rel="shortcut icon">
+</head>
+<body >
+<div id="app" >
+
+<div class="title-container">
+    <div class="title" v-on:click="PCPIShow" v-model="timeDate"><p>Welcome to Music Server      %{timeDate}%</p></div>
+</div>
+
+<div id="PC" v-show="PCShow">
+<div class="section-container">
+    <div class="section"><p>Audio Output to [ PC ]  Speaker</p></div>
+</div>
+
+<div id="audio-player-container" style="text-align: center;margin: auto;width:60vw;">
+   <audio id="audioPc"  v-on:loadedmetadata="mLoadPc($event)" v-on:timeupdate="mUpdatePc($event)" v-on:play="mPlayPc($event)" v-on:pause="mPausePc($event)"> <source src="{{filePc}}" type="audio/mpeg">你的瀏覽器不支援 audio tag！</audio>
+    <div style="width:60vw;display:flex;justify-content:space-between">
+    <div id="startTextPc">00:00</div>
+    <div id="endTextPc">00:00</div>
+    </div>
+    <div><input id="audioBarPc" type="range" min="0" step="0.25" value="0" v-on:change="mSetPc($event)" style="width:60vw"></div>
+    <div id="volTextPc">100</div>
+    <div><input id="volBarPc" type="range" min="0" setp="0.25" max="100" value="100" v-on:change=mVolSetPc($event) style="width:60vw"></div>
+</div>
+
+
+<div class="banner-container">
+<div class="banner"><p style="font-size:24px" v-model="albumPc">%{albumPc}%</p></div>
+<div class="banner"><p style="font-size:24px" v-model="songPc">%{songPc}%</p></div>
+</div>
+<!--
+<div style="display:none" ><audio id="my-audio" preload="metadata"> <source src="{{filePc}}" type="audio/mpeg">你的瀏覽器不支援 audio tag！ </audio></div>
+-->
+
+<div class="button-container">
+        <button type="text" class="key-button" v-model="num4dPc">%{num4dPc[0]}% %{num4dPc[1]}% %{num4dPc[2]}% %{num4dPc[3]}%</button>
+        <button type="button" class="key-button" v-on:click="keyInputPc(0)"><i class="fa-solid fa-0"></i></button>
+        <button type="button" class="key-button" v-on:click="keyInputPc(0)"><i class="fa-solid fa-0"></i></button>
+        <button type="button" class="key-button" v-on:click="keyInputPc(1)"><i class="fa-solid fa-1"></i></button>
+        <button type="button" class="key-button" v-on:click="keyInputPc(2)"><i class="fa-solid fa-2"></i></button>
+        <button type="button" class="key-button" v-on:click="keyInputPc(3)"><i class="fa-solid fa-3"></i></button>
+        <button type="button" class="key-button" v-on:click="keyInputPc(4)"><i class="fa-solid fa-4"></i></button>
+        <button type="button" class="key-button" v-on:click="keyInputPc(5)"><i class="fa-solid fa-5"></i></button>
+        <button type="button" class="key-button" v-on:click="keyInputPc(6)"><i class="fa-solid fa-6"></i></button>
+        <button type="button" class="key-button" v-on:click="keyInputPc(7)"><i class="fa-solid fa-7"></i></button>
+        <button type="button" class="key-button" v-on:click="keyInputPc(8)"><i class="fa-solid fa-8"></i></button>
+        <button type="button" class="key-button" v-on:click="keyInputPc(9)"><i class="fa-solid fa-9"></i></button>
+        <button type="button" class="key-button" v-on:click="setPlayModePc" v-if="musicPcPlayMode==0"><i class="fas fa-repeat"></i></button>
+        <button type="button" class="key-button" v-on:click="setPlayModePc" v-if="musicPcPlayMode==1"><i class="fa fa-shuffle"></i></button>
+        <button type="button" class="key-button" v-on:click="setPlayModePc" v-if="musicPcPlayMode==2"><i class="fa-solid fa-arrows-up-down"></i></button>
+        <button type="button" class="key-button" v-on:click="setPlayRatePc"><i class="fa-solid fa-xmark"></i> %{playRatePc}%</button>
+        <button type="button" class="key-button" v-on:click="setSleepTimePc">%{sleepTimePcShow}%  <i class="fa-solid fa-moon"></i></button>
+</div>
+
+<div class="button-container">
+        <button type="button" class="key-button" v-on:click="playPrePc"><i class="fa fa-fast-backward"></i></button>
+        <button type="button" class="key-button" v-on:click="playPausePc" v-if="musicPcPlaying"><i class="fa fa-pause"></i></button>
+        <button type="button" class="key-button" v-on:click="playPausePc" v-else><i class="fa fa-play"></i></button>
+        <button type="button" class="key-button" v-on:click="playNextPc"><i class="fa fa-fast-forward"></i></button>
+</div>
+
+
+<div style="display:none" ><audio id="radioPc"> <source src="https://stream.live.vc.bbcmedia.co.uk/bbc_world_service" type="audio/mpeg">    你的瀏覽器不支援 audio tag！ </audio></div>
+
+<div class="button-container" >
+    <select id="sel10Pc"  class="select-button"  v-on:Change="playRadioPc($event)">
+        <option default value="0">Radio - 1<i class="fa-solid fa-tower-cell"></i></option>
+        <option value="1">BBC World Service </option>
+        <option value="2">BBC London</option>
+        <option value="3">NPR News</option>
+        <option value="4">FOX News</option>
+        <option value="5">BBC Radio 5 Live</option>
+        <option value="6">BBC Asia Network</option>
+        <option value="7">BBC Radio 1</option>
+        <option value="8">ICRT</option>
+        <option value="9">BBC Radio 2</option>
+        <option value="10">Jerry Radio</option>
+    </select>
+    <select id="sel20Pc" class="select-button"  v-on:Change="playRadioPc($event)">
+        <option default value="0">Radio - 2<i class="fa-solid fa-wifi"></i></option>
+        <option value="11">台中古典音樂台</option>
+        <option value="12">中廣流行網</option>
+        <option value="13">中廣音樂網</option>
+        <option value="14">IC之音竹科廣播</option>
+        <option value="15">飛碟電台</option>
+        <option value="16">中廣新聞網</option>
+        <option value="17">BBC Radio 3</option>
+        <option value="18">BBC Radio 4</option>
+        <option value="19">BBC Radio 6 Music </option>
+        <option value="20">Classic FM</option>
+    </select>
+    <select id="sel30Pc" class="select-button"  v-on:Change="playRadioPc($event)">
+        <option default value="0">Radio - 3<i class="fa-solid fa-wifi"></i></option>
+        <option value="21">21</option>
+        <option value="22">22</option>
+        <option value="23">23</option>
+        <option value="24">24</option>
+        <option value="25">25</option>
+        <option value="26">26</option>
+        <option value="27">27</option>
+        <option value="28">28</option>
+        <option value="29">29</option>
+        <option value="30">30</option>
+    </select>
+</div>
+<div class="button-container" >
+        <button type="button" class="key-button" v-on:click="volCtlPc(-15)"><i class="fa fa-volume-low"></i></button>
+        <button type="button" class="key-button" v-on:click="volCtlPc(15)"><i class="fa fa-volume-high"></i></button>
+        <button type="button" class="key-button" v-on:click="volCtlPc(-100)"><i class="fa fa-volume-xmark"></i></button>
+</div>
+
+<div class="button-container style="width="100vw;">
+<select v-on:Change="playIndexPc($event)">
+    <option type="button" class="key-button" style="font-size: 18px;width:auto" default value="-1">請選擇要播放的歌曲</option>
+    <option type="button" class="key-button" style="font-size: 18px;width:auto" v-for="(file,index) in modfileList" :key="index" value="file">%{file}%</option>
+</select>
+</div>
+
+</div>
+
+
+<div id="PI" v-show="PIShow">
+
+<div class="section-container">
+    <div class="section"><p>Audio Output to [ PI ] Speaker</p></div>
+</div>
+
+<div id="audio-player-container" style="text-align: center;margin: auto;width:60vw;">
+    <div style="width:60vw;display:flex;justify-content:space-between">
+    <div id="startTextPi">00:00</div>
+    <div id="endTextPi">00:00</div>
+    </div>
+    <input id="audioBarPi" type="range" min="0" setp="0.25" value="0" v-on:change="mSetTimePi($event)" style="width:60vw">
+    <div id="volTextPi">100</div>
+    <input id="volBarPi" type="range" min="0" setp="0.25" max="100" value="100" v-on:change=mVolSetPi($event) style="width:60vw">
+</div>
+
+<div class="banner-container">
+<div class="banner"><p style="font-size:24px" v-model="albumPi">%{albumPi}%</p></div>
+<div class="banner"><p style="font-size:24px" v-model="songPi">%{songPi}%</p></div>
+</div>
+
+
+<div class="button-container">
+    <button type="text" class="key-button" v-model="num4dPi">%{num4dPi[0]}% %{num4dPi[1]}% %{num4dPi[2]}% %{num4dPi[3]}%</button>
+    <button type="button" class="key-button" v-on:click="keyInputPi(0)"><i class="fa-solid fa-0"></i></button>
+    <button type="button" class="key-button" v-on:click="keyInputPi(0)"><i class="fa-solid fa-0"></i></button>
+    <button type="button" class="key-button" v-on:click="keyInputPi(1)"><i class="fa-solid fa-1"></i></button>
+    <button type="button" class="key-button" v-on:click="keyInputPi(2)"><i class="fa-solid fa-2"></i></button>
+    <button type="button" class="key-button" v-on:click="keyInputPi(3)"><i class="fa-solid fa-3"></i></button>
+    <button type="button" class="key-button" v-on:click="keyInputPi(4)"><i class="fa-solid fa-4"></i></button>
+    <button type="button" class="key-button" v-on:click="keyInputPi(5)"><i class="fa-solid fa-5"></i></button>
+    <button type="button" class="key-button" v-on:click="keyInputPi(6)"><i class="fa-solid fa-6"></i></button>
+    <button type="button" class="key-button" v-on:click="keyInputPi(7)"><i class="fa-solid fa-7"></i></button>
+    <button type="button" class="key-button" v-on:click="keyInputPi(8)"><i class="fa-solid fa-8"></i></button>
+    <button type="button" class="key-button" v-on:click="keyInputPi(9)"><i class="fa-solid fa-9"></i></button>
+    <button type="button" class="key-button" v-on:click="setPlayModePi" v-if="musicPiPlayMode==0"><i class="fa-solid fa-repeat"></i></button>
+    <button type="button" class="key-button" v-on:click="setPlayModePi" v-if="musicPiPlayMode==1"><i class="fa-solid fa-shuffle"></i></button>
+    <button type="button" class="key-button" v-on:click="setPlayModePi" v-if="musicPiPlayMode==2"><i class="fa-solid fa-arrows-up-down"></i></button>
+    <button type="button" class="key-button" v-on:click="setPlayRatePi"><i class="fa-solid fa-xmark"></i> %{playRatePi}%</button>
+    <button type="button" class="key-button" v-on:click="setSleepTimePi" v-if="sleepTimePiShow">%{sleepTimePiShow}% <i class="fa-solid fa-moon"></i></button>
+</div>
+<div class="button-container">
+    <button type="button" class="key-button" v-on:click="playPrePi"><i class="fa fa-fast-backward"></i></button>
+    <button type="button" class="key-button" v-on:click="playPausePi" v-if="musicPiPlaying"><i class="fa fa-pause"></i></button>
+    <button type="button" class="key-button" v-on:click="playPausePi" v-else><i class="fa fa-play"></i></button>
+    <button type="button" class="key-button" v-on:click="playNextPi"><i class="fa fa-fast-forward"></i></button>
+</div>
+
+<div class="button-container" >
+    <select id="sel10Pi" class="select-button"  v-on:Change="playRadioPi($event)">
+        <option default value="0">Radio - 1<i class="fa-solid fa-wifi"></i></option>
+        <option value="1">BBC Wolrd Service</option>
+        <option value="7">BBC Radio 1</option>
+        <option value="2">BBC London</option>
+        <option value="3">NPR News</option>
+        <option value="4">FOX News</option>
+        <option value="5">BBC Radio 5 Live</option>
+        <option value="6">BBC Asia Network</option>
+        <option value="8">ICRT</option>
+        <option value="10">Jerry Radio</option>
+        <option value="9">BBC Radio 2</option>
+    </select>
+    <select id="sel20Pi" class="select-button" v-on:Change="playRadioPi($event)">
+        <option default value="0">Radio - 2<i class="fa-solid fa-wifi"></i></option>
+        <option value="11">台中古典音樂台</option>
+        <option value="12">中廣流行網</option>
+        <option value="13">中廣音樂網</option>
+        <option value="14">IC之音竹科廣播</option>
+        <option value="15">飛碟電台</option>
+        <option value="16">中廣新聞網</option>
+        <option value="17">BBC Radio 3</option>
+        <option value="18">BBC Radio 4</option>
+        <option value="19">BBC Radio 6Music </option>
+        <option value="20">Classic FM</option>
+    </select>
+    <select id="sel30Pi" class="select-button"  v-on:Change="playRadioPi($event)">
+        <option default value="0">Radio - 3<i class="fa-solid fa-wifi"></i></option>
+        <option value="21">BBC 1</option>
+        <option value="22">BBC 2</option>
+        <option value="23">BBC 3</option>
+        <option value="24">BBC 4</option>
+        <option value="25">BBC 5</option>
+        <option value="26">BBC 6</option>
+        <option value="27">BBC 7</option>
+        <option value="28">BBC 8</option>
+        <option value="29">BBC 9</option>
+        <option value="30">BBC 10</option>
+    </select>
+    </div>
+
+<div class="button-container">
+    <button type="button" class="key-button" v-on:click="volCtlPi(-15)"><i class="fa fa-volume-low"></i></button>
+    <button type="button" class="key-button" v-on:click="volCtlPi(15)"><i class="fa fa-volume-high"></i></button>
+    <button type="button" class="key-button" v-on:click="volCtlPi(-100)"><i class="fa-solid fa-volume-xmark"></i></button>
+</div>
+
+<div class="button-container" style="width: 80vw;">
+<select v-on:Change="playIndexPi($event)">
+    <option type="button" class="key-button" style="font-size: 18px;width:auto" default value="-1">請選擇要播放的歌曲</option>
+    <option type="button" class="key-button" style="font-size: 18px;width:auto" v-for="(file,index) in modfileList" :key="index" value="file">%{file}%</option>
+</select>
+</div>
+
+<hr>
+<div class="button-container" >
+    <button type="button" class="key-button" v-on:click="setCron"> 定時播放</button>
+    <select id="cronHour" class="select-button">
+        <option default value="0">Hour</option>
+        <option value="00"> 00 </option>
+        <option value="01"> 01 </option>
+        <option value="02"> 02 </option>
+        <option value="03"> 03 </option>
+        <option value="04"> 04 </option>
+        <option value="05"> 05 </option>
+        <option value="06"> 06 </option>
+        <option value="07"> 07 </option>
+        <option value="08"> 08 </option>
+        <option value="09"> 09 </option>
+        <option value="10"> 10 </option>
+        <option value="11"> 11 </option>
+        <option value="12"> 12 </option>
+        <option value="13"> 13 </option>
+        <option value="14"> 14 </option>
+        <option value="15"> 15 </option>
+        <option value="16"> 16 </option>
+        <option value="17"> 17 </option>
+        <option value="18"> 18 </option>
+        <option value="19"> 19 </option>
+        <option value="20"> 20 </option>
+        <option value="21"> 21 </option>
+        <option value="22"> 22 </option>
+        <option value="23"> 23 </option>
+    </select>
+    <select id="cronMin" class="select-button">
+        <option default value="0">Minutes</option>
+        <option value="0"> 00 </option>
+        <option value="5"> 05 </option>
+        <option value="10"> 10 </option>
+        <option value="15"> 15 </option>
+        <option value="20"> 20 </option>
+        <option value="25"> 25 </option>
+        <option value="30"> 30 </option>
+        <option value="35"> 35 </option>
+        <option value="40"> 40 </option>
+        <option value="45"> 45 </option>
+        <option value="50"> 50 </option>
+        <option value="55"> 55 </option>
+    </select>
+    </div>
+
+
+<div class="button-container" style="width: 80vw">
+    <select id="cronSelIndexPi" v-on:Change="setCronSong($event)">
+    <option type="button" class="key-button" style="font-size: 18px;width:auto" default value="-1">請選一首要設定定時播放的曲目</option>
+    <option type="button" class="key-button" style="font-size: 18px;width:auto" v-for="(file,index) in modfileList" :key="index" value="file">  %{file}%</option>
+</select>
+</div>
+
+<div style="text-align:center">
+ <div class="" v-if="cronStatus" v-model="cronTimeHour,cronTimeMin"><p style="font-size:22px; color:rgb(13, 202, 70)"> 設定定時播放 %{cronTimeHour}% : %{cronTimeMin}%</p></div>
+ <div class="" v-else><p style="font-size:22px; color:rgb(46, 201, 26)"> 無定時播放</p></div>
+ </div>
+ 
+<div class="banner-container">
+<div class="banner"><p style="font-size:24px" v-if="cronStatus" v-model="cronAlbumPi">%{cronAlbumPi}%</p></div>
+<div class="banner"><p style="font-size:24px" v-if="cronStatus" v-model="cronSongPi">%{cronSongPi}%</p></div>
+</div>
+
+</div>
+<!------------------------------------------------------------------>
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(0)" style="width:6em;height:2em">全  部</button>
+</div>
+<p></p>
+<!------->
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(14)" style="width:6em;height:2em">流  行</button>
+---
+<button type="button" v-on:click="getFileList(20)" style="width:6em;height:2em">少女時代</button>
+<button type="button" v-on:click="getFileList(21)" style="width:6em;height:2em">BLACKPINK</button>
+<button type="button" v-on:click="getFileList(23)" style="width:6em;height:2em">原子邦妮</button>
+<button type="button" v-on:click="getFileList(14)" style="width:6em;height:2em">流  行</button>
+<button type="button" v-on:click="getFileList(14)" style="width:6em;height:2em">流  行</button>
+<b> ...</b>
+</div>
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(2)" style="width:6em;height:2em">國  語</button>
+---
+<button type="button" v-on:click="getFileList(5)" style="width:6em;height:2em">張學友</button>
+<button type="button" v-on:click="getFileList(6)" style="width:6em;height:2em">劉德華</button>
+<button type="button" v-on:click="getFileList(17)" style="width:6em;height:2em">任賢齊</button>
+<button type="button" v-on:click="getFileList(6)" style="width:6em;height:2em">劉德華</button>
+<button type="button" v-on:click="getFileList(6)" style="width:6em;height:2em">劉德華</button>
+<b> ...</b>
+</div>
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(3)" style="width:6em;height:2em">台  語</button>
+---
+<button type="button" v-on:click="getFileList(7)" style="width:6em;height:2em">方宥心</button>
+<button type="button" v-on:click="getFileList(16)" style="width:6em;height:2em">黃乙玲</button>
+<button type="button" v-on:click="getFileList(22)" style="width:6em;height:2em">秀蘭瑪雅</button>
+<button type="button" v-on:click="getFileList(7)" style="width:6em;height:2em">方宥心</button>
+<button type="button" v-on:click="getFileList(7)" style="width:6em;height:2em">方宥心</button>
+<b> ...</b>
+</div>
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(9)" style="width:6em;height:2em">日  語</button>
+---
+<button type="button" v-on:click="getFileList(9)" style="width:6em;height:2em">日  語</button>
+<button type="button" v-on:click="getFileList(9)" style="width:6em;height:2em">日  語</button>
+<button type="button" v-on:click="getFileList(9)" style="width:6em;height:2em">日  語</button>
+<button type="button" v-on:click="getFileList(9)" style="width:6em;height:2em">日  語</button>
+<button type="button" v-on:click="getFileList(9)" style="width:6em;height:2em">日  語</button>
+<b> ...</b>
+</div>
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(13)" style="width:6em;height:2em">英  語</button>
+---
+<button type="button" v-on:click="getFileList(13)" style="width:6em;height:2em">英  語</button>
+<button type="button" v-on:click="getFileList(13)" style="width:6em;height:2em">英  語</button>
+<button type="button" v-on:click="getFileList(13)" style="width:6em;height:2em">英  語</button>
+<button type="button" v-on:click="getFileList(13)" style="width:6em;height:2em">英  語</button>
+<button type="button" v-on:click="getFileList(13)" style="width:6em;height:2em">英  語</button>
+<b> ...</b>
+</div>
+
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(4)" style="width:6em;height:2em">古  典</button>
+---
+<button type="button" v-on:click="getFileList(4)" style="width:6em;height:2em">古  典</button>
+<button type="button" v-on:click="getFileList(4)" style="width:6em;height:2em">古  典</button>
+<button type="button" v-on:click="getFileList(4)" style="width:6em;height:2em">古  典</button>
+<button type="button" v-on:click="getFileList(4)" style="width:6em;height:2em">古  典</button>
+<button type="button" v-on:click="getFileList(4)" style="width:6em;height:2em">古  典</button>
+<b> ...</b>
+</div>
+
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(1)" style="width:6em;height:2em">播  客</button>
+---
+<button type="button" v-on:click="getFileList(1)" style="width:6em;height:2em">播  客</button>
+<button type="button" v-on:click="getFileList(1)" style="width:6em;height:2em">播  客</button>
+<button type="button" v-on:click="getFileList(1)" style="width:6em;height:2em">播  客</button>
+<button type="button" v-on:click="getFileList(1)" style="width:6em;height:2em">播  客</button>
+<button type="button" v-on:click="getFileList(1)" style="width:6em;height:2em">播  客</button>
+<b> ...</b>
+</div>
+
+<div style="text-align:center">
+<button type="button" v-on:click="getFileList(15)" style="width:6em;height:2em">其  它</button>
+---
+<button type="button" v-on:click="getFileList(18)" style="width:6em;height:2em">紅樓夢</button>
+<button type="button" v-on:click="getFileList(18)" style="width:6em;height:2em">紅樓夢</button>
+<button type="button" v-on:click="getFileList(18)" style="width:6em;height:2em">紅樓夢</button>
+<button type="button" v-on:click="getFileList(18)" style="width:6em;height:2em">紅樓夢</button>
+<button type="button" v-on:click="getFileList(19)" style="width:6em;height:2em">佛  說</button>
+<b> ...</b>
+</div>
+
+<!------->
+<p></p>
+<p></p>
+<div style="text-align:center">
+<button type="button" v-on:click="downPodcastFile($event)" style="width:12em;height:2em">播客下載</button>
+</div>
+
+</div>
+<!--script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script-->
+<!--script src="https://unpkg.com/vue@3/dist/vue.global.js"></script-->
+<!--script src="https://unpkg.com/axios/dist/axios.min.js"></script-->
+<script src="./static/js/vue.global.js"></script>
+<script src="./static/js/axios.min.js"></script>
+<script src="./static/js/play.js"></script>
+
+</body>
+</html>
