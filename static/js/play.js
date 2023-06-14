@@ -689,6 +689,7 @@ const vm = createApp({
                 this.PCShow = !this.PCShow;
                 this.PIShow = !this.PIShow;
               },
+            //extract the mp3 filename from fileList
             calfileList() {
                let arr = this.fileList;
                let newArr = arr.map((str) => {

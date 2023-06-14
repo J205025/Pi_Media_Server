@@ -65,3 +65,10 @@ writable = yes
 
 #samba add user "ubuntu"
 $ sudo pdbedit -a -u ubuntu
+
+#mp3 volume modifification
+$ sudo apt install mp3gain
+- 將所有的 Mp3 音量 調整到預設 89db: 
+$ sudo mp3gain -a -r -k *.mp3
+-若嫌太小聲, 要調大聲到 99 db 的話, 使用 -d 10 即可: 
+$ sudo mp3gain -a -r -k -d 10 *.mp3
