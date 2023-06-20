@@ -88,8 +88,8 @@ const vm = createApp({
                url25:"https://prod-18-232-88-129.wostreaming.net/foxnewsradio-foxnewsradioaac-imc?session-id=0f99acd44126cef33b40ce217c9ea1ad",
                url26:"https://prod-18-232-88-129.wostreaming.net/foxnewsradio-foxnewsradioaac-imc?session-id=0f99acd44126cef33b40ce217c9ea1ad",
                url27:"https://prod-18-232-88-129.wostreaming.net/foxnewsradio-foxnewsradioaac-imc?session-id=0f99acd44126cef33b40ce217c9ea1ad",
-               url28:"https://prod-18-232-88-129.wostreaming.net/foxnewsradio-foxnewsradioaac-imc?session-id=0f99acd44126cef33b40ce217c9ea1ad",
-               url29:"https://prod-18-232-88-129.wostreaming.net/foxnewsradio-foxnewsradioaac-imc?session-id=0f99acd44126cef33b40ce217c9ea1ad",
+               url28:"https://kissfm2.ice.infomaniak.ch/kissfm2-128.mp3",
+               url29:"https://n11.rcs.revma.com/srn5f9kmwxhvv?rj-ttl=5&rj-tok=AAABiLjND3oAqdBUB1noZmxWGg",
                url30:"http://media-ice.musicradio.com:80/ClassicFMMP3"
                 }
           },

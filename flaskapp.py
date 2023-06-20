@@ -15,7 +15,7 @@ import json
 import glob
 import random 
 import jinja2
-import RPi.GPIO as GPIO
+##import RPi.GPIO as GPIO
 import subprocess
 import time
 import threading
@@ -168,7 +168,18 @@ def handleCronPlayPi():
     global __indexPi__
     handlePlayPi(__cronIndexPi__)
     __indexPi = __cronIndexPi__
-    
+   
+
+#def handleCronPlayPiRadio():
+#    global __radioVlcInstance__
+#    global __radioPiPlayingNo__
+#    global __radioVlcPi__
+#    global __urlCron__
+#    vlcmediaRadio  = __radioVlcInstance__.media_new(__urlCron__)
+#    __radioVlcPi__.set_media(vlcmediaRadio)
+#   __radioVlcPi__.play()
+
+ 
     
 def handleKeyInputPi(channel):
     global __indexPi__
@@ -413,17 +424,17 @@ def genFileList_sh(style):
            subdir = __typeList__[0]
     __musicVlcPi__.stop()
     __musicPiPlaying__ = False
-    mp3s = []; 
+    songs = []; 
     for path, subdirs, files in os.walk(__dir__ + subdir, followlinks=True):
        # for name in files:
         path = path[(len(__dir__)-1):];
         path = path+"/";
         path = path[1:];
         files = [path + file for file in files];
-        mp3s= mp3s + files; 
-    mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
-    mp3s.sort()
-    __fileList__ = mp3s;
+        songs = songs + files; 
+    songs = [ f for f in songs if f[-4:] == '.mp3' or f[-4:] =='.MP3' or f[-5:] == '.flac' or f[-5:] == '.FLAC' or f[-4:] == '.ape' or f[-4:] == '.APE'];
+    songs.sort()
+    __fileList__ = songs;
     __indexMax__ = len(__fileList__) 
     __indexPi__ = random.randrange(__indexMax__)
     file = __dir__ + __fileList__[__indexPi__]
@@ -496,16 +507,16 @@ if(False):
 #    mp3_list.sort(key=lambda x:int(x[:-4]))
 #--------------------------------------------------------------------
 #file list Method 2
-#    mp3s = []; 
+#    songs = []; 
 #    for path, subdirs, files in os.walk(r'./static/assets'):
 #       # for name in files:
 #        path = path[(len(__dir__)-1):];
 #        path = path+"/";
 #        path = path[1:];
 #        files = [path + file for file in files];
-#        mp3s= mp3s + files; 
-#    mp3s = [ f for f in mp3s if f[-4:] == '.mp3' ];
-#    __fileList__ = mp3s;
+#        songs= songs + files; 
+#    songs = [ f for f in songs if f[-4:] == '.mp3' ];
+#    __fileList__ = songs;
 #---------------------------------------------------------------------
 #file list Methos 3
 #    __fileListRn__ = glob.glob(r'../Music/*.mp3')

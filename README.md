@@ -72,3 +72,6 @@ $ sudo apt install mp3gain
 $ sudo mp3gain -a -r -k *.mp3
 -若嫌太小聲, 要調大聲到 99 db 的話, 使用 -d 10 即可: 
 $ sudo mp3gain -a -r -k -d 10 *.mp3
+$ sudo mp3gain -r -d 5 *.mp3 增加/減少音量 
+ref:
+https://www.linux.com/news/adjusting-mp3s-mp3gain/
