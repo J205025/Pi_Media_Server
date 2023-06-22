@@ -23,7 +23,8 @@ import vlc
 #
 #------------------------------------------------------------------
 __dir__ = "./static/assets/"
-__fileList__ = []
+__fileListPc__ = []
+__fileListPi__ = []
 #                 0       1        2       3     4       5       6        7         8          9     10       
 __typeList__ = ["all","podcast","國語","台語","古典","張學友","劉德華","方宥心","原子邦妮","日語","周杰倫",\
 #                         11         12       13    14      15      16     17     18       19       20       
@@ -32,6 +33,7 @@ __typeList__ = ["all","podcast","國語","台語","古典","張學友","劉德�
                        "BLACKPINK","秀蘭瑪雅","蘇打綠","蘇宥蓉","張惠妹","LadyGaga","BryanAdams","Adele","LeannRimes","Regine"] 
 __fileList_Rn__ = []
 __indexMax__ = 0
+__indexMaxPi__ = 0
 __indexPi__ = 1
 __cronIndexPi__ = 1
 __indexPc__ = 1 
@@ -126,12 +128,12 @@ def handleSelectedPi():
     global __musicVlcPi__
     global __musicPiPlaying__
     global __dir__
-    global __fileList__
+    global __fileListPi__
     global __num4dPi__
     global __indexPi__
     global __num4dPi_i__
     global __vlcmedia__
-    #file = __dir__ + __fileList__[__indexPi__]
+    #file = __dir__ + __fileListPi__[__indexPi__]
     handlePlayPi(__indexPi__)
     #__musicVlcPi__.stop()
     #__vlcmedia__  = __musicVlcInstance__.media_new(file)
@@ -149,13 +151,13 @@ def convert(list):
     return(no)
 
 def handlePlayPi(index):
-    global __fileList__
+    global __fileListPi__
     global __dir__
     global __musicVlcInstance__
     global __vlcmedia__
     global __musicVlcPi__
     global __musicPiPlaying__
-    file = __dir__ + __fileList__[index]
+    file = __dir__ + __fileListPi__[index]
     __musicVlcPi__.stop()
     __vlcmedia__  = __musicVlcInstance__.media_new(file)
     __musicVlcPi__.set_media(__vlcmedia__)
@@ -183,7 +185,7 @@ def handleCronPlayPi():
     
 def handleKeyInputPi(channel):
     global __indexPi__
-    global __indexMax__
+    global __indexMaxPi__
     global __dir__
     global __musicPiPlaying__
     global __num4dPi_i__
@@ -200,9 +202,9 @@ def handleKeyInputPi(channel):
     __num4dPi__[2] = __num4dPi__[3] 
     __num4dPi__[3] = Number 
     num = convert(__num4dPi__)
-    __indexPi__ = ( num % __indexMax__) - 1
+    __indexPi__ = ( num % __indexMaxPi__) - 1
     if (__indexPi__ == -1 ):
-       __indexPi__ = __indexPi__ + __indexMax__
+       __indexPi__ = __indexPi__ + __indexMaxPi__
     print("the NO."+str(__indexPi__ + 1)+" mp3 will be played")
     __timer_Key__ = threading.Timer(3, handleSelectedPi)
     __timer_Key__.start()
@@ -210,8 +212,7 @@ def handleKeyInputPi(channel):
 
 def handleNextPi():
     global __indexPi__
-    global __indexMax__
-    #global __fileList__
+    global __indexMaxPi__
     #global __dir__
     #global __musicVlcInstance__
     #global __musicVlcPi__
@@ -219,14 +220,14 @@ def handleNextPi():
     #global __musicPiPlaying__
     #global __musicPiPlayMode__
     if (__musicPiPlayMode__ == 1):
-        __indexPi__ = random.randrange(__indexMax__)
+        __indexPi__ = random.randrange(__indexMaxPi__)
     elif(__musicPiPlayMode__ == 0):
         __indexPi__ = __indexPi__ + 1
-        if (__indexPi__ == __indexMax__):
+        if (__indexPi__ == __indexMaxPi__):
             __indexPi__ = 0; 
     else:
         __indexPi__ = __indexPi__
-    #file = __dir__ + __fileList__[__indexPi__]
+    #file = __dir__ + __fileListPi__[__indexPi__]
     handlePlayPi(__indexPi__)
     #__musicVlcPi__.stop()
     #__vlcmedia__  = __musicVlcInstance__.media_new(file)
@@ -238,22 +239,23 @@ def handleNextPi():
 
 def handlePrePi():
     global __indexPi__
-    global __indexMax__
-    #global __fileList__
+    global __indexMaxPi__
+    #global __fileListPi__
     #global __dir__
     #global __musicVlcInstance__
     #global __vlcmedia__
     #global __musicVlcPi__
     #global __musicPiPlaying__
     if (__musicPiPlayMode__ == 1):
-        __indexPi__ = random.randrange(__indexMax__)
+        __indexPi__ = random.randrange(__indexMaxPi__)
     if (__musicPiPlayMode__ == 0):
         __indexPi__ = __indexPi__ - 1
         if (__indexPi__ < 0):
-           __indexPi__= __indexMax__ - 1
+           __indexPi__= __indexMaxPi__ - 1
     else:
         __indexPi__ = __indexPi__
-    #file = __dir__ + __fileList__[__indexPi__]
+    #global __fileListPi__
+    #file = __dir__ + __fileListPi__[__indexPi__]
     handlePlayPi(__indexPi__)
     #__vlcmedia__  = __musicVlcInstance__.media_new(file)
     #__musicVlcPi__.stop()
@@ -268,13 +270,13 @@ def handlePlayPausePi():
     global __musicVlcInstance__
     global __musicVlcPi__
     global __musicPiPlaying__
-    global __fileList__
+    global __fileListPi__
     if (__musicPiPlaying__ == True):
         time.sleep(0.1)
         __musicVlcPi__.pause()
         __musicPiPlaying__ = False
     else:
-        file = __dir__ + __fileList__[__indexPi__]
+        file = __dir__ + __fileListPi__[__indexPi__]
        # vlcmedia  = __musicVlcInstance__.media_new(file)
        # __musicVlcPi__.set_media(vlcmedia)
         __musicVlcPi__.play()
@@ -349,12 +351,14 @@ def stopPlaying():
         
 
 def genFileList_sh(style):
-    global __fileList__
+    global __fileListPc__
+    global __fileListPi__
     global __dir__
     global __musicVlcPi__
     global __vlcmedia__
     global __musicPiPlaying__
-    global __indexMax__
+    global __indexMaxPc__
+    global __indexMaxPi__
     global __indexPi__
     global __typeList__
     match style:
@@ -432,12 +436,22 @@ def genFileList_sh(style):
         path = path[1:];
         files = [path + file for file in files];
         songs = songs + files; 
-    songs = [ f for f in songs if f[-4:] == '.mp3' or f[-4:] =='.MP3' or f[-5:] == '.flac' or f[-5:] == '.FLAC' or f[-4:] == '.ape' or f[-4:] == '.APE'];
-    songs.sort()
-    __fileList__ = songs;
-    __indexMax__ = len(__fileList__) 
-    __indexPi__ = random.randrange(__indexMax__)
-    file = __dir__ + __fileList__[__indexPi__]
+    songsPc = [ f for f in songs if f[-4:] == '.mp3' or f[-4:] =='.MP3' or f[-5:] == '.flac' or f[-5:] == '.FLAC'];
+    songsPc.sort()
+    __fileListPc__ = songsPc;
+   # flac/ape format song  extend (for PI Vlc player, vlc support more types of formats)
+    songsPi = [ f for f in songs if f[-4:] == '.ape' or f[-4:] == '.APE'];
+    songsPi = songsPi +songsPc
+    songsPi.sort()
+    __fileListPi__ = songsPi
+    
+    __indexMaxPc__ = len(__fileListPc__) 
+    __indexMaxPi__ = len(__fileListPi__) 
+    print("indexPC:"+str(__indexMaxPc__))
+    print("indexPi:"+str(__indexMaxPi__))
+    
+    __indexPi__ = random.randrange(__indexMaxPi__)
+    file = __dir__ + __fileListPi__[__indexPi__]
     __vlcmedia__  = __musicVlcInstance__.media_new(file)
     __musicVlcPi__.set_media(__vlcmedia__)
     
@@ -527,12 +541,12 @@ if(False):
 #    __fileList__.sort(key=lambda x:int(x[:-4]))
 #---------------------------------------------------------------------
 genFileList_sh(0)
-if not (len(__fileList__) > 0):
+if not (len(__fileListPc__) > 0):
     print ("No mp3 files found!")
 print ('--- Press button #play to start playing mp3 ---')
 
 
-file1 = __dir__ + __fileList__[__indexPi__]
+file1 = __dir__ + __fileListPi__[__indexPi__]
 __vlcmedia__  = __musicVlcInstance__.media_new(file1)
 __musicVlcPi__.set_media(__vlcmedia__)
 __musicVlcPiDuration__ = __vlcmedia__.get_duration()
@@ -555,7 +569,8 @@ scheduler.start()
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global __dir__
-    global __fileList__
+    global __fileListPc__
+    global __fileListPi__
     global __indexPi__
     global __musicPiPlaying__ 
     global __musicPiPlayMode__
@@ -574,7 +589,8 @@ def index():
         return render_template('index.html')
     if request.method =='POST':
         return jsonify({
-        "fileList" : __fileList__,
+        "fileListPc" : __fileListPc__,
+        "fileListPi" : __fileListPi__,
         "indexPi" : __indexPi__,
         "musicPiPlaying" : __musicPiPlaying__,
         "musicPiPlayMode" : __musicPiPlayMode__,
@@ -592,7 +608,6 @@ def index():
 @app.route('/playPrePi', methods=['POST'])
 def playPrePi():
     global __indexPi__
-    global __indexMax__
     global __musicPiPlaying__
     handlePrePi();
     return jsonify({ 
@@ -603,7 +618,6 @@ def playPrePi():
 @app.route('/playNextPi', methods=['POST'])
 def playNextPi():
     global __indexPi__
-    global __indexMax__
     global __musicPiPlaying__
     handleNextPi();
     return jsonify({ 
@@ -613,14 +627,13 @@ def playNextPi():
 @app.route('/playIndexPi', methods=['POST'])
 def playIndexPi():
     global __indexPi__
-    global __indexMax__
     global __musicPiPlaying__
     global __vlcmedia__
     global __musicVlcPiDuration__
     data=request.get_json()
     num=int(data["indexPi"])
     __indexPi__= num
-   # file = __dir__ + __fileList__[__indexPi__]
+   # file = __dir__ + __fileListPi__[__indexPi__]
     handlePlayPi(__indexPi__)
    # __musicVlcPi__.stop()
    # __vlcmedia__  = __musicVlcInstance__.media_new(file)
@@ -639,12 +652,12 @@ def playIndexPi():
 def playSelectedPi():
     global __indexPi__
     global __musicPiPlaying__
-    global __indexMax__
+    global __indexMaxPi__
     global __vlcmedia__
     global __musicVlcPiDuration__
     data=request.get_json()
     num=int(data["num"])
-    __indexPi__= num % __indexMax__
+    __indexPi__= num % __indexMaxPi__
     handleSelectedPi();
     __musicVlcPiDuration__ = __vlcmedia__.get_duration()
     print("musicPiDuration")
@@ -793,7 +806,8 @@ def volumeControlPi():
     
 @app.route('/getMetaPi', methods=['POST'])
 def getMetaPi():
-    global __fileList__
+    global __fileListPc__
+    global __fileListPi__
     global __musicVlcPiDuration__
     global __musicVlcPi__
     global __indexPi__
@@ -814,7 +828,8 @@ def getMetaPi():
 @app.route('/refreshMetaPi', methods=['POST'])
 def refreshMetaPi():
     global __dir__
-    global __fileList__
+    global __fileListPc__
+    global __fileListPi__
     global __indexPi__
     global __musicPiPlaying__ 
     global __musicPiPlayMode__
@@ -832,7 +847,8 @@ def refreshMetaPi():
     musicVlcPiCurrent =__musicVlcPi__.get_time()
     __musicVlcPiDuration__ = __vlcmedia__.get_duration()
     return jsonify({
-        "fileList" : __fileList__,
+        "fileListPc" : __fileListPc__,
+        "fileListPi" : __fileListPi__,
         "indexPi" : __indexPi__,
         "musicPiPlaying" : __musicPiPlaying__,
         "musicPiPlayMode" : __musicPiPlayMode__,
@@ -850,7 +866,8 @@ def refreshMetaPi():
     
 @app.route('/getFileList', methods=['POST'])
 def getFileList():
-    global __fileList__
+    global __fileListPc__
+    global __fileListPi__
     global __musicPiPlaying__
     global __indexPi__
     global __cronIndexPi__
@@ -858,7 +875,8 @@ def getFileList():
     style=int(data["style"])
     genFileList_sh(style)
     return jsonify({
-        "fileList" : __fileList__,
+        "fileListPc" : __fileListPc__,
+        "fileListPi" : __fileListPi__,
         "musicPiPlaying" : __musicPiPlaying__,
         "indexPi":__indexPi__,
         "cronIndexPi":__cronIndexPi__
@@ -940,14 +958,14 @@ def setCron():
     global __cronStatus__
     global __cronIndexPi__
     global __dir__
-    global __fileList__
+    global __fileListPi__
     data=request.get_json()
     __cronStatus__=data["cronStatus"]
     __cronIndePi__=data["cronIndexPi"]
     print("__cronStatus: "+str(__cronStatus__))
     print(type(__cronStatus__))
     num=int(data["cronIndexPi"])
-    file = __dir__ + __fileList__[num]
+    file = __dir__ + __fileListPi__[num]
     print(file+"will be played")
     __cronTimeHour__=int(data["setHour"])
     __cronTimeMin__=int(data["setMin"])

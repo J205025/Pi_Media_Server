@@ -20,15 +20,18 @@ const vm = createApp({
                musicPiPlayMode : 0,
                playRatePc : 1 ,
                playRatePi : 1 ,
-               fileList : [],
-               modfileList : [],
+               fileListPc : [],
+               fileListPi : [],
+               modfileListPc : [],
+               modfileListPi : [],
                dir :"./static/assets/",
                filePc: '',
                filePi : '',
                cronFilePi : '',
                indexPc : 0,
                indexPi : 0,
-               indexMax : 0 ,
+               indexMaxPc : 0 ,
+               indexMaxPi : 0 ,
                num4dPc : [0,0,0,0],
                num4dPi : [0,0,0,0],
                num4dPc_i : 4,
@@ -118,7 +121,7 @@ const vm = createApp({
               this.elementAudioBarPi.max= durationPi/1000;
               this.elementAudioBarPi.value= currentPi/1000;
               this.indexPi = res.data.indexPi;
-              this.filePi= this.fileList[this.indexPi];
+              this.filePi= this.fileListPi[this.indexPi];
               document.getElementById("startTextPi").textContent=this.calCurrentTime(currentPi/1000);
               console.log(this.calCurrentTime(currentPi/1000));
               document.getElementById("endTextPi").textContent=this.calTotalTime(durationPi/1000);
@@ -160,10 +163,10 @@ const vm = createApp({
             playSelectedPc(){
                 num=this.num4dPc.join("");
                 console.log("current keyno is: "+num);
-                this.indexPc= num % this.indexMax;
-                this.filePc=this.fileList[this.indexPc];
-                console.log(this.dir+this.fileList[this.indexPc]);
-                dirfilePc=this.dir+this.fileList[this.indexPc];
+                this.indexPc= num % this.indexMaxPc;
+                this.filePc=this.fileListPc[this.indexPc];
+                console.log(this.dir+this.fileListPc[this.indexPc]);
+                dirfilePc=this.dir+this.fileListPc[this.indexPc];
                 this.elementAudioPc.pause();
                 this.elementAudioPc.setAttribute('src',dirfilePc);
                 this.elementAudioPc.load();
@@ -181,8 +184,8 @@ const vm = createApp({
 		}
 		else{    
                 this.indexPc = event.target.selectedIndex - 1;
-                this.filePc=this.fileList[this.indexPc];
-                dirfilePc=this.dir+this.fileList[this.indexPc];
+                this.filePc=this.fileListPc[this.indexPc];
+                dirfilePc=this.dir+this.fileListPc[this.indexPc];
                 this.elementAudioPc.pause();
                 this.elementAudioPc.setAttribute('src',dirfilePc);
                 this.elementAudioPc.load();
@@ -210,7 +213,7 @@ const vm = createApp({
                 this.keytimerPcRunning = true;
                 },
             playPausePc(){
-                dirfilePc=this.dir+this.fileList[this.indexPc];
+                dirfilePc=this.dir+this.fileListPc[this.indexPc];
                 console.log(dirfilePc); 
                 this.elementAudioPc.setAttribute('src',dirfilePc);
                 if(this.musicPcPlaying == false){
@@ -227,7 +230,7 @@ const vm = createApp({
            	  },
             playPrePc(){
                 if(this.musicPcPlayMode==1){
-                rn = this.getRandom(this.indexMax-1, 0);
+                rn = this.getRandom(this.indexMaxPc-1, 0);
                 this.indexPc = rn
                   }
                 else if(this.musicPcPlayMode==0){
@@ -237,10 +240,10 @@ const vm = createApp({
                 this.indexPc = this.indexPc;
                   }
                 if(this.indexPc < 0){
-                  this.indexPc = this.indexMax - 1;
+                  this.indexPc = this.indexMaxPc - 1;
                   }
-                this.filePc=this.fileList[this.indexPc];
-                dirfilePc=this.dir+this.fileList[this.indexPc];
+                this.filePc=this.fileListPc[this.indexPc];
+                dirfilePc=this.dir+this.fileListPc[this.indexPc];
                 this.elementAudioPc.setAttribute('src',dirfilePc);
                 this.elementAudioPc.load();
                 this.elementAudioPc.play();
@@ -251,7 +254,7 @@ const vm = createApp({
               },
             playNextPc(){
                 if(this.musicPcPlayMode==1){
-                rn = this.getRandom(this.indexMax-1, 0);
+                rn = this.getRandom(this.indexMaxPc-1, 0);
                 this.indexPc = rn
                   }
                 else if(this.musicPcPlayMode==0){
@@ -260,11 +263,11 @@ const vm = createApp({
                 else{
                 this.indexPc = this.indexPc;
                   }
-                if(this.indexPc >= this.indexMax){
+                if(this.indexPc >= this.indexMaxPc){
                   this.indexPc = 0;
                   }
-                this.filePc=this.fileList[this.indexPc];
-                dirfilePc=this.dir+this.fileList[this.indexPc];
+                this.filePc=this.fileListPc[this.indexPc];
+                dirfilePc=this.dir+this.fileListPc[this.indexPc];
                 console.log(dirfilePc);
                 this.elementAudioPc.pause();
                 this.elementAudioPc.setAttribute('src',dirfilePc);
@@ -367,7 +370,7 @@ const vm = createApp({
                 axios.post('/playSelectedPi',{"num":num}).then(res => {
                 this.musicPiPlaying = res.data.musicPiPlaying;
                 this.indexPi = res.data.indexPi;
-                this.filePi=this.fileList[this.indexPi];
+                this.filePi=this.fileListPi[this.indexPi];
                 console.log(this.filePi)
                 console.log("works playSelectedPi");
                   })
@@ -434,7 +437,7 @@ const vm = createApp({
                 this.musicPiPlaying = res.data.musicPiPlaying; 
                 this.indexPi = res.data.indexPi;
                 console.log(this.filePi)
-                this.filePi = this.fileList[res.data.indexPi];
+                this.filePi = this.fileListPi[res.data.indexPi];
                 console.log("works playPausePi");
                 })
                 .catch(error => {
@@ -444,7 +447,7 @@ const vm = createApp({
             playPrePi(){
                 axios.post('/playPrePi').then(res => {
                 this.indexPi = res.data.indexPi;
-                this.filePi = this.fileList[res.data.indexPi];
+                this.filePi = this.fileListPi[res.data.indexPi];
                 console.log(this.filePi)
                 this.musicPiPlaying = res.data.musicPiPlaying; 
                 console.log("playPrePi works");
@@ -456,9 +459,9 @@ const vm = createApp({
             playNextPi(){
                 axios.post('/playNextPi').then(res => {
                 this.indexPi = res.data.indexPi;
-                this.filePi = this.fileList[res.data.indexPi];
+                this.filePi = this.fileListPi[res.data.indexPi];
                 console.log(this.filePi)
-                dir_filePi = this.dir+this.fileList[this.indexPi];
+                dir_filePi = this.dir+this.fileListPi[this.indexPi];
                 this.musicPiPlaying = res.data.musicPiPlaying; 
                 console.log("playNextPi works");
                 })
@@ -479,9 +482,9 @@ const vm = createApp({
 		indexPi = indexPi -1;	
                 axios.post('/playIndexPi',{"indexPi":indexPi}).then(res => {
                 this.indexPi = res.data.indexPi;
-                this.filePi = this.fileList[res.data.indexPi];
+                this.filePi = this.fileListPi[res.data.indexPi];
                 console.log(this.filePi)
-                dir_filePi = this.dir+this.fileList[this.indexPi];
+                dir_filePi = this.dir+this.fileListPi[this.indexPi];
                 this.musicPiPlaying = res.data.musicPiPlaying; 
                 console.log("playNextPi works");
                 })
@@ -541,24 +544,29 @@ const vm = createApp({
                 })
               },
             refreshList(){
-                this.indexMax = this.fileList.length;
-                rn = this.getRandom(this.indexMax-1, 0);
-                this.indexPc=rn;
-                this.filePc=this.fileList[rn];
-                this.filePi=this.fileList[this.indexPi];
-                this.cronFilePi=this.fileList[this.cronIndexPi];
-                this.calfileList();
+                this.indexMaxPc = this.fileListPc.length;
+                this.indexMaxPi = this.fileListPi.length;
+                rnPc = this.getRandom(this.indexMaxPc-1, 0);
+                rnPi = this.getRandom(this.indexMaxPi-1, 0);
+                this.indexPc=rnPc;
+                this.filePc=this.fileListPc[this.indexPc];
+                this.filePi=this.fileListPi[this.indexPi];
+                this.cronFilePi=this.fileListPi[this.cronIndexPi];
+                this.calfileListPc();
+                this.calfileListPi();
               },
             getFileList(style){
                 document.getElementById("audioPc").pause();
                 this.musicPcPlaying = false;
                 this.musicPiPlaying = false;
                 axios.post('/getFileList',{"style":style}).then(res => {
-                this.fileList = res.data.fileList;
+                this.fileListPc = res.data.fileListPc;
+                this.fileListPi = res.data.fileListPi;
                 this.indexPi = res.data.indexPi;
                 this.cronIndexPi = res.data.cronIndexPi;
                 this.refreshList();
-                console.log(this.fileList);
+                console.log(this.fileListPc);
+                console.log(this.fileListPi);
                 console.log("FileList Refresh");
                 })
                 .catch(error => {
@@ -599,15 +607,15 @@ const vm = createApp({
                 )
                 //this.loading();
                 this.cronIndexPi =document.getElementById("cronSelIndexPi").selectedIndex -1 ;
-                this.cronFilePi=this.fileList[this.cronIndexPi];
+                this.cronFilePi=this.fileListPi[this.cronIndexPi];
               },
 
             setCronSong(event){
                 this.cronIndexPi = event.target.selectedIndex - 1;
                 axios.post('/setCronSong',{"cronIndexPi":this.cronIndexPi}).then(res => {
                 this.cronIndexPi = res.data.cronIndexPi;
-                console.log(this.fileList[this.cronIndexPi]+" will be played");
-                this.cronFilePi=this.fileList[this.cronIndexPi];
+                console.log(this.fileListPi[this.cronIndexPi]+" will be played");
+                this.cronFilePi=this.fileListPi[this.cronIndexPi];
                 })
                 .catch(error => {
                 console.log("handle error =>", error);
@@ -690,8 +698,8 @@ const vm = createApp({
                 this.PIShow = !this.PIShow;
               },
             //extract the mp3 filename from fileList
-            calfileList() {
-               let arr = this.fileList;
+            calfileListPc() {
+               let arr = this.fileListPc;
                let newArr = arr.map((str) => {
                let index = str.lastIndexOf("/");
                let str1 = str.substring(0, index);
@@ -700,7 +708,19 @@ const vm = createApp({
                let str3 = str1.substring(index2 + 1);
                return str3+"---"+str2;
                  });
-                this.modfileList = newArr;
+                this.modfileListPc = newArr;
+              },
+            calfileListPi() {
+               let arr = this.fileListPi;
+               let newArr = arr.map((str) => {
+               let index = str.lastIndexOf("/");
+               let str1 = str.substring(0, index);
+               let str2 = str.substring(index + 1);
+               let index2 = str1.lastIndexOf("/");
+               let str3 = str1.substring(index2 + 1);
+               return str3+"---"+str2;
+                 });
+                this.modfileListPi = newArr;
               },
               //--------------------------------------------------------------------------------------------------
             loading(){
@@ -709,21 +729,21 @@ const vm = createApp({
               this.musicPiPlaying = res.data.musicPiPlaying;
               this.playRatePi = res.data.playRatePi;
               this.musicPiPlayMode = res.data.musicPiPlayMode;
-              this.fileList = res.data.fileList;
+              this.fileListPc = res.data.fileListPc;
+              this.fileListPi = res.data.fileListPi;
               this.radioPiPlayingNo = res.data.radioPiPlayingNo;   
-              this.indexMax = this.fileList.length;
+              this.indexMaxPc = this.fileListPc.length;
+              this.indexMaxPc = this.fileListPi.length;
               this.volumePi = res.data.volumePi;
               this.volumePiMute = res.data.volumePiMute;
               this.cronStatus = res.data.cronStatus;
               this.cronTimeHour = res.data.cronTimeHour;
               this.cronTimeMin = res.data.cronTimeMin;
               this.cronIndexPi = res.data.cronIndexPi;
-              this.cronFilePi= this.fileList[this.cronIndexPi];
-              rn = this.getRandom(this.indexMax-1, 0);
-              //rn = rn % this.indexMax;
-              this.indexPc=rn;
-              this.filePc=this.fileList[rn];
-              this.filePi=this.fileList[this.indexPi];
+              this.cronFilePi= this.fileListPi[this.cronIndexPi];
+              rnPc = this.getRandom(this.indexMaxPc-1, 0);
+              this.filePc=this.fileListPc[this.indexPc];
+              this.filePi=this.fileListPi[this.indexPi];
               console.log("filePc: "+this.filePc);
               console.log("filePi: "+this.filePi);
               console.log("musicPiPlaying: "+this.musicPiPlaying);
@@ -756,7 +776,8 @@ const vm = createApp({
               this.elementVolBarPi.value = this.volumePi;
               this.continuePlayingPc();
               this.continueMetaPi();
-              this.calfileList();
+              this.calfileListPc();
+              this.calfileListPi();
               this.element10Pi = document.getElementById("sel10Pi");
               this.element20Pi = document.getElementById("sel20Pi");
               this.element30Pi = document.getElementById("sel30Pi");
@@ -798,21 +819,23 @@ const vm = createApp({
                 this.musicPiPlaying = res.data.musicPiPlaying;
                 this.playRatePi = res.data.playRatePi;
                 this.musicPiPlayMode = res.data.musicPiPlayMode;
-                this.fileList = res.data.fileList;
+                this.fileListPi = res.data.fileListPi;
+                this.fileListPc = res.data.fileListPc;
                 this.radioPiPlayingNo = res.data.radioPiPlayingNo;   
-                this.indexMax = this.fileList.length;
+                this.indexMaxPc = this.fileListPc.length;
+                this.indexMaxPi = this.fileListPi.length;
                 this.volumePi = res.data.volumePi;
                 this.volumePiMute = res.data.volumePiMute;
                 this.cronStatus = res.data.cronStatus;
                 this.cronTimeHour = res.data.cronTimeHour;
                 this.cronTimeMin = res.data.cronTimeMin;
                 this.cronIndexPi = res.data.cronIndexPi;
-                this.cronFilePi= this.fileList[this.cronIndexPi];
+                this.cronFilePi= this.fileListPi[this.cronIndexPi];
                 durationPi = res.data.durationPi;
                 currentPi = res.data.currentPi;
                 this.elementAudioBarPi.max= durationPi/1000;
                 this.elementAudioBarPi.value= currentPi/1000;
-                this.filePi= this.fileList[this.indexPi];
+                this.filePi= this.fileListPi[this.indexPi];
                 if(this.musicPcPlaying == true){
                 document.getElementById("startTextPi").textContent=this.calCurrentTime(currentPi/1000);
                 console.log(this.calCurrentTime(currentPi/1000));
