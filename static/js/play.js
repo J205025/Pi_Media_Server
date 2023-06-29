@@ -63,6 +63,9 @@ const vm = createApp({
                albumStringPc: "",
                albumStringPi: "",
                cronAlbumStringPi: "",
+               baseFolderList: "",
+               subFolderList: "",
+               selectedOption: "",
                //broswer audio play src
                url01:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
                url02:"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -722,6 +725,21 @@ const vm = createApp({
                  });
                 this.modfileListPi = newArr;
               },
+            subFolderListGen(option) {
+              console.log("Use this type string to axios get the Artist name_list  and render to an new option/select element. ");
+              console.log(option);
+              type = option
+              axios.post('/getArtistList',{"type":type}).then(res => {
+              this.subFolderList = res.data.subFolderList;
+              console.log(this.subFolderList);
+              })
+              .catch(error => {
+              console.log("handle error =>", error);
+              })
+              },
+            genAlbumList() {
+              console.log("Song List generated");
+              },
               //--------------------------------------------------------------------------------------------------
             loading(){
               axios.post('/').then(res => {
@@ -740,6 +758,7 @@ const vm = createApp({
               this.cronTimeHour = res.data.cronTimeHour;
               this.cronTimeMin = res.data.cronTimeMin;
               this.cronIndexPi = res.data.cronIndexPi;
+              this.baseFolderList = res.data.baseFolderList;
               this.cronFilePi= this.fileListPi[this.cronIndexPi];
               rnPc = this.getRandom(this.indexMaxPc-1, 0);
               this.filePc=this.fileListPc[this.indexPc];

@@ -65,6 +65,8 @@ __timer_Sleep__ = None
 __cronTimeHour__ = '00'
 __cronTimeMin__ = '00'
 __cronStatus__= False
+__baseFolderList__ = '' 
+__subFolderList__ = '' 
 radioUrl={
           "url01":"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
           "url02":"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -350,6 +352,13 @@ def stopPlaying():
         __sleeTimePi__ =3
         
 
+def get_subdirectories(folder_path):
+    subdirectories = []
+    for entry in os.scandir(folder_path):
+        if entry.is_dir():
+            subdirectories.append(entry.name)
+    return subdirectories   
+ 
 def genFileList_sh(style):
     global __fileListPc__
     global __fileListPi__
@@ -361,6 +370,7 @@ def genFileList_sh(style):
     global __indexMaxPi__
     global __indexPi__
     global __typeList__
+    global __baseFolderList__
     match style:
         case 0:
            subdir = __typeList__[0]
@@ -454,7 +464,8 @@ def genFileList_sh(style):
     file = __dir__ + __fileListPi__[__indexPi__]
     __vlcmedia__  = __musicVlcInstance__.media_new(file)
     __musicVlcPi__.set_media(__vlcmedia__)
-    
+ 
+
 def downPodcastFile_sh():
     N = 3
     Ndays_ago = date.today()- timedelta(days=N)
@@ -540,6 +551,11 @@ if(False):
 #    __fileList__ = get_files(__dir__)
 #    __fileList__.sort(key=lambda x:int(x[:-4]))
 #---------------------------------------------------------------------
+#folder_path = '/media/usb1/'
+folder_path = './static/assets/'
+__baseFolderList__ = get_subdirectories(folder_path)
+print(__baseFolderList__)
+
 genFileList_sh(0)
 if not (len(__fileListPc__) > 0):
     print ("No mp3 files found!")
@@ -566,6 +582,7 @@ scheduler.init_app(app)
 scheduler.start()
 #-----------------------
 #==============================================================================================
+#-----------API---------------------
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global __dir__
@@ -583,6 +600,7 @@ def index():
     global __cronTimeMin__
     global __cronIndexPi__
     global __musicVlcPi__
+    global __baseFolderList__
     if request.method == 'GET':
         __playRatePi__ = 1
         __musicVlcPi__.set_rate(__playRatePi__)
@@ -602,7 +620,8 @@ def index():
         "cronStatus":__cronStatus__,
         "cronTimeHour":__cronTimeHour__,
         "cronTimeMin":__cronTimeMin__,
-        "cronIndexPi":__cronIndexPi__
+        "cronIndexPi":__cronIndexPi__,
+        "baseFolderList":__baseFolderList__
          })
     
 @app.route('/playPrePi', methods=['POST'])
@@ -998,6 +1017,19 @@ def setCronSong():
 def myjobb():
     downPodcastFile_sh2()
     print("myDownPodcastFileJob executed")
+
+@app.route('/getArtistList', methods=['POST'])
+def getArtistList():
+    global __dir__
+    global __subFolderList__
+    data=request.get_json()
+    type  = data["type"]
+    path = __dir__ + type
+    print(path)
+    __subFolderList__ = get_subdirectories(path)
+    return jsonify({
+        "subFolderList" : __subFolderList__
+         })
 
 if __name__ == '__main__':
     #import argparse

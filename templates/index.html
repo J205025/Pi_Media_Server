@@ -362,6 +362,19 @@
 <b> ...</b>
 </div>
 
+
+
+<div>
+<select v-model="selectedOption"  v-on:Change="subFolderListGen(selectedOption)">
+    <option type="button" class="key-button" style="font-size: 18px;width:auto" v-for="type in baseFolderList" :value="type"> %{type}% </option>
+</select>
+</div>
+<div>
+<select v-on:Change="genAlbumList()">
+    <option type="button" class="key-button" style="font-size: 18px;width:auto" v-for="(album, index) in subFolderList" :key="index" value="album">%{album}%</option>
+</select>
+</div>
+
 <!------->
 <p></p>
 <p></p>
