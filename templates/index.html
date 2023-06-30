@@ -232,8 +232,8 @@
 
 <div class="button-container" style="width: 80vw;">
 <select v-on:Change="playIndexPi($event)">
-    <option type="button" class="key-button" style="font-size: 18px;width:auto" default value="0">請選擇要播放的歌曲</option>
-    <option type="button" class="key-button" style="font-size: 18px;width:auto" v-for="(file,index) in modfileListPi" :key="index" value="file">%{index}%: %{file}%</option>
+    <option type="button" class="key-button" style="font-size: 20px;width:auto" default value="0">請選擇要播放的歌曲</option>
+    <option type="button" class="key-button" style="font-size: 20px;width:auto" v-for="(file,index) in modfileListPi" :key="index" value="file">%{index}%: %{file}%</option>
 </select>
 </div>
 
@@ -287,14 +287,14 @@
 
 <div class="button-container" style="width: 80vw">
     <select id="cronSelIndexPi" v-on:Change="setCronSong($event)">
-    <option type="button" class="key-button" style="font-size: 18px;width:auto" default value="0">請選一首要設定定時播放的曲目</option>
-    <option type="button" class="key-button" style="font-size: 18px;width:auto" v-for="(file,index) in modfileListPi" :key="index" value="file">%{index}%: %{file}%</option>
+    <option type="button" class="key-button" style="font-size: 20px;width:auto" default value="0">請選一首要設定定時播放的曲目</option>
+    <option type="button" class="key-button" style="font-size: 20px;width:auto" v-for="(file,index) in modfileListPi" :key="index" value="file">%{index}%: %{file}%</option>
 </select>
 </div>
 
 <div style="text-align:center">
- <div class="" v-if="cronStatus" v-model="cronTimeHour,cronTimeMin"><p style="font-size:22px; color:rgb(13, 202, 70)"> 設定定時播放 %{cronTimeHour}% : %{cronTimeMin}%</p></div>
- <div class="" v-else><p style="font-size:22px; color:rgb(46, 201, 26)"> 無定時播放</p></div>
+ <div class="" v-if="cronStatus" v-model="cronTimeHour,cronTimeMin"><p style="font-size:24px; color:rgb(13, 202, 70)"> 設定定時播放 %{cronTimeHour}% : %{cronTimeMin}%</p></div>
+ <div class="" v-else><p style="font-size:24px; color:rgb(46, 201, 26)"> 無定時播放</p></div>
  </div>
  
 <div class="banner-container">
@@ -305,74 +305,21 @@
 </div>
 <!------------------------------------------------------------------>
 <hr>
-<div style="text-align:center">
-<button type="button" v-on:click="getFileList(0)" style="width:10em;height:2em">全  部 歌 曲</button>
-</div>
 <p></p>
 <!------->
 <div style="text-align:center">
-<button type="button" v-on:click="getFileList(14)" style="width:6em;height:2em">流  行</button>
----
-<button type="button" v-on:click="getFileList(20)" style="width:6em;height:2em">少女時代</button>
-<button type="button" v-on:click="getFileList(21)" style="width:6em;height:2em">BLACKPINK</button>
-<button type="button" v-on:click="getFileList(8)" style="width:6em;height:2em">原子邦妮</button>
-<button type="button" v-on:click="getFileList(14)" style="width:6em;height:2em">流  行</button>
-<button type="button" v-on:click="getFileList(14)" style="width:6em;height:2em">流  行</button>
-<b> ...</b>
+<p style="font-size:22px">請選你要的類型曲目</p>
 </div>
 <div style="text-align:center">
-<button type="button" v-on:click="getFileList(2)" style="width:6em;height:2em">國  語</button>
----
-<button type="button" v-on:click="getFileList(5)" style="width:6em;height:2em">張學友</button>
-<button type="button" v-on:click="getFileList(6)" style="width:6em;height:2em">劉德華</button>
-<button type="button" v-on:click="getFileList(17)" style="width:6em;height:2em">任賢齊</button>
-<button type="button" v-on:click="getFileList(23)" style="width:6em;height:2em">蘇打綠</button>
-<button type="button" v-on:click="getFileList(25)" style="width:6em;height:2em">張惠妹</button>
-<b> ...</b>
-</div>
-<div style="text-align:center">
-<button type="button" v-on:click="getFileList(3)" style="width:6em;height:2em">台  語</button>
----
-<button type="button" v-on:click="getFileList(7)" style="width:6em;height:2em">方宥心</button>
-<button type="button" v-on:click="getFileList(16)" style="width:6em;height:2em">黃乙玲</button>
-<button type="button" v-on:click="getFileList(22)" style="width:6em;height:2em">秀蘭瑪雅</button>
-<button type="button" v-on:click="getFileList(11)" style="width:6em;height:2em">鄭進一</button>
-<button type="button" v-on:click="getFileList(24)" style="width:6em;height:2em">蘇宥蓉</button>
-<b> ...</b>
-</div>
-<div style="text-align:center">
-<button type="button" v-on:click="getFileList(13)" style="width:6em;height:2em">英  語</button>
----
-<button type="button" v-on:click="getFileList(26)" style="width:6em;height:2em">Lady Gaga</button>
-<button type="button" v-on:click="getFileList(27)" style="width:6em;height:2em">Bryan Adams</button>
-<button type="button" v-on:click="getFileList(28)" style="width:6em;height:2em">Adele</button>
-<button type="button" v-on:click="getFileList(29)" style="width:6em;height:2em">Leann Rimes</button>
-<button type="button" v-on:click="getFileList(30)" style="width:6em;height:2em">Regine</button>
-<b> ...</b>
-</div>
-
-<div style="text-align:center">
-<button type="button" v-on:click="getFileList(15)" style="width:6em;height:2em">其  它</button>
----
-<button type="button" v-on:click="getFileList(1)" style="width:6em;height:2em">播  客</button>
-<button type="button" v-on:click="getFileList(9)" style="width:6em;height:2em">日  語</button>
-<button type="button" v-on:click="getFileList(4)" style="width:6em;height:2em">古  典</button>
-<button type="button" v-on:click="getFileList(18)" style="width:6em;height:2em">紅樓夢</button>
-<button type="button" v-on:click="getFileList(19)" style="width:6em;height:2em">佛  說</button>
-<b> ...</b>
-</div>
-
-
-
-<div>
 <select v-model="selectedOption"  v-on:Change="subFolderListGen(selectedOption)">
-    <option type="button" class="key-button" style="font-size: 18px;width:auto" v-for="type in baseFolderList" :value="type"> %{type}% </option>
+    <option type="button" class="key-button" style="font-size: 24px;width:auto" >請選音樂類型</option>
+    <option type="button" class="key-button" style="font-size: 24px;width:auto" v-for="(musictype,index) in baseFolderList" key="index" :value="musictype"> %{musictype}% </option>
 </select>
-</div>
-<div>
-<select v-on:Change="genAlbumList()">
-    <option type="button" class="key-button" style="font-size: 18px;width:auto" v-for="(album, index) in subFolderList" :key="index" value="album">%{album}%</option>
+<select v-model="selectedOption2"  v-on:Change="genAlbumList(selectedOption2)">
+    <option type="button" class="key-button" style="font-size: 24px;width:auto" >請選此類的歌手</option>
+    <option type="button" class="key-button" style="font-size: 24px;width:auto" v-for="(musicstar,index) in subFolderList" key="index":value="musicstar">%{musicstar}%</option>
 </select>
+
 </div>
 
 <!------->

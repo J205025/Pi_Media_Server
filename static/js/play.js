@@ -66,6 +66,9 @@ const vm = createApp({
                baseFolderList: "",
                subFolderList: "",
                selectedOption: "",
+               selectedOption2: "",
+               selectedType: "",
+               selectedStar: "",
                //broswer audio play src
                url01:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
                url02:"http://stream.live.vc.bbcmedia.co.uk/bbc_london",
@@ -725,11 +728,9 @@ const vm = createApp({
                  });
                 this.modfileListPi = newArr;
               },
-            subFolderListGen(option) {
-              console.log("Use this type string to axios get the Artist name_list  and render to an new option/select element. ");
-              console.log(option);
-              type = option
-              axios.post('/getArtistList',{"type":type}).then(res => {
+            subFolderListGen(musictype) {
+              this.selectedType = musictype; 
+              axios.post('/getArtistList',{"musictype":musictype}).then(res => {
               this.subFolderList = res.data.subFolderList;
               console.log(this.subFolderList);
               })
@@ -737,8 +738,22 @@ const vm = createApp({
               console.log("handle error =>", error);
               })
               },
-            genAlbumList() {
-              console.log("Song List generated");
+            genAlbumList(musicstar) {
+              this.seletecdStar = musicstar;
+              musictype = this.selectedType; 
+              axios.post('/getFileList2',{"musictype":musictype,"musicstar":musicstar}).then(res => {
+                this.fileListPc = res.data.fileListPc;
+                this.fileListPi = res.data.fileListPi;
+                this.indexPi = res.data.indexPi;
+                this.cronIndexPi = res.data.cronIndexPi;
+                this.refreshList();
+                console.log(this.fileListPc);
+                console.log(this.fileListPi);
+                console.log("FileList Refresh");
+              })
+              .catch(error => {
+              console.log("handle error =>", error);
+              })
               },
               //--------------------------------------------------------------------------------------------------
             loading(){
