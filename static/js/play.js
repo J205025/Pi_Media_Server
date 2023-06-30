@@ -739,6 +739,9 @@ const vm = createApp({
               })
               },
             genAlbumList(musicstar) {
+              document.getElementById("audioPc").pause();
+              this.musicPcPlaying = false;
+              this.musicPiPlaying = false;
               this.seletecdStar = musicstar;
               musictype = this.selectedType; 
               axios.post('/getFileList2',{"musictype":musictype,"musicstar":musicstar}).then(res => {
