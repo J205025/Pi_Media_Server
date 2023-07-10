@@ -230,10 +230,10 @@
     <button type="button" class="key-button" v-on:click="volCtlPi(-100)"><i class="fa-solid fa-volume-xmark"></i></button>
 </div>
 
-<div class="button-container" style="width: 80vw;">
+<div class="button-container" style="width:80vw;font-size: 20px;width:auto">
 <select v-on:Change="playIndexPi($event)">
-    <option type="button" class="key-button" style="font-size: 20px;width:auto" default value="0">請選擇要播放的歌曲</option>
-    <option type="button" class="key-button" style="font-size: 20px;width:auto" v-for="(file,index) in modfileListPi" :key="index" value="file">%{index}%: %{file}%</option>
+    <option type="button" class="key-button" default value="0">請選擇要播放的歌曲</option>
+    <option type="button" class="key-button" v-for="(file,index) in modfileListPi" :key="index" value="file">%{index}%: %{file}%</option>
 </select>
 </div>
 
@@ -285,10 +285,10 @@
     </div>
 
 
-<div class="button-container" style="width: 80vw">
+<div class="button-container" style="width: 80vw;font-size: 20px;width:auto">
     <select id="cronSelIndexPi" v-on:Change="setCronSong($event)">
-    <option type="button" class="key-button" style="font-size: 20px;width:auto" default value="0">請選一首要設定定時播放的曲目</option>
-    <option type="button" class="key-button" style="font-size: 20px;width:auto" v-for="(file,index) in modfileListPi" :key="index" value="file">%{index}%: %{file}%</option>
+    <option type="button" class="key-button" default value="0">請選一首要設定定時播放的曲目</option>
+    <option type="button" class="key-button" v-for="(file,index) in modfileListPi" :key="index" value="file">%{index}%: %{file}%</option>
 </select>
 </div>
 
@@ -310,14 +310,14 @@
 <div style="text-align:center">
 <p style="font-size:22px">請選你要的類型曲目</p>
 </div>
-<div style="text-align:center">
+<div style="text-align:center;font-size:24px;width:auto;height:36px">
 <select v-model="selectedOption"  v-on:Change="subFolderListGen(selectedOption)">
-    <option type="button" class="key-button" style="font-size: 24px;width:auto" >請選音樂類型</option>
-    <option type="button" class="key-button" style="font-size: 24px;width:auto" v-for="(musictype,index) in baseFolderList" key="index" :value="musictype"> %{musictype}% </option>
+    <option type="button" class="key-button"  >請選音樂類型</option>
+    <option type="button" class="key-button" v-for="(musictype,index) in baseFolderList" key="index" :value="musictype"> %{musictype}% </option>
 </select>
 <select v-model="selectedOption2"  v-on:Change="genAlbumList(selectedOption2)">
-    <option type="button" class="key-button" style="font-size: 24px;width:auto" >請選此類的歌手</option>
-    <option type="button" class="key-button" style="font-size: 24px;width:auto" v-for="(musicstar,index) in subFolderList" key="index":value="musicstar">%{musicstar}%</option>
+    <option type="button" class="key-button" >請選此類的歌手</option>
+    <option type="button" class="key-button" v-for="(musicstar,index) in subFolderList" key="index":value="musicstar">%{musicstar}%</option>
 </select>
 
 </div>
