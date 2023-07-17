@@ -5,5 +5,7 @@
 *.swp
 .venv/
 ./static/assets
+./flask_session
 *.pyc
+
 __pycache__
