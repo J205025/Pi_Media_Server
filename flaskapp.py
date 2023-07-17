@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from flask import Flask,render_template,request,jsonify
+from flask import Flask,g,render_template,request,jsonify,redirect,session,url_for	
+from flask_session import Session
 from flask_apscheduler import APScheduler
 from flask_cors import CORS
 from threading import Thread
@@ -25,12 +26,8 @@ import vlc
 __dir__ = "./static/assets/"
 __fileListPc__ = []
 __fileListPi__ = []
-#                 0       1        2       3     4       5       6        7         8          9     10       
-__typeList__ = ["all","podcast","國語","台語","古典","張學友","劉德華","方宥心","原子邦妮","日語","周杰倫",\
-#                         11         12       13    14      15      16     17     18       19       20       
-                       "鄭進一","原子邦妮","英語","流行","其它","黃乙玲","任賢齊","紅樓夢","佛說","少女時代",\
-#                         21         22           23       24      25        26         27           28       29         30       
-                       "BLACKPINK","秀蘭瑪雅","蘇打綠","蘇宥蓉","張惠妹","LadyGaga","BryanAdams","Adele","LeannRimes","Regine"] 
+#                 0       1        2       3     4       5           
+__typeList__ = ["all","podcast","國語","台語","古典","張學友"]
 __fileList_Rn__ = []
 __indexMax__ = 0
 __indexMaxPi__ = 0
@@ -99,6 +96,12 @@ radioUrl={
           "url29":"http://stream.live.vc.bbcmedia.co.uk/bbc_6music",
           "url30":"http://media-ice.musicradio.com:80/ClassicFMMP3"
           }
+
+users = [
+         {"id":"1", "name":"j205025","password":"happy1234"},
+         {"id":"2", "name":"jerry","password":"happy1234"}
+        ]
+
 url_json=json.dumps(radioUrl)
 __url__=json.loads(url_json)
 
@@ -378,64 +381,6 @@ def genFileList_sh(style):
            subdir = __typeList__[1]
         case 2:
            subdir = __typeList__[2]
-        case 3:
-           subdir = __typeList__[3]
-        case 4:
-           subdir = __typeList__[4]
-        case 5:
-           subdir = __typeList__[5]
-        case 6:
-           subdir = __typeList__[6]
-        case 7:
-           subdir = __typeList__[7]
-        case 8:
-           subdir = __typeList__[8]
-        case 9:
-           subdir = __typeList__[9]
-        case 10:
-           subdir = __typeList__[10]
-        case 11:
-           subdir = __typeList__[11]
-        case 12:
-           subdir = __typeList__[12]
-        case 13:
-           subdir = __typeList__[13]
-        case 14:
-           subdir = __typeList__[14]
-        case 15:
-           subdir = __typeList__[15]
-        case 16:
-           subdir = __typeList__[16]
-        case 17:
-           subdir = __typeList__[17]
-        case 18:
-           subdir = __typeList__[18]
-        case 19:
-           subdir = __typeList__[19]
-        case 20:
-           subdir = __typeList__[20]
-        case 21:
-           subdir = __typeList__[21]
-        case 22:
-           subdir = __typeList__[22]
-        case 23:
-           subdir = __typeList__[23]
-        case 24:
-           subdir = __typeList__[24]
-        case 25:
-           subdir = __typeList__[25]
-        case 26:
-           subdir = __typeList__[26]
-        case 27:
-           subdir = __typeList__[27]
-        case 28:
-           subdir = __typeList__[28]
-        case 29:
-           subdir = __typeList__[29]
-        case 30:
-           subdir = __typeList__[30]
-        case _:
-           subdir = __typeList__[0]
     __musicVlcPi__.stop()
     __musicPiPlaying__ = False
     songs = []; 
@@ -507,17 +452,6 @@ def genFileList_sh2(subdir):
     file = __dir__ + __fileListPi__[__indexPi__]
     __vlcmedia__  = __musicVlcInstance__.media_new(file)
     __musicVlcPi__.set_media(__vlcmedia__)
- 
-
-
-
-
-
-
-
-
-
-
 
 def downPodcastFile_sh():
     N = 3
@@ -614,16 +548,34 @@ if not (len(__fileListPc__) > 0):
     print ("No mp3 files found!")
 print ('--- Press button #play to start playing mp3 ---')
 
-
 file1 = __dir__ + __fileListPi__[__indexPi__]
 __vlcmedia__  = __musicVlcInstance__.media_new(file1)
 __musicVlcPi__.set_media(__vlcmedia__)
 __musicVlcPiDuration__ = __vlcmedia__.get_duration()
 threading.Timer( 10 , continuePlaying ).start()
 #==============================================================================================
-app = Flask(__name__)
+class User:
+    def __init__(self, id, username, password):
+        self.id = id
+        self.username = username
+        self.password = password
+
+    def __repr__(self):
+        return f'<User: {self.username}>'
+
+users = []
+users.append(User(id=1, username='jerry', password='1234'))
+users.append(User(id=2, username='jack', password='1234'))
+users.append(User(id=3, username='amy', password='1234'))
+#==============================================================================================
+app = Flask(__name__, template_folder="templates")
+app.secret_key = 'somesecretkeythatonlyishouldknow'
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+
 CORS(app)
-#-----------------------
+#==============================================================================================
 #https://viniciuschiele.github.io/flask-apscheduler/index.html
 class Config(object):
     SCHEDULER_API_ENABLED = True
@@ -633,9 +585,33 @@ scheduler = APScheduler()
 # scheduler.api_enabled = True
 scheduler.init_app(app)
 scheduler.start()
-#-----------------------
 #==============================================================================================
-#-----------API---------------------
+@app.before_request
+def before_request():
+    g.user = None
+    if 'user_id' in session:
+        user = [x for x in users if x.id == session['user_id']][0]
+        g.user = user
+
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    if request.method == 'POST':
+        session.pop('user_id', None)
+        username = request.form['username']
+        password = request.form['password']
+        user = [x for x in users if x.username == username][0]
+        if user and user.password == password:
+            session['user_id'] = user.id
+        #    return redirect("/")
+            return render_template('index.html')
+        return redirect('/login')
+    return render_template('login.html')
+
+@app.route("/logout")
+def logout():
+    session["name"] = None
+    return redirect("/login")
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global __dir__
@@ -655,6 +631,8 @@ def index():
     global __musicVlcPi__
     global __baseFolderList__
     if request.method == 'GET':
+        if not session.get("name"):
+            return redirect("/login")
         __playRatePi__ = 1
         __musicVlcPi__.set_rate(__playRatePi__)
         return render_template('index.html')
