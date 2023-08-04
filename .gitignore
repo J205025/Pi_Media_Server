@@ -4,8 +4,8 @@
 *.txt
 *.swp
 .venv/
-./static/assets
-./flask_session
+static/assets/
+flask_session/
 *.pyc
 
-__pycache__
+__pycache__/
