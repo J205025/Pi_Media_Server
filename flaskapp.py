@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from flask import Flask,g,render_template,request,jsonify,redirect,session,url_for	
+from flask import Flask,flash,g,render_template,request,jsonify,redirect,session,url_for	
 from flask_session import Session
 from flask_apscheduler import APScheduler
 from flask_cors import CORS
@@ -513,7 +513,7 @@ if(False):
     GPIO.add_event_detect(33, GPIO.FALLING, callback=handlePrePi, bouncetime=500)
    #GPIO.add_event_detect(37, GPIO.FALLING, callback=handlevolumePi, bouncetime=500)
     
-#---------------------------------------------------------------------
+#==============================================================================================
 #file list Method 1
 #    __fileList__ = [ f for f in os.listdir(r'./static/assets/.') if f[-4:] == '.mp3' ]
 #    mp3_list.sort(key=lambda x:int(x[:-4]))
@@ -537,10 +537,11 @@ if(False):
 #file list Method 4
 #    __fileList__ = get_files(__dir__)
 #    __fileList__.sort(key=lambda x:int(x[:-4]))
-#---------------------------------------------------------------------
+#==============================================================================================
 #folder_path = '/media/usb1/'
 folder_path = './static/assets/'
 __baseFolderList__ = get_subdirectories(folder_path)
+print(__baseFolderList__)
 print(__baseFolderList__)
 
 genFileList_sh2("國語/張學友")
@@ -603,6 +604,7 @@ def login():
         if user and user.password == password:
             session['user_id'] = user.id
         #    return redirect("/")
+            flash('You were successfully logged in')
             return render_template('index.html')
         return redirect('/login')
     return render_template('login.html')
@@ -864,7 +866,6 @@ def getMetaPi():
     global __volumePi__
     global __volumePiMute__
     global __musicPiPlaying__
-    
     musicVlcPiCurrent =__musicVlcPi__.get_time()
     __musicVlcPiDuration__ = __vlcmedia__.get_duration()
     return jsonify({
@@ -1078,6 +1079,7 @@ def getArtistList():
     path = __dir__ + musictype
     print(path)
     __subFolderList__ = get_subdirectories(path)
+    print(__subFolderList__)
     return jsonify({
         "subFolderList" : __subFolderList__
          })
