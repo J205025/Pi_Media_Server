@@ -566,7 +566,7 @@ class User:
 
 users = []
 users.append(User(id=1, username='jerry', password='1234'))
-users.append(User(id=2, username='jack', password='1234'))
+users.append(User(id=2, username='sasa', password='1234'))
 users.append(User(id=3, username='amy', password='1234'))
 #==============================================================================================
 app = Flask(__name__, template_folder="templates")
