@@ -18,8 +18,8 @@ Flask-Session==0.6.0
 Flask-SQLAlchemy==3.0.5
 Flask-WTF==1.1.1
 getpodcast==1.0.10
-gevent==23.9.1
-greenlet==2.0.2
+gevent
+greenlet
 gunicorn==21.2.0
 idna==3.4
 itsdangerous==2.1.2
